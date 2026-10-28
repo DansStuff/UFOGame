@@ -1,0 +1,23 @@
+---
+description: Tunable values live in src/constants.ts
+alwaysApply: true
+---
+
+# Constants
+
+Put tunable numbers and strings in `src/constants.ts`. Group them by feature. Start each group with a `// MARK:` comment so the outline can jump to it. Prefix names so they still read clearly in that file (`HAZARD_SPAWN_INTERVAL`, not `interval`).
+
+`constants.ts` is for tuning, not for every `const`:
+
+- Message schemas stay in `src/networking/messages.ts`
+- ECS components stay next to the systems that define them
+- Authored data stays in the domain that owns it
+
+```ts
+// ❌ BAD — magic number beside the system that uses it
+const holdSeconds = 1.5
+
+// ✅ GOOD — src/constants.ts
+// MARK: Repair
+export const BREACH_REPAIR_HOLD_LEVEL_1_SECONDS = 1.5
+```
