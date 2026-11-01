@@ -50,3 +50,27 @@ export const PLANET_SPIN_MAX_DEGREES_PER_SECOND = 10
  * Spin between updates comes from the synced angular velocity.
  */
 export const PLANET_ROTATION_BLEND_SECONDS = 0.25
+
+// MARK: Ship trail
+
+/** How long a trail plane stays before the lifetime system removes it. */
+export const TRAIL_SEGMENT_LIFETIME_SECONDS = 3
+
+/**
+ * Chord length that commits the open plane and starts the next one.
+ * Shorter planes follow the planet's curve more closely.
+ */
+export const TRAIL_SEGMENT_LENGTH_METERS = 1.5
+
+/** Open planes shorter than this are not spawned. */
+export const TRAIL_SEGMENT_MIN_LENGTH_METERS = 0.05
+
+/** Width of each trail plane, across the direction of travel. */
+export const TRAIL_WIDTH_METERS = 2.5
+
+export const TRAIL_COLOR_RED = 0.45
+export const TRAIL_COLOR_GREEN = 0.85
+export const TRAIL_COLOR_BLUE = 1
+
+/** Emissive strength at full life. The lifetime system fades it to zero. */
+export const TRAIL_EMISSIVE_INTENSITY = 4

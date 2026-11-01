@@ -7,6 +7,7 @@ import { setupGameState } from './gamestate'
 import { setupStateMachine } from './gamestate/stateMachine'
 import { setupClientRoom } from './networking/client'
 import { setupShipMotion } from './shipMotion'
+import { setupShipTrail } from './shipTrail'
 import { setupUi } from './ui'
 
 export function main() {
@@ -20,5 +21,6 @@ export function main() {
   }
 
   setupClientRoom()
+  setupShipTrail()
   setupUi()
 }
