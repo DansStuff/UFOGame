@@ -66,9 +66,9 @@
               "z": 88
             },
             "scale": {
-              "x": 100,
-              "y": 100,
-              "z": 100
+              "x": 1,
+              "y": 1,
+              "z": 1
             },
             "rotation": {
               "x": 0,
@@ -206,6 +206,90 @@
           }
         },
         "519": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 513
+          }
+        },
+        "520": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 513
+          }
+        },
+        "521": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 513
+          }
+        },
+        "522": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 513
+          }
+        },
+        "523": {
           "json": {
             "position": {
               "x": 0,
@@ -384,6 +468,34 @@
             "visibleMeshesCollisionMask": 0,
             "invisibleMeshesCollisionMask": 3
           }
+        },
+        "520": {
+          "json": {
+            "src": "assets/scene/Models/OuterLights.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
+          }
+        },
+        "521": {
+          "json": {
+            "src": "assets/scene/Models/InnerLights.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
+          }
+        },
+        "522": {
+          "json": {
+            "src": "assets/scene/Models/Beam.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
+          }
+        },
+        "523": {
+          "json": {
+            "src": "assets/scene/Models/BeamRing.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
+          }
         }
       }
     },
@@ -438,6 +550,26 @@
         "519": {
           "json": {
             "value": "ProbeInteractable.gltf"
+          }
+        },
+        "520": {
+          "json": {
+            "value": "OuterLights"
+          }
+        },
+        "521": {
+          "json": {
+            "value": "InnerLights"
+          }
+        },
+        "522": {
+          "json": {
+            "value": "Beam"
+          }
+        },
+        "523": {
+          "json": {
+            "value": "BeamRing"
           }
         }
       }
@@ -598,7 +730,11 @@
                 "open": true,
                 "children": [
                   514,
-                  519
+                  519,
+                  520,
+                  521,
+                  522,
+                  523
                 ]
               },
               {
@@ -630,6 +766,22 @@
               {
                 "entity": 519,
                 "open": true,
+                "children": []
+              },
+              {
+                "entity": 520,
+                "children": []
+              },
+              {
+                "entity": 521,
+                "children": []
+              },
+              {
+                "entity": 522,
+                "children": []
+              },
+              {
+                "entity": 523,
                 "children": []
               }
             ]
@@ -682,6 +834,18 @@
           "json": {}
         },
         "519": {
+          "json": {}
+        },
+        "520": {
+          "json": {}
+        },
+        "521": {
+          "json": {}
+        },
+        "522": {
+          "json": {}
+        },
+        "523": {
           "json": {}
         }
       }

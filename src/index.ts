@@ -6,8 +6,9 @@ import { isServer } from '@dcl/sdk/network'
 import { setupGameState } from './gamestate'
 import { setupStateMachine } from './gamestate/stateMachine'
 import { setupClientRoom } from './networking/client'
+import { setupSaucerFX } from './saucerFx'
 import { setupShipMotion } from './shipMotion'
-import { setupShipTrail } from './shipTrail'
+import { setupShipWind } from './shipWind'
 import { setupUi } from './ui'
 
 export function main() {
@@ -21,6 +22,7 @@ export function main() {
   }
 
   setupClientRoom()
-  setupShipTrail()
+  setupShipWind()
+  setupSaucerFX()
   setupUi()
 }
