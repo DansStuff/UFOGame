@@ -4,14 +4,22 @@
  * request. Clients do not run this machine.
  */
 import { isServer } from '@dcl/sdk/network'
+import { replaceAbductable } from '../abduction'
 import { applyRoundEnded, applyRoundReset, applyRoundStarted, getGameState, type GamePhase } from './index'
 import { notifyRoundEnd, notifyRoundReset, notifyRoundStart, setupServerInbox } from './serverRoom'
 
-export type GameEvent = { type: 'ROUND_START' } | { type: 'ROUND_END' } | { type: 'ROUND_RESET' }
+export type GameEvent =
+  | { type: 'ROUND_START' }
+  | { type: 'ROUND_END' }
+  | { type: 'ROUND_RESET' }
+  | { type: 'PROBE'; abductableId: number }
 
 let currentState: GamePhase = 'idle'
 
 function nextState(state: GamePhase, event: GameEvent): GamePhase | null {
+  // Probe does not change phase. It is legal in every phase.
+  if (event.type === 'PROBE') return state
+
   switch (state) {
     case 'idle':
       if (event.type === 'ROUND_START') return 'inRound'
@@ -45,10 +53,21 @@ function applyTransition(from: GamePhase, to: GamePhase, event: GameEvent): void
   if (event.type === 'ROUND_RESET') {
     applyRoundReset()
     notifyRoundReset(Date.now())
+    return
+  }
+
+  if (event.type === 'PROBE') {
+    replaceAbductable()
   }
 }
 
 export function processEvent(event: GameEvent): boolean {
+  // A stale click names a cow that has already been replaced.
+  if (event.type === 'PROBE' && getGameState().abductableId !== event.abductableId) {
+    console.log(`[STATE] Ignored ${event.type} in ${currentState}`)
+    return false
+  }
+
   const next = nextState(currentState, event)
   if (next === null) {
     console.log(`[STATE] Ignored ${event.type} in ${currentState}`)
@@ -95,6 +114,11 @@ export function setupStateMachine(): void {
     onInitialState: (from) => {
       console.log(`[SERVER] Initial state requested by ${from}`)
       publishPhase(from)
+    },
+    onProbe: (from, abductableId) => {
+      if (processEvent({ type: 'PROBE', abductableId })) {
+        console.log(`[SERVER] Cow ${abductableId} probed by ${from}`)
+      }
     }
   })
 }

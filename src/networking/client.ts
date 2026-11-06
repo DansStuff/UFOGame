@@ -6,6 +6,12 @@ import { isServer } from '@dcl/sdk/network'
 import { catchUpFromGameState, hasBoundGameState, onGameStateCatchUp, type GameStateSnapshot } from '../gamestate'
 import { room } from './messages'
 
+/** Asks the server to probe the cow with this id. Ignored until the room is ready. */
+export function requestProbe(abductableId: number): void {
+  if (isServer() || !room.isReady()) return
+  room.send('requestProbe', { requestedAt: Date.now(), abductableId })
+}
+
 export function setupClientRoom(): void {
   if (isServer()) return
 

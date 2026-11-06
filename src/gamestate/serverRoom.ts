@@ -9,6 +9,7 @@ export type ServerInboxHandlers = {
   onRoundEnd: (playerAddress: string) => void
   onRoundReset: (playerAddress: string) => void
   onInitialState: (playerAddress: string) => void
+  onProbe: (playerAddress: string, abductableId: number) => void
 }
 
 export function notifyRoundStart(startedAt: number, to?: string): void {
@@ -57,5 +58,10 @@ export function setupServerInbox(handlers: ServerInboxHandlers): void {
   room.onMessage('requestInitialState', (_data, context) => {
     if (!context) return
     handlers.onInitialState(context.from)
+  })
+
+  room.onMessage('requestProbe', (data, context) => {
+    if (!context) return
+    handlers.onProbe(context.from, data.abductableId)
   })
 }

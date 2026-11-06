@@ -26,8 +26,7 @@ import {
   GltfContainer,
   InputAction,
   Name,
-  PointerEvents,
-  PointerEventType,
+  pointerEventsSystem,
   Schemas,
   Transform,
   VisibilityComponent
@@ -62,6 +61,7 @@ import {
   type GameStateSnapshot,
   type PlanetRotationSnapshot
 } from './gamestate'
+import { requestProbe } from './networking/client'
 import { shipTiltQuaternion } from './shipMotion'
 import { abductionBeamOn } from './shipSpeed'
 
@@ -199,19 +199,20 @@ function spawnAbductable(
     src: model.src,
     visibleMeshesCollisionMask: ColliderLayer.CL_POINTER
   })
-  PointerEvents.create(entity, {
-    pointerEvents: [
-      {
-        eventType: PointerEventType.PET_DOWN,
-        eventInfo: {
-          button: InputAction.IA_POINTER,
-          hoverText: ABDUCTABLE_HOVER_TEXT,
-          showFeedback: true,
-          maxDistance: ABDUCTABLE_POINTER_MAX_DISTANCE_METERS
-        }
+  pointerEventsSystem.onPointerDown(
+    {
+      entity,
+      opts: {
+        button: InputAction.IA_POINTER,
+        hoverText: ABDUCTABLE_HOVER_TEXT,
+        showFeedback: true,
+        maxDistance: ABDUCTABLE_POINTER_MAX_DISTANCE_METERS
       }
-    ]
-  })
+    },
+    () => {
+      requestProbe(id)
+    }
+  )
   Animator.create(entity, {
     states: model.clips.map((clip) => {
       const idle = clip === model.idleClip
@@ -248,7 +249,10 @@ function findNamed(value: string): Entity | null {
 function removeAbductables(): void {
   const entities: Entity[] = []
   for (const [entity] of engine.getEntitiesWith(Abductable)) entities.push(entity)
-  for (const entity of entities) engine.removeEntity(entity)
+  for (const entity of entities) {
+    pointerEventsSystem.removeOnPointerDown(entity)
+    engine.removeEntity(entity)
+  }
 }
 
 /**
@@ -451,6 +455,13 @@ function raiseCarry(dt: number, planet: Entity, ship: Entity): void {
 /** Downward speed while falling. Server-only, so clients follow the synced height. */
 let fallSpeedMetersPerSecond = 0
 
+/** Server-only. Drops the current cow and places a new one on the surface. */
+export function replaceAbductable(): void {
+  serverCarry = null
+  fallSpeedMetersPerSecond = 0
+  applyAbductablePlacement(randomSurfaceDirection())
+}
+
 /** Lets go of the ship. The current y offset is the height the fall starts from. */
 function releaseCarry(planet: Entity, ship: Entity): void {
   const state = getGameState()
@@ -632,7 +643,7 @@ export function setupAbduction(): void {
   fallSpeedMetersPerSecond = 0
 
   if (isServer()) {
-    applyAbductablePlacement(randomSurfaceDirection())
+    replaceAbductable()
     engine.addSystem(AbductableAngleSystem)
     return
   }

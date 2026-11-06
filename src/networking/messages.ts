@@ -17,6 +17,10 @@ export const Messages = {
   requestInitialState: Schemas.Map({
     requestedAt: Schemas.Int64
   }),
+  requestProbe: Schemas.Map({
+    requestedAt: Schemas.Int64,
+    abductableId: Schemas.Int
+  }),
 
   // Server → Client
   notifyRoundStart: Schemas.Map({
