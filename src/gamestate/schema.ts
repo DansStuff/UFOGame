@@ -30,11 +30,13 @@ export const GameState = engine.defineComponent('game:State', {
    */
   abductableAngularOffset: Schemas.Float,
   /**
-   * Meters along the abductable's local up, past the planet surface.
-   * The server raises this toward the ship while the cow is underneath, and sets it back to 0 outside that angle.
-   * Clients add this to the surface radius when they place the model.
+   * Meters above the planet surface.
+   * On the planet this is added to the surface radius. On the ship it is added to the
+   * ship-local height captured when the lift started. After a release it falls back to 0.
    */
-  abductableYOffset: Schemas.Float
+  abductableYOffset: Schemas.Float,
+  /** True while the abductable is parented to the ship. False parents it to the planet. */
+  abductableOnShip: Schemas.Boolean
 })
 
 export type GamePhase = 'idle' | 'inRound' | 'roundEnded'
@@ -72,4 +74,5 @@ export type GameStateSnapshot = {
   abductableId: number
   abductableAngularOffset: number
   abductableYOffset: number
+  abductableOnShip: boolean
 }

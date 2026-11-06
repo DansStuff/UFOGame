@@ -77,7 +77,7 @@ function averagePlayerOffset(): { x: number; z: number } | null {
  * Pitch dips +Z when positive. Roll dips +X when negative.
  * Composed so a player standing on +X / +Z lowers that side of the saucer.
  */
-function shipTiltQuaternion(pitch: number, roll: number): Quaternion {
+export function shipTiltQuaternion(pitch: number, roll: number): Quaternion {
   return Quaternion.multiply(
     Quaternion.fromAngleAxis(pitch, Vector3.Right()),
     Quaternion.fromAngleAxis(roll, Vector3.Forward())

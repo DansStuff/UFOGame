@@ -37,7 +37,8 @@ export function defaultGameState(): GameStateSnapshot {
     abductableDirection: { x: 0, y: 0, z: 0 },
     abductableId: 0,
     abductableAngularOffset: 0,
-    abductableYOffset: 0
+    abductableYOffset: 0,
+    abductableOnShip: false
   }
 }
 
@@ -67,7 +68,8 @@ function readSnapshot(): GameStateSnapshot {
     abductableDirection: copyDirection(state.abductableDirection),
     abductableId: state.abductableId,
     abductableAngularOffset: state.abductableAngularOffset,
-    abductableYOffset: state.abductableYOffset
+    abductableYOffset: state.abductableYOffset,
+    abductableOnShip: state.abductableOnShip
   }
 }
 
@@ -169,6 +171,20 @@ export function applyAbductablePlacement(direction: AbductableDirectionSnapshot)
   state.abductableDirection.y = direction.y
   state.abductableDirection.z = direction.z
   state.abductableYOffset = 0
+  state.abductableOnShip = false
+}
+
+/** Server-only. Updates the planet-space placement without changing the spawn id. */
+export function applyAbductableDirection(direction: AbductableDirectionSnapshot): void {
+  const state = GameState.getMutable(stateEntityOrThrow())
+  state.abductableDirection.x = direction.x
+  state.abductableDirection.y = direction.y
+  state.abductableDirection.z = direction.z
+}
+
+/** Server-only. True parents the abductable to the ship. False parents it to the planet. */
+export function applyAbductableOnShip(onShip: boolean): void {
+  GameState.getMutable(stateEntityOrThrow()).abductableOnShip = onShip
 }
 
 /** Server-only. Degrees from the planet center. 0 is directly under the ship. */

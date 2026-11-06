@@ -3,11 +3,13 @@
  * once, stores it on GameState with a spawn id, and keeps the angle from the
  * planet center up to date. Each client parents the cow to the planet along
  * that ray, so it spins with the surface. A new id replaces the cow. Local up
- * points away from the planet origin. While the synced angle is within the
- * lift limit, the server raises the y offset until the cow is above the ship.
- * Outside that limit the offset snaps back to the surface. Clients add the
- * offset to the surface radius. While it is off the surface, each client tumbles
- * it around a random axis. That spin is not synced.
+ * points away from the planet origin. A lift starts within the angle limit
+ * while the abduction beam is on, and parents the cow to the ship. The beam
+ * follows ship speed, which is derived from the synced planet spin. Above that
+ * speed the cow is released and falls toward the planet where the ship carried it. Clients add
+ * the y offset to the surface radius, or to the ship-local height captured at
+ * the grab. While it is off the surface, each client tumbles it around a random
+ * axis and eases it toward the ship center. Neither of those is synced.
  * RedArrow rides a horizontal ring around the ship and points along the
  * horizontal direction from the ship to the cow. AbductableArrow is a child
  * of the planet, placed above the cow along the cow's up. It shows while the synced angle stays
@@ -20,6 +22,7 @@ import {
   engine,
   Entity,
   getWorldPosition,
+  getWorldRotation,
   GltfContainer,
   InputAction,
   Name,
@@ -34,6 +37,8 @@ import { isServer } from '@dcl/sdk/network'
 import { EntityNames } from '../assets/scene/entity-names'
 import {
   ABDUCTABLE_ARROW_MAX_ANGLE_DEGREES,
+  ABDUCTABLE_CENTER_METERS_PER_SECOND,
+  ABDUCTABLE_FALL_GRAVITY_METERS_PER_SECOND_SQUARED,
   ABDUCTABLE_HOVER_TEXT,
   ABDUCTABLE_LIFT_ABOVE_SHIP_METERS,
   ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES,
@@ -48,12 +53,17 @@ import {
 } from './constants'
 import {
   applyAbductableAngularOffset,
+  applyAbductableDirection,
+  applyAbductableOnShip,
   applyAbductablePlacement,
   applyAbductableYOffset,
   getGameState,
   type AbductableDirectionSnapshot,
+  type GameStateSnapshot,
   type PlanetRotationSnapshot
 } from './gamestate'
+import { shipTiltQuaternion } from './shipMotion'
+import { abductionBeamOn } from './shipSpeed'
 
 /** The cow. `angularOffset` is degrees from the ship. `yOffset` is meters along local up past the surface. */
 export const Abductable = engine.defineComponent('abductable:Target', {
@@ -116,6 +126,55 @@ function outwardDirection(direction: AbductableDirectionSnapshot): Vector3 {
   return Vector3.normalize(Vector3.create(direction.x, direction.y, direction.z))
 }
 
+/** Unit quaternions invert by conjugation. */
+function unrotate(rotation: Quaternion, vector: Vector3): Vector3 {
+  const normalized = Quaternion.normalize(rotation)
+  const inverse = Quaternion.create(-normalized.x, -normalized.y, -normalized.z, normalized.w)
+  return Vector3.rotate(vector, inverse)
+}
+
+function cowPlanetLocal(direction: AbductableDirectionSnapshot, yOffset: number): Vector3 {
+  return Vector3.scale(outwardDirection(direction), PLANET_SURFACE_RADIUS_METERS + yOffset)
+}
+
+function planetLocalToWorld(planet: Entity, planetRotation: PlanetRotationSnapshot, local: Vector3): Vector3 {
+  return Vector3.add(getWorldPosition(engine, planet), Vector3.rotate(local, planetRotation))
+}
+
+function shipLocalOfWorld(ship: Entity, tilt: Quaternion, world: Vector3): Vector3 {
+  return unrotate(tilt, Vector3.subtract(world, getWorldPosition(engine, ship)))
+}
+
+function worldOfShipLocal(ship: Entity, tilt: Quaternion, local: Vector3): Vector3 {
+  return Vector3.add(getWorldPosition(engine, ship), Vector3.rotate(local, tilt))
+}
+
+function planetDirectionOfWorld(
+  planet: Entity,
+  planetRotation: PlanetRotationSnapshot,
+  world: Vector3
+): AbductableDirectionSnapshot | null {
+  const local = unrotate(planetRotation, Vector3.subtract(world, getWorldPosition(engine, planet)))
+  if (Vector3.lengthSquared(local) < 1e-8) return null
+  const normal = Vector3.normalize(local)
+  return { x: normal.x, y: normal.y, z: normal.z }
+}
+
+function sameDirection(a: AbductableDirectionSnapshot, b: AbductableDirectionSnapshot): boolean {
+  return Math.abs(a.x - b.x) < 1e-5 && Math.abs(a.y - b.y) < 1e-5 && Math.abs(a.z - b.z) < 1e-5
+}
+
+function tiltOf(state: GameStateSnapshot): Quaternion {
+  return shipTiltQuaternion(state.shipPitch, state.shipRoll)
+}
+
+/** Ship-local pose of the cow from the synced direction and y offset. */
+function shipLocalFromState(planet: Entity, ship: Entity, state: GameStateSnapshot): Vector3 {
+  const alongRay = cowPlanetLocal(state.abductableDirection, state.abductableYOffset)
+  const world = planetLocalToWorld(planet, state.planetRotation, alongRay)
+  return shipLocalOfWorld(ship, tiltOf(state), world)
+}
+
 function spawnAbductable(
   planet: Entity,
   direction: AbductableDirectionSnapshot,
@@ -165,11 +224,10 @@ function spawnAbductable(
       }
     })
   })
-  syncSpinner(entity, direction, yOffset)
 }
 
-/** Adds a tumble while the cow is off the surface, and stands it back up on the ground. */
-function syncSpinner(entity: Entity, direction: AbductableDirectionSnapshot, yOffset: number): void {
+/** Adds a tumble while the cow is off the surface. Standing it back up is the planet placement's job. */
+function syncSpinner(entity: Entity, yOffset: number): void {
   if (yOffset > 0) {
     if (Spinner.getOrNull(entity) !== null) return
     const axis = randomSurfaceDirection()
@@ -178,16 +236,6 @@ function syncSpinner(entity: Entity, direction: AbductableDirectionSnapshot, yOf
   }
   if (Spinner.getOrNull(entity) === null) return
   Spinner.deleteFrom(entity)
-  Transform.getMutable(entity).rotation = rotationWithUp(outwardDirection(direction))
-}
-
-/** Moves an existing cow along local up without restarting its animator. */
-function applyYOffset(entity: Entity, direction: AbductableDirectionSnapshot, yOffset: number): void {
-  const position = Vector3.scale(outwardDirection(direction), PLANET_SURFACE_RADIUS_METERS + yOffset)
-  const transform = Transform.getMutable(entity)
-  transform.position.x = position.x
-  transform.position.y = position.y
-  transform.position.z = position.z
 }
 
 function findNamed(value: string): Entity | null {
@@ -293,18 +341,22 @@ function arrowLocalY(abductable: Entity): number {
 
 /**
  * Parents the arrow to the planet, above the cow along the ray from the planet center.
- * The cow's spin does not move the arrow.
+ * World position is used so a cow parented to the ship still places the arrow.
  */
 function placeAbductableArrow(arrow: Entity, abductable: Entity, planet: Entity): void {
-  const cow = Transform.get(abductable)
-  if (Vector3.lengthSquared(cow.position) < 1e-8) return
-  const up = Vector3.normalize(cow.position)
+  const cowWorld = getWorldPosition(engine, abductable)
+  const planetWorld = getWorldPosition(engine, planet)
+  const fromPlanet = Vector3.subtract(cowWorld, planetWorld)
+  if (Vector3.lengthSquared(fromPlanet) < 1e-8) return
+  const local = unrotate(Transform.get(planet).rotation, fromPlanet)
+  if (Vector3.lengthSquared(local) < 1e-8) return
+  const up = Vector3.normalize(local)
   const height = arrowLocalY(abductable)
   const transform = Transform.getMutable(arrow)
   transform.parent = planet
-  transform.position.x = cow.position.x + up.x * height
-  transform.position.y = cow.position.y + up.y * height
-  transform.position.z = cow.position.z + up.z * height
+  transform.position.x = local.x + up.x * height
+  transform.position.y = local.y + up.y * height
+  transform.position.z = local.z + up.z * height
   transform.rotation = rotationWithUp(up)
 }
 
@@ -350,11 +402,83 @@ function liftTargetMeters(planet: Entity, ship: Entity): number {
   return Math.max(0, gap + ABDUCTABLE_LIFT_ABOVE_SHIP_METERS - PLANET_SURFACE_RADIUS_METERS)
 }
 
+/** Ship-local XZ captured at the grab, and the Y that corresponds to a y offset of 0. Not synced. */
+type ShipCarry = {
+  localX: number
+  localZ: number
+  baseY: number
+}
+
+let serverCarry: ShipCarry | null = null
+
+function captureServerCarry(planet: Entity, ship: Entity, state: GameStateSnapshot): void {
+  const local = shipLocalFromState(planet, ship, state)
+  serverCarry = { localX: local.x, localZ: local.z, baseY: local.y - state.abductableYOffset }
+}
+
+function carriedWorld(ship: Entity, state: GameStateSnapshot, yOffset: number): Vector3 | null {
+  if (serverCarry === null) return null
+  return worldOfShipLocal(
+    ship,
+    tiltOf(state),
+    Vector3.create(serverCarry.localX, serverCarry.baseY + yOffset, serverCarry.localZ)
+  )
+}
+
+function writeCarriedDirection(planet: Entity, ship: Entity, state: GameStateSnapshot, yOffset: number): void {
+  const world = carriedWorld(ship, state, yOffset)
+  if (world === null) return
+  const direction = planetDirectionOfWorld(planet, state.planetRotation, world)
+  if (direction === null || sameDirection(direction, state.abductableDirection)) return
+  applyAbductableDirection(direction)
+}
+
+function raiseCarry(dt: number, planet: Entity, ship: Entity): void {
+  const state = getGameState()
+  const target = liftTargetMeters(planet, ship)
+  let yOffset = state.abductableYOffset
+  if (yOffset < target) {
+    const step = Math.min(Math.max(dt, 0), SIMULATION_MAX_DELTA_SECONDS)
+    const next = Math.min(target, yOffset + ABDUCTABLE_LIFT_METERS_PER_SECOND * step)
+    if (next !== yOffset) {
+      applyAbductableYOffset(next)
+      yOffset = next
+    }
+  }
+  writeCarriedDirection(planet, ship, state, yOffset)
+}
+
+/** Downward speed while falling. Server-only, so clients follow the synced height. */
+let fallSpeedMetersPerSecond = 0
+
+/** Lets go of the ship. The current y offset is the height the fall starts from. */
+function releaseCarry(planet: Entity, ship: Entity): void {
+  const state = getGameState()
+  if (serverCarry === null) captureServerCarry(planet, ship, state)
+  writeCarriedDirection(planet, ship, state, state.abductableYOffset)
+  serverCarry = null
+  fallSpeedMetersPerSecond = 0
+  if (state.abductableOnShip) applyAbductableOnShip(false)
+}
+
+/** Speeds y offset toward the surface while the cow is not being abducted. */
+function fallTowardSurface(dt: number): void {
+  const state = getGameState()
+  if (state.abductableYOffset <= 0) {
+    fallSpeedMetersPerSecond = 0
+    return
+  }
+  const step = Math.min(Math.max(dt, 0), SIMULATION_MAX_DELTA_SECONDS)
+  fallSpeedMetersPerSecond += ABDUCTABLE_FALL_GRAVITY_METERS_PER_SECOND_SQUARED * step
+  const next = Math.max(0, state.abductableYOffset - fallSpeedMetersPerSecond * step)
+  if (next !== state.abductableYOffset) applyAbductableYOffset(next)
+  if (next === 0) fallSpeedMetersPerSecond = 0
+}
+
 /**
- * The planet entity on the server keeps its authored rotation. This writes the
- * angle from the synced spin so every client shares one value. Within the lift
- * limit, it raises the cow toward the ship. Outside that limit, the cow snaps
- * back to the surface.
+ * Publishes the angle from the synced spin. A lift starts within the angle limit
+ * while the beam is on, and the cow then rides the ship. The beam turning off
+ * releases it, and it falls onto the planet at the carried point.
  */
 function AbductableAngleSystem(dt: number): void {
   const state = getGameState()
@@ -367,61 +491,145 @@ function AbductableAngleSystem(dt: number): void {
   const angleDegrees = angleFromPlanetCenter(planet, ship, state.abductableDirection, state.planetRotation)
   if (angleDegrees === null) return
   if (angleDegrees !== state.abductableAngularOffset) applyAbductableAngularOffset(angleDegrees)
-  if (angleDegrees > ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES) {
-    if (state.abductableYOffset !== 0) applyAbductableYOffset(0)
+
+  if (state.abductableOnShip) {
+    if (serverCarry === null) captureServerCarry(planet, ship, state)
+    if (!abductionBeamOn()) {
+      releaseCarry(planet, ship)
+      fallTowardSurface(dt)
+      return
+    }
+    raiseCarry(dt, planet, ship)
     return
   }
 
-  const target = liftTargetMeters(planet, ship)
-  if (state.abductableYOffset >= target) return
-  const step = Math.min(Math.max(dt, 0), SIMULATION_MAX_DELTA_SECONDS)
-  const next = Math.min(target, state.abductableYOffset + ABDUCTABLE_LIFT_METERS_PER_SECOND * step)
-  if (next === state.abductableYOffset) return
-  applyAbductableYOffset(next)
+  if (state.abductableYOffset > 0) {
+    fallTowardSurface(dt)
+    return
+  }
+
+  if (angleDegrees > ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES || !abductionBeamOn()) return
+  fallSpeedMetersPerSecond = 0
+  captureServerCarry(planet, ship, state)
+  applyAbductableOnShip(true)
+  raiseCarry(dt, planet, ship)
+}
+
+type ClientCarry = ShipCarry & { id: number }
+
+let clientCarry: ClientCarry | null = null
+
+function invertQuaternion(rotation: Quaternion): Quaternion {
+  const normalized = Quaternion.normalize(rotation)
+  return Quaternion.create(-normalized.x, -normalized.y, -normalized.z, normalized.w)
+}
+
+function moveToward(current: number, target: number, maxStep: number): number {
+  const delta = target - current
+  if (Math.abs(delta) <= maxStep) return target
+  return current + Math.sign(delta) * maxStep
+}
+
+/** Parents the cow to the planet and stands it up when it is back on the surface. */
+function placeOnPlanet(entity: Entity, planet: Entity, state: GameStateSnapshot): void {
+  clientCarry = null
+  const outward = outwardDirection(state.abductableDirection)
+  const position = Vector3.scale(outward, PLANET_SURFACE_RADIUS_METERS + state.abductableYOffset)
+  const transform = Transform.getMutable(entity)
+  transform.parent = planet
+  transform.position.x = position.x
+  transform.position.y = position.y
+  transform.position.z = position.z
+  if (state.abductableYOffset === 0) transform.rotation = rotationWithUp(outward)
+  syncSpinner(entity, state.abductableYOffset)
 }
 
 /**
- * Spawns the cow from GameState, replaces it when the id changes, and applies the lift.
+ * Parents the cow to the ship. Local Y follows the synced y offset from the grab.
+ * Local XZ eases toward the ship center and is not written back.
+ */
+function placeOnShip(entity: Entity, planet: Entity, ship: Entity, state: GameStateSnapshot, dt: number): void {
+  const transform = Transform.getMutable(entity)
+  const attaching = clientCarry === null || clientCarry.id !== state.abductableId
+  if (attaching) {
+    const worldRotation = getWorldRotation(engine, entity)
+    const shipWorldRotation = getWorldRotation(engine, ship)
+    const local = shipLocalFromState(planet, ship, state)
+    clientCarry = {
+      id: state.abductableId,
+      localX: local.x,
+      localZ: local.z,
+      baseY: local.y - state.abductableYOffset
+    }
+    transform.parent = ship
+    transform.rotation = Quaternion.multiply(invertQuaternion(shipWorldRotation), worldRotation)
+  }
+  if (clientCarry === null) return
+
+  const step = Math.min(Math.max(dt, 0), SIMULATION_MAX_DELTA_SECONDS)
+  const maxStep = ABDUCTABLE_CENTER_METERS_PER_SECOND * step
+  clientCarry.localX = moveToward(clientCarry.localX, 0, maxStep)
+  clientCarry.localZ = moveToward(clientCarry.localZ, 0, maxStep)
+  transform.parent = ship
+  transform.position.x = clientCarry.localX
+  transform.position.y = clientCarry.baseY + state.abductableYOffset
+  transform.position.z = clientCarry.localZ
+  syncSpinner(entity, state.abductableYOffset)
+}
+
+/**
+ * Spawns the cow from GameState and parents it to the ship or the planet.
  * Id 0 or a zero direction means nothing is placed.
  */
-function AbductableSpawnSystem(): void {
+function AbductableSpawnSystem(dt: number): void {
   const state = getGameState()
   const placed = state.abductableId !== 0 && hasPlacement(state.abductableDirection)
-  const existing = findAbductable()
+  let existing = findAbductable()
 
   if (!placed) {
+    clientCarry = null
     if (existing !== null) removeAbductables()
     return
   }
 
-  if (existing !== null && Abductable.get(existing).id === state.abductableId) {
-    const component = Abductable.getMutable(existing)
-    if (component.angularOffset !== state.abductableAngularOffset) {
-      component.angularOffset = state.abductableAngularOffset
-    }
-    if (component.yOffset !== state.abductableYOffset) {
-      component.yOffset = state.abductableYOffset
-      applyYOffset(existing, state.abductableDirection, state.abductableYOffset)
-      syncSpinner(existing, state.abductableDirection, state.abductableYOffset)
-    }
-    return
+  if (existing === null || Abductable.get(existing).id !== state.abductableId) {
+    if (existing !== null) removeAbductables()
+    clientCarry = null
+    const planet = findPlanet()
+    if (planet === null) return
+    spawnAbductable(
+      planet,
+      state.abductableDirection,
+      state.abductableId,
+      state.abductableAngularOffset,
+      state.abductableYOffset
+    )
+    existing = findAbductable()
   }
+  if (existing === null) return
 
-  if (existing !== null) removeAbductables()
+  const component = Abductable.getMutable(existing)
+  component.id = state.abductableId
+  component.angularOffset = state.abductableAngularOffset
+  component.yOffset = state.abductableYOffset
+
   const planet = findPlanet()
   if (planet === null) return
-  spawnAbductable(
-    planet,
-    state.abductableDirection,
-    state.abductableId,
-    state.abductableAngularOffset,
-    state.abductableYOffset
-  )
+  if (state.abductableOnShip) {
+    const ship = findNamed(EntityNames.Ship)
+    if (ship === null) return
+    placeOnShip(existing, planet, ship, state, dt)
+    return
+  }
+  placeOnPlanet(existing, planet, state)
 }
 
 export function setupAbduction(): void {
   planetEntity = null
   loggedArrowAngleDegrees = Number.NaN
+  serverCarry = null
+  clientCarry = null
+  fallSpeedMetersPerSecond = 0
 
   if (isServer()) {
     applyAbductablePlacement(randomSurfaceDirection())

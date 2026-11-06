@@ -96,7 +96,7 @@ export const ABDUCTABLE_MODELS: AbductableModel[] = [
 export const ABDUCTABLE_HOVER_TEXT = 'Probe'
 
 /** How far the camera can be from an abductable and still show the hover text. */
-export const ABDUCTABLE_POINTER_MAX_DISTANCE_METERS = 5
+export const ABDUCTABLE_POINTER_MAX_DISTANCE_METERS = 6
 
 /** Scene-space height of the ring the direction arrow travels. */
 export const RED_ARROW_RING_Y = 40
@@ -118,7 +118,7 @@ export const ARROW_HIDE_ANGLE_DEGREES = 10
  * The abductable rises toward the ship while the angle from the planet center
  * is within this many degrees. 0 is directly under the ship.
  */
-export const ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES = 2
+export const ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES = 3
 
 /** Rise toward the ship, in meters per second, along the abductable's up. */
 export const ABDUCTABLE_LIFT_METERS_PER_SECOND = 3
@@ -128,6 +128,12 @@ export const ABDUCTABLE_LIFT_ABOVE_SHIP_METERS = 1.5
 
 /** Client-only tumble while the abductable is off the surface, in degrees per second. */
 export const ABDUCTABLE_SPIN_DEGREES_PER_SECOND = 40
+
+/** Client-only slide toward the ship center while carried, in meters per second. */
+export const ABDUCTABLE_CENTER_METERS_PER_SECOND = 1
+
+/** Acceleration toward the planet center after the beam lets go, in meters per second squared. */
+export const ABDUCTABLE_FALL_GRAVITY_METERS_PER_SECOND_SQUARED = 20
 
 // MARK: Debug
 

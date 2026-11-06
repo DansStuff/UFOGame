@@ -44,12 +44,11 @@ import {
   BEAM_RING_ROUGHNESS,
   BEAM_RING_SCALE_BOTTOM,
   BEAM_RING_SCALE_TOP,
-  PLANET_SPIN_MAX_DEGREES_PER_SECOND,
   SAUCER_LIGHTS_MAX_DEGREES_PER_SECOND,
   SAUCER_LIGHTS_MIN_DEGREES_PER_SECOND,
   SIMULATION_MAX_DELTA_SECONDS
 } from './constants'
-import { getGameState } from './gamestate'
+import { shipSpeedFraction } from './shipSpeed'
 
 type LightRing = {
   entity: Entity | null
@@ -67,14 +66,6 @@ let beam: Entity | null = null
 let beamRings: Entity[] = []
 /** Cycles elapsed, kept in [0, 1) by the fractional wrap. 0 is the low end of the travel. */
 let beamPhase = 0
-
-/** 0 when stopped, 1 at max planet spin. */
-function shipSpeedFraction(): number {
-  if (PLANET_SPIN_MAX_DEGREES_PER_SECOND <= 0) return 0
-  const velocity = getGameState().planetAngularVelocity
-  const speed = Math.hypot(velocity.x, velocity.y, velocity.z)
-  return Math.min(Math.max(speed / PLANET_SPIN_MAX_DEGREES_PER_SECOND, 0), 1)
-}
 
 /** Degrees per second around local up. The minimum rate holds while the ship is stopped. */
 function lightRingDegreesPerSecond(speedFraction: number): number {
