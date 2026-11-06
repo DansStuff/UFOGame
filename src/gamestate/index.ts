@@ -5,12 +5,14 @@ import {
   GameState,
   type GamePhase,
   type GameStateSnapshot,
+  type AbductableDirectionSnapshot,
   type PlanetAngularVelocitySnapshot,
   type PlanetRotationSnapshot
 } from './schema'
 
 export {
   GameState,
+  type AbductableDirectionSnapshot,
   type GamePhase,
   type GameStateSnapshot,
   type PlanetAngularVelocitySnapshot,
@@ -31,7 +33,11 @@ export function defaultGameState(): GameStateSnapshot {
     shipPitch: 0,
     shipRoll: 0,
     planetRotation: { x: 0, y: 0, z: 0, w: 1 },
-    planetAngularVelocity: { x: 0, y: 0, z: 0 }
+    planetAngularVelocity: { x: 0, y: 0, z: 0 },
+    abductableDirection: { x: 0, y: 0, z: 0 },
+    abductableId: 0,
+    abductableAngularOffset: 0,
+    abductableYOffset: 0
   }
 }
 
@@ -57,7 +63,11 @@ function readSnapshot(): GameStateSnapshot {
     shipPitch: state.shipPitch,
     shipRoll: state.shipRoll,
     planetRotation: copyRotation(state.planetRotation),
-    planetAngularVelocity: copyAngularVelocity(state.planetAngularVelocity)
+    planetAngularVelocity: copyAngularVelocity(state.planetAngularVelocity),
+    abductableDirection: copyDirection(state.abductableDirection),
+    abductableId: state.abductableId,
+    abductableAngularOffset: state.abductableAngularOffset,
+    abductableYOffset: state.abductableYOffset
   }
 }
 
@@ -69,6 +79,11 @@ function copyRotation(rotation: PlanetRotationSnapshot | undefined): PlanetRotat
 function copyAngularVelocity(velocity: PlanetAngularVelocitySnapshot | undefined): PlanetAngularVelocitySnapshot {
   if (!velocity) return { x: 0, y: 0, z: 0 }
   return { x: velocity.x, y: velocity.y, z: velocity.z }
+}
+
+function copyDirection(direction: AbductableDirectionSnapshot | undefined): AbductableDirectionSnapshot {
+  if (!direction) return { x: 0, y: 0, z: 0 }
+  return { x: direction.x, y: direction.y, z: direction.z }
 }
 
 /** Subscribe to the snapshot applied when this client first binds the synced entity. */
@@ -144,6 +159,26 @@ export function applyShipMotion(
   state.planetAngularVelocity.x = planetAngularVelocity.x
   state.planetAngularVelocity.y = planetAngularVelocity.y
   state.planetAngularVelocity.z = planetAngularVelocity.z
+}
+
+/** Server-only. Places a new abductable. The id bump tells clients to replace the previous one. */
+export function applyAbductablePlacement(direction: AbductableDirectionSnapshot): void {
+  const state = GameState.getMutable(stateEntityOrThrow())
+  state.abductableId += 1
+  state.abductableDirection.x = direction.x
+  state.abductableDirection.y = direction.y
+  state.abductableDirection.z = direction.z
+  state.abductableYOffset = 0
+}
+
+/** Server-only. Degrees from the planet center. 0 is directly under the ship. */
+export function applyAbductableAngularOffset(degrees: number): void {
+  GameState.getMutable(stateEntityOrThrow()).abductableAngularOffset = degrees
+}
+
+/** Server-only. Meters along local up, past the surface. The id stays the same. */
+export function applyAbductableYOffset(meters: number): void {
+  GameState.getMutable(stateEntityOrThrow()).abductableYOffset = meters
 }
 
 export function setupGameState(): void {

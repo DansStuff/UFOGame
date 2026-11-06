@@ -16,7 +16,25 @@ export const GameState = engine.defineComponent('game:State', {
   /** Planet orientation. The surface under the ship scrolls opposite the tilt. */
   planetRotation: Schemas.Quaternion,
   /** World-space angular velocity in degrees per second. Clients spin with this between updates. */
-  planetAngularVelocity: Schemas.Vector3
+  planetAngularVelocity: Schemas.Vector3,
+  /**
+   * Unit direction from the planet origin to the abductable, in planet space.
+   * Zero until the server places it. Clients parent the cow to the planet along this ray.
+   */
+  abductableDirection: Schemas.Vector3,
+  /** 0 until the server places one. Increments each time a new one is placed. */
+  abductableId: Schemas.Int,
+  /**
+   * Degrees between the ship and the abductable, measured from the planet center.
+   * 0 is directly under the ship. The server writes this whenever it changes.
+   */
+  abductableAngularOffset: Schemas.Float,
+  /**
+   * Meters along the abductable's local up, past the planet surface.
+   * The server raises this toward the ship while the cow is underneath, and sets it back to 0 outside that angle.
+   * Clients add this to the surface radius when they place the model.
+   */
+  abductableYOffset: Schemas.Float
 })
 
 export type GamePhase = 'idle' | 'inRound' | 'roundEnded'
@@ -35,6 +53,13 @@ export type PlanetAngularVelocitySnapshot = {
   z: number
 }
 
+/** Unit direction from the planet origin to the abductable, in planet space. */
+export type AbductableDirectionSnapshot = {
+  x: number
+  y: number
+  z: number
+}
+
 export type GameStateSnapshot = {
   phase: GamePhase
   startedAt: number
@@ -43,4 +68,8 @@ export type GameStateSnapshot = {
   shipRoll: number
   planetRotation: PlanetRotationSnapshot
   planetAngularVelocity: PlanetAngularVelocitySnapshot
+  abductableDirection: AbductableDirectionSnapshot
+  abductableId: number
+  abductableAngularOffset: number
+  abductableYOffset: number
 }

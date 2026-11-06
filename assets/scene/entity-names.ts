@@ -5,6 +5,7 @@
  * Object containing all entity names in the scene for autocomplete support.
  */
 export enum EntityNames {
+  AbductableArrow = "AbductableArrow",
   Beam = "Beam",
   BeamRing = "BeamRing",
   InnerLights = "InnerLights",
@@ -15,6 +16,8 @@ export enum EntityNames {
   Probe1_gltf_3 = "Probe1.gltf_3",
   Probe1_gltf_4 = "Probe1.gltf_4",
   ProbeInteractable_gltf = "ProbeInteractable.gltf",
+  RedArrow = "RedArrow",
   Ship = "Ship",
   Spotlight = "Spotlight",
+  cow_glb = "cow.glb",
 } 

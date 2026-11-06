@@ -125,103 +125,82 @@
           "json": {
             "position": {
               "x": 3.5,
-              "y": -2.779643182293512e-11,
-              "z": -0.7300000190734863
-            },
-            "scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "rotation": {
-              "x": -0.7071067690849304,
-              "y": 0,
-              "z": 0,
-              "w": 0.7071067690849304
-            },
-            "parent": 514
-          }
-        },
-        "516": {
-          "json": {
-            "position": {
-              "x": -3.5,
-              "y": -2.779643182293512e-11,
-              "z": -0.7300000190734863
-            },
-            "scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "rotation": {
-              "x": 0,
-              "y": -0.7071067690849304,
-              "z": 0.7071067690849304,
-              "w": 0
-            },
-            "parent": 514
-          }
-        },
-        "517": {
-          "json": {
-            "position": {
-              "x": -1.4210854715202004e-14,
-              "y": -3.5,
-              "z": -0.7300000190734863
-            },
-            "scale": {
-              "x": 0.9999999403953552,
-              "y": 1,
-              "z": 0.9999999403953552
-            },
-            "rotation": {
-              "x": -0.5,
-              "y": 0.5,
-              "z": -0.5,
-              "w": 0.5
-            },
-            "parent": 514
-          }
-        },
-        "518": {
-          "json": {
-            "position": {
-              "x": -1.4210854715202004e-14,
-              "y": 3.5,
-              "z": -0.7300000190734863
-            },
-            "scale": {
-              "x": 0.9999999403953552,
-              "y": 1,
-              "z": 0.9999999403953552
-            },
-            "rotation": {
-              "x": -0.5,
-              "y": -0.5,
-              "z": 0.5,
-              "w": 0.5
-            },
-            "parent": 514
-          }
-        },
-        "519": {
-          "json": {
-            "position": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
+              "y": 0.3499999940395355,
+              "z": -2.5014628590724897e-8
             },
             "rotation": {
               "x": 0,
               "y": 0,
               "z": 0,
               "w": 1
+            },
+            "scale": {
+              "x": 1,
+              "y": 0.9999999403953552,
+              "z": 0.9999999403953552
+            },
+            "parent": 513
+          }
+        },
+        "516": {
+          "json": {
+            "position": {
+              "x": -3.5,
+              "y": 0.3499999940395355,
+              "z": -2.5014628590724897e-8
+            },
+            "rotation": {
+              "x": 0,
+              "y": 1,
+              "z": -1.7114270889351246e-8,
+              "w": 0
+            },
+            "scale": {
+              "x": 0.9999999403953552,
+              "y": 0.9999999403953552,
+              "z": 0.9999999403953552
+            },
+            "parent": 513
+          }
+        },
+        "517": {
+          "json": {
+            "position": {
+              "x": -1.4210854715202004e-14,
+              "y": 0.34999987483024597,
+              "z": -3.5
+            },
+            "rotation": {
+              "x": -1.2101617485882343e-8,
+              "y": 0.7071067690849304,
+              "z": -1.2101617485882343e-8,
+              "w": 0.7071067690849304
+            },
+            "scale": {
+              "x": 0.9999998807907104,
+              "y": 0.9999999403953552,
+              "z": 0.9999999403953552
+            },
+            "parent": 513
+          }
+        },
+        "518": {
+          "json": {
+            "position": {
+              "x": -1.4210854715202004e-14,
+              "y": 0.3500001132488251,
+              "z": 3.499999761581421
+            },
+            "rotation": {
+              "x": -1.2101617485882343e-8,
+              "y": -0.7071067690849304,
+              "z": 1.2101617485882343e-8,
+              "w": 0.7071067690849304
+            },
+            "scale": {
+              "x": 0.9999998807907104,
+              "y": 0.9999999403953552,
+              "z": 0.9999999403953552
             },
             "parent": 513
           }
@@ -308,6 +287,48 @@
               "w": 1
             },
             "parent": 513
+          }
+        },
+        "524": {
+          "json": {
+            "position": {
+              "x": 157.3300018310547,
+              "y": 55,
+              "z": 91.97000122070312
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.7071067690849304,
+              "z": 0,
+              "w": 0.7071067690849304
+            },
+            "scale": {
+              "x": 14,
+              "y": 14,
+              "z": 14
+            },
+            "parent": 0
+          }
+        },
+        "526": {
+          "json": {
+            "position": {
+              "x": 101.47000122070312,
+              "y": 67.4800033569336,
+              "z": 83.01000213623047
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "scale": {
+              "x": 3,
+              "y": 3,
+              "z": 3
+            },
+            "parent": 0
           }
         }
       }
@@ -408,6 +429,20 @@
               }
             ]
           }
+        },
+        "526": {
+          "json": {
+            "states": [
+              {
+                "clip": "Point",
+                "playing": true,
+                "weight": 1,
+                "speed": 1,
+                "loop": true,
+                "shouldReset": false
+              }
+            ]
+          }
         }
       }
     },
@@ -438,35 +473,28 @@
           "json": {
             "src": "assets/scene/Models/Probe1.gltf",
             "visibleMeshesCollisionMask": 0,
-            "invisibleMeshesCollisionMask": 3
+            "invisibleMeshesCollisionMask": 0
           }
         },
         "516": {
           "json": {
             "src": "assets/scene/Models/Probe1.gltf",
             "visibleMeshesCollisionMask": 0,
-            "invisibleMeshesCollisionMask": 3
+            "invisibleMeshesCollisionMask": 0
           }
         },
         "517": {
           "json": {
             "src": "assets/scene/Models/Probe1.gltf",
             "visibleMeshesCollisionMask": 0,
-            "invisibleMeshesCollisionMask": 3
+            "invisibleMeshesCollisionMask": 0
           }
         },
         "518": {
           "json": {
             "src": "assets/scene/Models/Probe1.gltf",
             "visibleMeshesCollisionMask": 0,
-            "invisibleMeshesCollisionMask": 3
-          }
-        },
-        "519": {
-          "json": {
-            "src": "assets/scene/Models/ProbeInteractable.gltf",
-            "visibleMeshesCollisionMask": 0,
-            "invisibleMeshesCollisionMask": 3
+            "invisibleMeshesCollisionMask": 0
           }
         },
         "520": {
@@ -493,6 +521,20 @@
         "523": {
           "json": {
             "src": "assets/scene/Models/BeamRing.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
+          }
+        },
+        "524": {
+          "json": {
+            "src": "assets/scene/Models/RedArrow.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
+          }
+        },
+        "526": {
+          "json": {
+            "src": "assets/scene/Models/TutArrow.gltf",
             "visibleMeshesCollisionMask": 0,
             "invisibleMeshesCollisionMask": 3
           }
@@ -547,11 +589,6 @@
             "value": "Probe1.gltf_4"
           }
         },
-        "519": {
-          "json": {
-            "value": "ProbeInteractable.gltf"
-          }
-        },
         "520": {
           "json": {
             "value": "OuterLights"
@@ -571,34 +608,15 @@
           "json": {
             "value": "BeamRing"
           }
-        }
-      }
-    },
-    {
-      "name": "core::PointerEvents",
-      "jsonSchema": {
-        "type": "object",
-        "properties": {},
-        "serializationType": "protocol-buffer",
-        "protocolBuffer": "PBPointerEvents"
-      },
-      "data": {
-        "519": {
+        },
+        "524": {
           "json": {
-            "pointerEvents": [
-              {
-                "eventType": 1,
-                "eventInfo": {
-                  "button": 3,
-                  "hoverText": "Probe",
-                  "maxDistance": 10,
-                  "showFeedback": true,
-                  "showHighlight": true,
-                  "maxPlayerDistance": 0,
-                  "priority": 0
-                }
-              }
-            ]
+            "value": "RedArrow"
+          }
+        },
+        "526": {
+          "json": {
+            "value": "AbductableArrow"
           }
         }
       }
@@ -710,7 +728,9 @@
                 "open": true,
                 "children": [
                   512,
-                  513
+                  513,
+                  524,
+                  526
                 ]
               },
               {
@@ -723,6 +743,7 @@
               },
               {
                 "entity": 512,
+                "open": true,
                 "children": []
               },
               {
@@ -730,22 +751,20 @@
                 "open": true,
                 "children": [
                   514,
-                  519,
                   520,
                   521,
                   522,
-                  523
-                ]
-              },
-              {
-                "entity": 514,
-                "open": true,
-                "children": [
+                  523,
                   515,
                   516,
                   517,
                   518
                 ]
+              },
+              {
+                "entity": 514,
+                "open": true,
+                "children": []
               },
               {
                 "entity": 515,
@@ -764,11 +783,6 @@
                 "children": []
               },
               {
-                "entity": 519,
-                "open": true,
-                "children": []
-              },
-              {
                 "entity": 520,
                 "children": []
               },
@@ -782,6 +796,14 @@
               },
               {
                 "entity": 523,
+                "children": []
+              },
+              {
+                "entity": 524,
+                "children": []
+              },
+              {
+                "entity": 526,
                 "children": []
               }
             ]
@@ -833,9 +855,6 @@
         "518": {
           "json": {}
         },
-        "519": {
-          "json": {}
-        },
         "520": {
           "json": {}
         },
@@ -847,6 +866,16 @@
         },
         "523": {
           "json": {}
+        },
+        "524": {
+          "json": {
+            "porportionalScaling": true
+          }
+        },
+        "526": {
+          "json": {
+            "porportionalScaling": true
+          }
         }
       }
     },
