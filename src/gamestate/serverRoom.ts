@@ -10,6 +10,7 @@ export type ServerInboxHandlers = {
   onRoundReset: (playerAddress: string) => void
   onInitialState: (playerAddress: string) => void
   onProbe: (playerAddress: string, abductableId: number) => void
+  onActivity: (playerAddress: string) => void
 }
 
 export function notifyRoundStart(startedAt: number, to?: string): void {
@@ -28,6 +29,18 @@ export function notifyRoundEnd(endedAt: number, to?: string): void {
     return
   }
   room.send('notifyRoundEnd', payload)
+}
+
+export function notifyActivityRecall(
+  recalledAt: number,
+  to: string,
+  position: { x: number; y: number; z: number }
+): void {
+  room.send(
+    'notifyActivityRecall',
+    { recalledAt, x: position.x, y: position.y, z: position.z },
+    { to: [to] }
+  )
 }
 
 export function notifyRoundReset(resetAt: number, to?: string): void {
@@ -63,5 +76,10 @@ export function setupServerInbox(handlers: ServerInboxHandlers): void {
   room.onMessage('requestProbe', (data, context) => {
     if (!context) return
     handlers.onProbe(context.from, data.abductableId)
+  })
+
+  room.onMessage('requestActivity', (_data, context) => {
+    if (!context) return
+    handlers.onActivity(context.from)
   })
 }

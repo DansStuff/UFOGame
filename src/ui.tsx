@@ -4,6 +4,7 @@
 import ReactEcs, { ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { Color4, Vector3 } from '@dcl/sdk/math'
 import { movePlayerTo } from '~system/RestrictedActions'
+import { markActivity } from './activity'
 import { DEBUG_SPAWN_X, DEBUG_SPAWN_Y, DEBUG_SPAWN_Z } from './constants'
 
 export function setupUi() {
@@ -11,6 +12,7 @@ export function setupUi() {
 }
 
 function returnToShip(): void {
+  markActivity()
   void movePlayerTo({
     newRelativePosition: Vector3.create(DEBUG_SPAWN_X, DEBUG_SPAWN_Y, DEBUG_SPAWN_Z)
   })

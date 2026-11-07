@@ -12,6 +12,16 @@ export function requestProbe(abductableId: number): void {
   room.send('requestProbe', { requestedAt: Date.now(), abductableId })
 }
 
+/**
+ * Tells the server this client had input during the last heartbeat window.
+ * Returns false when the room cannot take the message yet, so the caller can retry.
+ */
+export function reportActivity(): boolean {
+  if (isServer() || !room.isReady()) return false
+  room.send('requestActivity', { reportedAt: Date.now() })
+  return true
+}
+
 export function setupClientRoom(): void {
   if (isServer()) return
 

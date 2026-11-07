@@ -11,30 +11,27 @@
 /** Clamp for per-frame `dt` so a hitch cannot jump the sim too far. */
 export const SIMULATION_MAX_DELTA_SECONDS = 0.1
 
-// MARK: Ship motion
+// MARK: Ship steering
 
 /** Scene-space X of the ship. Player positions are measured from here. */
 export const SHIP_CENTER_X = 88
 /** Scene-space Z of the ship. Player positions are measured from here. */
 export const SHIP_CENTER_Z = 88
 
+/** Width of the saucer mesh. The steering edge is half of this. */
+export const SHIP_DISC_DIAMETER_METERS = 39
+
 /**
- * Players inside this distance from the ship center are left out of the tilt average.
+ * Players inside this distance from the ship center are left out.
  * If every player is inside it, the ship stays level.
  */
 export const SHIP_TILT_SAFE_RADIUS = 5.5
 
-/** Slack on the average of players outside the safe radius. Offsets inside this do not tilt that axis. */
-export const SHIP_TILT_DEADZONE = 1
-
-/** Width of the saucer mesh. */
-export const SHIP_DISC_DIAMETER_METERS = 39
-
 /**
- * Meters past the deadzone, on one axis, that reach full tilt.
- * The saucer deck is 19.5m in radius, so full tilt lands inside the deck.
+ * Distance from the ship center where one player's tilt contribution is at its maximum.
+ * This is the saucer rim.
  */
-export const SHIP_TILT_INFLUENCE_RADIUS = 12
+export const SHIP_TILT_EDGE_RADIUS = SHIP_DISC_DIAMETER_METERS / 2
 
 /** Largest pitch or roll. Steep enough to read, shallow enough to walk back up. */
 export const SHIP_TILT_MAX_DEGREES = 10
@@ -43,7 +40,7 @@ export const SHIP_TILT_MAX_DEGREES = 10
 export const SHIP_TILT_SMOOTH_SECONDS = 0.4
 
 /**
- * Planet spin at full tilt, in degrees per second.
+ * Planet spin at full steering influence, in degrees per second.
  * The planet radius is about 97m, so this is roughly 10 m/s of surface travel.
  */
 export const PLANET_SPIN_MAX_DEGREES_PER_SECOND = 15
@@ -118,7 +115,7 @@ export const ARROW_HIDE_ANGLE_DEGREES = 10
  * The abductable rises toward the ship while the angle from the planet center
  * is within this many degrees. 0 is directly under the ship.
  */
-export const ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES = 3
+export const ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES = 4
 
 /** Rise toward the ship, in meters per second, along the abductable's up. */
 export const ABDUCTABLE_LIFT_METERS_PER_SECOND = 3
@@ -263,3 +260,29 @@ export const BEAM_RING_EMISSIVE_BLUE = 0.004879222882974488
 /** Beam ring surface, copied from BeamRing.gltf. */
 export const BEAM_RING_METALLIC = 0
 export const BEAM_RING_ROUGHNESS = 0.5
+
+// MARK: Activity
+
+/**
+ * How often an active client may tell the server it saw input.
+ * A quiet window sends nothing.
+ */
+export const ACTIVITY_HEARTBEAT_SECONDS = 5
+
+/**
+ * Silence after the last report before the server treats that player as inactive.
+ * An active client reports every heartbeat, so this is two quiet windows.
+ */
+export const ACTIVITY_IDLE_SECONDS = ACTIVITY_HEARTBEAT_SECONDS * 3
+
+/**
+ * How far inside the safe-zone edge an inactive player is placed.
+ * The spot stays on the line from the ship center through where they were standing.
+ */
+export const ACTIVITY_RECALL_INSET_METERS = 1
+
+/**
+ * Meters above the ship origin an inactive player is placed.
+ * The extra height clears the floor.
+ */
+export const ACTIVITY_RECALL_HEIGHT_METERS = 2

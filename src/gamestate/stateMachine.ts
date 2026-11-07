@@ -4,6 +4,7 @@
  * request. Clients do not run this machine.
  */
 import { isServer } from '@dcl/sdk/network'
+import { noteActivity } from '../activity'
 import { replaceAbductable } from '../abduction'
 import { applyRoundEnded, applyRoundReset, applyRoundStarted, getGameState, type GamePhase } from './index'
 import { notifyRoundEnd, notifyRoundReset, notifyRoundStart, setupServerInbox } from './serverRoom'
@@ -119,6 +120,10 @@ export function setupStateMachine(): void {
       if (processEvent({ type: 'PROBE', abductableId })) {
         console.log(`[SERVER] Cow ${abductableId} probed by ${from}`)
       }
+    },
+    onActivity: (from) => {
+      noteActivity(from)
+      console.log(`[SERVER] Activity reported by ${from}`)
     }
   })
 }

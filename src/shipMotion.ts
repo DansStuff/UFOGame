@@ -13,9 +13,8 @@ import {
   PLANET_SPIN_MAX_DEGREES_PER_SECOND,
   SHIP_CENTER_X,
   SHIP_CENTER_Z,
-  SHIP_TILT_DEADZONE,
+  SHIP_TILT_EDGE_RADIUS,
   SHIP_TILT_SAFE_RADIUS,
-  SHIP_TILT_INFLUENCE_RADIUS,
   SHIP_TILT_MAX_DEGREES,
   SHIP_TILT_SMOOTH_SECONDS,
   SIMULATION_MAX_DELTA_SECONDS
@@ -52,21 +51,21 @@ function smoothToward(current: number, target: number, dt: number, snap: number)
 }
 
 /**
- * Signed share of one axis of an averaged player offset.
- * 0 inside the deadzone, ±1 once the offset reaches the influence radius.
+ * 0 just outside the safe radius, 1 at the edge, linear in between.
+ * Players past the edge stay at 1.
  */
-function axisInfluence(offset: number): number {
-  const magnitude = Math.abs(offset)
-  if (magnitude <= SHIP_TILT_DEADZONE) return 0
-  const ranged = Math.min((magnitude - SHIP_TILT_DEADZONE) / SHIP_TILT_INFLUENCE_RADIUS, 1)
-  return Math.sign(offset) * ranged
+function tiltContribution(distance: number): number {
+  const span = SHIP_TILT_EDGE_RADIUS - SHIP_TILT_SAFE_RADIUS
+  if (span <= 0) return 1
+  return Math.min(Math.max((distance - SHIP_TILT_SAFE_RADIUS) / span, 0), 1)
 }
 
 /**
  * Players currently in the scene, averaged, mapped to a ship speed.
  * People inside the safe radius are left out. If nobody is outside it, the speed is 0.
- * Each axis of the average runs through axisInfluence. The returned speed is the
- * length of that pair, clamped to 0..1. Edit that expression to retune the curve.
+ * Each other player adds a push toward the side they stand on. That push is 0 just
+ * outside the safe radius and 1 at the saucer edge, rising in a straight line.
+ * The returned speed is the length of the averaged pushes, clamped to 0..1.
  * Top speed is applied by the caller.
  */
 export function normalizedShipSpeed(): number {
@@ -79,15 +78,17 @@ export function normalizedShipSpeed(): number {
   for (const [, , transform] of engine.getEntitiesWith(PlayerIdentityData, Transform)) {
     const x = transform.position.x - SHIP_CENTER_X
     const z = transform.position.z - SHIP_CENTER_Z
-    if (Math.hypot(x, z) <= SHIP_TILT_SAFE_RADIUS) continue
-    sumX += x
-    sumZ += z
+    const distance = Math.hypot(x, z)
+    if (distance <= SHIP_TILT_SAFE_RADIUS) continue
+    const push = tiltContribution(distance) / distance
+    sumX += x * push
+    sumZ += z * push
     count++
   }
   if (count === 0) return 0
 
-  const influenceX = axisInfluence(sumX / count)
-  const influenceZ = axisInfluence(sumZ / count)
+  const influenceX = sumX / count
+  const influenceZ = sumZ / count
   sampledShipPitch = influenceZ * SHIP_TILT_MAX_DEGREES
   sampledShipRoll = -influenceX * SHIP_TILT_MAX_DEGREES
   return Math.min(Math.hypot(influenceX, influenceZ), 1)

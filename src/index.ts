@@ -4,6 +4,7 @@
  */
 import { isServer } from '@dcl/sdk/network'
 import { setupAbduction } from './abduction'
+import { setupActivity } from './activity'
 import { setupGameState } from './gamestate'
 import { setupStateMachine } from './gamestate/stateMachine'
 import { setupClientRoom } from './networking/client'
@@ -17,6 +18,7 @@ export function main() {
   setupStateMachine()
   setupShipMotion()
   setupAbduction()
+  setupActivity()
 
   if (isServer()) {
     console.log('[SERVER] Init server')

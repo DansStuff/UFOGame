@@ -21,6 +21,9 @@ export const Messages = {
     requestedAt: Schemas.Int64,
     abductableId: Schemas.Int
   }),
+  requestActivity: Schemas.Map({
+    reportedAt: Schemas.Int64
+  }),
 
   // Server → Client
   notifyRoundStart: Schemas.Map({
@@ -31,6 +34,12 @@ export const Messages = {
   }),
   notifyRoundReset: Schemas.Map({
     resetAt: Schemas.Int64
+  }),
+  notifyActivityRecall: Schemas.Map({
+    recalledAt: Schemas.Int64,
+    x: Schemas.Float,
+    y: Schemas.Float,
+    z: Schemas.Float
   })
 }
 
