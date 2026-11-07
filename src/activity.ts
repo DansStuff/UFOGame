@@ -1,11 +1,12 @@
 /**
  * Client heartbeat and server idle recall. The client polls the InputActions
  * that desktop and mobile both produce, and sends at most one report per window
- * when any of them fired. Camera look is left out: mouse delta stays 0 on
- * mobile, and the saucer's tilt would move a world-space camera while the
- * player is still.
+ * when any of them fired. The first input after the client has gone idle is sent
+ * immediately, so the server hears it before a recall. Camera look is left out:
+ * mouse delta stays 0 on mobile, and the saucer's tilt would move a world-space
+ * camera while the player is still.
  *
- * After two quiet windows, a player standing outside the safe zone is sent to a
+ * Once idle, a player standing outside the safe zone is sent to a
  * spot one meter inside that zone, on the line from the ship center through
  * where they were. Players already inside the zone are left where they are.
  */
@@ -68,6 +69,8 @@ const recalledPlayers = new Set<string>()
 
 let hadInput = false
 let secondsSinceHeartbeat = 0
+/** When this client last told the server it was active, or when it joined. */
+let lastReportAt = 0
 
 /** Records a local input that `inputSystem` does not see, such as a scene UI tap. */
 export function markActivity(): void {
@@ -92,6 +95,10 @@ function forgetPlayer(playerAddress: string): void {
   lastActivityAtByPlayer.delete(playerAddress)
   joinedAtByPlayer.delete(playerAddress)
   recalledPlayers.delete(playerAddress)
+}
+
+function isInactive(now = Date.now()): boolean {
+  return now - lastReportAt >= ACTIVITY_IDLE_MS
 }
 
 function sawActivityInput(): boolean {
@@ -142,8 +149,22 @@ function recallPosition(playerAddress: string): Vector3 | null {
   )
 }
 
+function noteReportSent(): void {
+  hadInput = false
+  lastReportAt = Date.now()
+  secondsSinceHeartbeat = 0
+}
+
 function ActivityClientSystem(dt: number): void {
   if (sawActivityInput()) markActivity()
+
+  // An idle player must reach the server on the press, not at the next window.
+  // Otherwise the first step out of the safe zone is still seen as idle.
+  if (hadInput && isInactive()) {
+    if (!reportActivity()) return
+    noteReportSent()
+    return
+  }
 
   secondsSinceHeartbeat += dt
   if (secondsSinceHeartbeat < ACTIVITY_HEARTBEAT_SECONDS) return
@@ -151,7 +172,7 @@ function ActivityClientSystem(dt: number): void {
   secondsSinceHeartbeat = 0
   if (!hadInput) return
   if (!reportActivity()) return
-  hadInput = false
+  noteReportSent()
 }
 
 function ActivityServerSystem(): void {
@@ -171,6 +192,7 @@ function ActivityServerSystem(): void {
 export function setupActivity(): void {
   hadInput = false
   secondsSinceHeartbeat = 0
+  lastReportAt = Date.now()
   lastActivityAtByPlayer.clear()
   joinedAtByPlayer.clear()
   recalledPlayers.clear()
@@ -190,6 +212,8 @@ export function setupActivity(): void {
   }
 
   room.onMessage('notifyActivityRecall', (data) => {
+    // A report is already in flight, or this client has not gone idle.
+    if (hadInput || sawActivityInput() || !isInactive()) return
     void movePlayerTo({
       newRelativePosition: Vector3.create(data.x, data.y, data.z)
     })

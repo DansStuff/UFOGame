@@ -15,9 +15,7 @@ export enum EntityNames {
   Probe1_gltf_2 = "Probe1.gltf_2",
   Probe1_gltf_3 = "Probe1.gltf_3",
   Probe1_gltf_4 = "Probe1.gltf_4",
-  ProbeInteractable_gltf = "ProbeInteractable.gltf",
   RedArrow = "RedArrow",
   Ship = "Ship",
   Spotlight = "Spotlight",
-  cow_glb = "cow.glb",
 } 

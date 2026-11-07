@@ -271,7 +271,7 @@ export const ACTIVITY_HEARTBEAT_SECONDS = 5
 
 /**
  * Silence after the last report before the server treats that player as inactive.
- * An active client reports every heartbeat, so this is two quiet windows.
+ * An active client reports every heartbeat, so this is three quiet windows.
  */
 export const ACTIVITY_IDLE_SECONDS = ACTIVITY_HEARTBEAT_SECONDS * 3
 
