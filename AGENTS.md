@@ -28,7 +28,7 @@ Source is grouped by domain, not by client vs server. `src/index.ts` is the comp
 - `scene.json`: scene metadata (parcels, spawn points, permissions). `authoritativeMultiplayer` stays enabled for the auth-server runtime.
 - `assets/`: 3D models and other content.
 
-The SDK is the auth-server build `@dcl/sdk@7.27.1-33086747846.commit-824d240` (same commit as VirtualSpace), not `@dcl/sdk@latest`. That build is what provides `isServer`, `syncEntity`, `registerMessages`, and `validateBeforeChange`.
+The SDK is the auth-server build `@dcl/sdk@7.32.1-41691874543.commit-3063788`, not `@dcl/sdk@latest`. That build is what provides `isServer`, `syncEntity`, `registerMessages`, and `validateBeforeChange`.
 
 ## Key constraints
 
