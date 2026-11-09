@@ -96,7 +96,7 @@ export const ABDUCTABLE_HOVER_TEXT = 'Probe'
 export const ABDUCTABLE_POINTER_MAX_DISTANCE_METERS = 6
 
 /** Scene-space height of the ring the direction arrow travels. */
-export const RED_ARROW_RING_Y = 40
+export const RED_ARROW_RING_Y = 55
 
 /**
  * AbductableArrow shows while the angle between the ship and the abductable,

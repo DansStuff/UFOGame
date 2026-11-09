@@ -205,6 +205,27 @@
             "parent": 513
           }
         },
+        "519": {
+          "json": {
+            "position": {
+              "x": 7.75,
+              "y": 0,
+              "z": 27
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "parent": 0
+          }
+        },
         "520": {
           "json": {
             "position": {
@@ -296,16 +317,16 @@
               "y": 55,
               "z": 91.97000122070312
             },
+            "scale": {
+              "x": 14,
+              "y": 14,
+              "z": 14
+            },
             "rotation": {
               "x": 0.1830127090215683,
               "y": 0.6830127239227295,
               "z": -0.1830127090215683,
               "w": 0.6830127239227295
-            },
-            "scale": {
-              "x": 14,
-              "y": 14,
-              "z": 14
             },
             "parent": 0
           }
@@ -318,9 +339,9 @@
               "z": 83.01000213623047
             },
             "scale": {
-              "x": 3,
-              "y": 3,
-              "z": 3
+              "x": 5,
+              "y": 5,
+              "z": 5
             },
             "rotation": {
               "x": 0,
@@ -346,19 +367,11 @@
           "json": {
             "states": [
               {
-                "clip": "0TPose",
-                "playing": false,
-                "weight": 1,
-                "speed": 1,
-                "loop": false,
-                "shouldReset": false
-              },
-              {
                 "clip": "Idle",
                 "playing": true,
                 "weight": 1,
                 "speed": 0.8999999761581421,
-                "loop": true,
+                "loop": false,
                 "shouldReset": false
               }
             ]
@@ -430,6 +443,36 @@
             ]
           }
         },
+        "519": {
+          "json": {
+            "states": [
+              {
+                "clip": "0TPose",
+                "playing": false,
+                "weight": 1,
+                "speed": 1,
+                "loop": false,
+                "shouldReset": false
+              },
+              {
+                "clip": "Idle",
+                "playing": false,
+                "weight": 1,
+                "speed": 1,
+                "loop": false,
+                "shouldReset": false
+              },
+              {
+                "clip": "Probe1",
+                "playing": false,
+                "weight": 1,
+                "speed": 1,
+                "loop": false,
+                "shouldReset": false
+              }
+            ]
+          }
+        },
         "526": {
           "json": {
             "states": [
@@ -442,6 +485,22 @@
                 "shouldReset": false
               }
             ]
+          }
+        }
+      }
+    },
+    {
+      "name": "core::Billboard",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {},
+        "serializationType": "protocol-buffer",
+        "protocolBuffer": "PBBillboard"
+      },
+      "data": {
+        "526": {
+          "json": {
+            "billboardMode": 2
           }
         }
       }
@@ -495,6 +554,13 @@
             "src": "assets/scene/Models/Probe1.gltf",
             "visibleMeshesCollisionMask": 0,
             "invisibleMeshesCollisionMask": 0
+          }
+        },
+        "519": {
+          "json": {
+            "src": "assets/scene/Models/Probe1.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
           }
         },
         "520": {
@@ -571,22 +637,27 @@
         },
         "515": {
           "json": {
-            "value": "Probe1.gltf"
+            "value": "Probe1"
           }
         },
         "516": {
           "json": {
-            "value": "Probe1.gltf_2"
+            "value": "Probe2"
           }
         },
         "517": {
           "json": {
-            "value": "Probe1.gltf_3"
+            "value": "Probe3"
           }
         },
         "518": {
           "json": {
-            "value": "Probe1.gltf_4"
+            "value": "Probe4"
+          }
+        },
+        "519": {
+          "json": {
+            "value": "Probe1.gltf_5"
           }
         },
         "520": {
@@ -730,7 +801,8 @@
                   512,
                   513,
                   524,
-                  526
+                  526,
+                  519
                 ]
               },
               {
@@ -805,6 +877,10 @@
               {
                 "entity": 526,
                 "children": []
+              },
+              {
+                "entity": 519,
+                "children": []
               }
             ]
           }
@@ -853,6 +929,9 @@
           "json": {}
         },
         "518": {
+          "json": {}
+        },
+        "519": {
           "json": {}
         },
         "520": {
