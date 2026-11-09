@@ -2,7 +2,8 @@
  * The abductable is a cow on the planet surface. The server picks a direction
  * once, stores it on GameState with a spawn id, and keeps the angle from the
  * planet center up to date. Each client parents the cow to the planet along
- * that ray, so it spins with the surface. A new id replaces the cow. Local up
+ * that ray, so it spins with the surface. Each target starts with its own sample
+ * count. A successful probe removes one. At zero a new id replaces the cow. Local up
  * points away from the planet origin. A lift starts within the angle limit
  * while the abduction beam is on, and parents the cow to the ship. The beam
  * follows ship speed, which is derived from the synced planet spin. Above that
@@ -65,11 +66,12 @@ import { requestProbe } from './networking/client'
 import { shipTiltQuaternion } from './shipMotion'
 import { abductionBeamOn } from './shipSpeed'
 
-/** The cow. `angularOffset` is degrees from the ship. `yOffset` is meters along local up past the surface. */
+/** The cow. `samples` is how many probes it has left. `angularOffset` is degrees from the ship. `yOffset` is meters along local up past the surface. */
 export const Abductable = engine.defineComponent('abductable:Target', {
   id: Schemas.Int,
   angularOffset: Schemas.Float,
-  yOffset: Schemas.Float
+  yOffset: Schemas.Float,
+  samples: Schemas.Int
 })
 
 /**
@@ -180,14 +182,15 @@ function spawnAbductable(
   direction: AbductableDirectionSnapshot,
   id: number,
   angularOffset: number,
-  yOffset: number
+  yOffset: number,
+  samples: number
 ): void {
   const model = ABDUCTABLE_MODELS[0]
   if (!model) return
 
   const outward = outwardDirection(direction)
   const entity = engine.addEntity()
-  Abductable.create(entity, { id, angularOffset, yOffset })
+  Abductable.create(entity, { id, angularOffset, yOffset, samples })
   Transform.create(entity, {
     parent: planet,
     // Local to the planet entity, so the scene position is that entity's position plus this offset.
@@ -459,7 +462,7 @@ let fallSpeedMetersPerSecond = 0
 export function replaceAbductable(): void {
   serverCarry = null
   fallSpeedMetersPerSecond = 0
-  applyAbductablePlacement(randomSurfaceDirection())
+  applyAbductablePlacement(randomSurfaceDirection(), ABDUCTABLE_MODELS[0]?.samples ?? 0)
 }
 
 /** Lets go of the ship. The current y offset is the height the fall starts from. */
@@ -613,7 +616,8 @@ function AbductableSpawnSystem(dt: number): void {
       state.abductableDirection,
       state.abductableId,
       state.abductableAngularOffset,
-      state.abductableYOffset
+      state.abductableYOffset,
+      state.abductableSamples
     )
     existing = findAbductable()
   }
@@ -623,6 +627,7 @@ function AbductableSpawnSystem(dt: number): void {
   component.id = state.abductableId
   component.angularOffset = state.abductableAngularOffset
   component.yOffset = state.abductableYOffset
+  component.samples = state.abductableSamples
 
   const planet = findPlanet()
   if (planet === null) return

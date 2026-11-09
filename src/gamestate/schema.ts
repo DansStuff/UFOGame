@@ -36,7 +36,14 @@ export const GameState = engine.defineComponent('game:State', {
    */
   abductableYOffset: Schemas.Float,
   /** True while the abductable is parented to the ship. False parents it to the planet. */
-  abductableOnShip: Schemas.Boolean
+  abductableOnShip: Schemas.Boolean,
+  /**
+   * Samples left on the current abductable.
+   * Clients copy this onto the Abductable component. A new placement sets it from that target.
+   */
+  abductableSamples: Schemas.Int,
+  /** Samples the crew has extracted since this server started. Round reset does not clear it. */
+  samplesCollected: Schemas.Int
 })
 
 export type GamePhase = 'idle' | 'inRound' | 'roundEnded'
@@ -75,4 +82,6 @@ export type GameStateSnapshot = {
   abductableAngularOffset: number
   abductableYOffset: number
   abductableOnShip: boolean
+  abductableSamples: number
+  samplesCollected: number
 }

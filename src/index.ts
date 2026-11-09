@@ -5,6 +5,7 @@
 import { isServer } from '@dcl/sdk/network'
 import { setupAbduction } from './abduction'
 import { setupActivity } from './activity'
+import { setupDebugUi } from './debugUi'
 import { setupGameState } from './gamestate'
 import { setupStateMachine } from './gamestate/stateMachine'
 import { setupClientRoom } from './networking/client'
@@ -12,7 +13,8 @@ import { setupProbes } from './probes'
 import { setupSaucerFX } from './saucerFx'
 import { setupShipMotion } from './shipMotion'
 import { setupShipWind } from './shipWind'
-import { setupUi } from './ui'
+import { setupUi } from './ui/index'
+import { registerUiBehaviors } from './ui-behaviors'
 
 export function main() {
   setupGameState()
@@ -31,4 +33,6 @@ export function main() {
   setupSaucerFX()
   setupProbes()
   setupUi()
+  registerUiBehaviors()
+  setupDebugUi()
 }

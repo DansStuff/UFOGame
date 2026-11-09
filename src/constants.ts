@@ -59,10 +59,12 @@ export const PLANET_ROTATION_BLEND_SECONDS = 0.25
  */
 export const PLANET_SURFACE_RADIUS_METERS = 97
 
-/** One abductable model. The uniform scale, the arrow height, and the clips belong to that file. */
+/** One abductable model. The uniform scale, the sample count, the arrow height, and the clips belong to that file. */
 export type AbductableModel = {
   src: string
   scale: number
+  /** Samples a probe can extract from this target before it is replaced. */
+  samples: number
   /** Meters above this model's origin, along its up. Measured in planet space. */
   arrowLocalY: number
   /** Clip played on a loop. The other clips stay stopped. */
@@ -76,6 +78,7 @@ export const ABDUCTABLE_MODELS: AbductableModel[] = [
   {
     src: 'assets/scene/Models/Abductable/cow.glb',
     scale: 0.45,
+    samples: 15,
     arrowLocalY: 2,
     idleClip: 'Armature|Idle',
     clips: [

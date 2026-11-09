@@ -38,7 +38,9 @@ export function defaultGameState(): GameStateSnapshot {
     abductableId: 0,
     abductableAngularOffset: 0,
     abductableYOffset: 0,
-    abductableOnShip: false
+    abductableOnShip: false,
+    abductableSamples: 0,
+    samplesCollected: 0
   }
 }
 
@@ -69,7 +71,9 @@ function readSnapshot(): GameStateSnapshot {
     abductableId: state.abductableId,
     abductableAngularOffset: state.abductableAngularOffset,
     abductableYOffset: state.abductableYOffset,
-    abductableOnShip: state.abductableOnShip
+    abductableOnShip: state.abductableOnShip,
+    abductableSamples: state.abductableSamples,
+    samplesCollected: state.samplesCollected
   }
 }
 
@@ -164,7 +168,7 @@ export function applyShipMotion(
 }
 
 /** Server-only. Places a new abductable. The id bump tells clients to replace the previous one. */
-export function applyAbductablePlacement(direction: AbductableDirectionSnapshot): void {
+export function applyAbductablePlacement(direction: AbductableDirectionSnapshot, samples: number): void {
   const state = GameState.getMutable(stateEntityOrThrow())
   state.abductableId += 1
   state.abductableDirection.x = direction.x
@@ -172,6 +176,19 @@ export function applyAbductablePlacement(direction: AbductableDirectionSnapshot)
   state.abductableDirection.z = direction.z
   state.abductableYOffset = 0
   state.abductableOnShip = false
+  state.abductableSamples = Math.max(0, Math.floor(samples))
+}
+
+/**
+ * Server-only. Moves one sample from the current abductable onto the crew total.
+ * Returns how many that abductable has left. Zero means it should be replaced.
+ */
+export function applyAbductableSampleTaken(): number {
+  const state = GameState.getMutable(stateEntityOrThrow())
+  if (state.abductableSamples <= 0) return 0
+  state.abductableSamples -= 1
+  state.samplesCollected += 1
+  return state.abductableSamples
 }
 
 /** Server-only. Updates the planet-space placement without changing the spawn id. */

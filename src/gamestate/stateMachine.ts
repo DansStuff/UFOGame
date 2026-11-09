@@ -6,7 +6,14 @@
 import { isServer } from '@dcl/sdk/network'
 import { noteActivity } from '../activity'
 import { replaceAbductable } from '../abduction'
-import { applyRoundEnded, applyRoundReset, applyRoundStarted, getGameState, type GamePhase } from './index'
+import {
+  applyAbductableSampleTaken,
+  applyRoundEnded,
+  applyRoundReset,
+  applyRoundStarted,
+  getGameState,
+  type GamePhase
+} from './index'
 import { notifyProbed, notifyRoundEnd, notifyRoundReset, notifyRoundStart, setupServerInbox } from './serverRoom'
 
 export type GameEvent =
@@ -59,17 +66,21 @@ function applyTransition(from: GamePhase, to: GamePhase, event: GameEvent): void
 
   if (event.type === 'PROBE') {
     notifyProbed(Date.now())
-    // Temporary: leave the current cow in place so the same one can be probed again.
-    return
+    const remaining = applyAbductableSampleTaken()
+    if (remaining > 0) return
+    console.log(`[STATE] Abductable ${event.abductableId} has no samples left`)
     replaceAbductable()
   }
 }
 
 export function processEvent(event: GameEvent): boolean {
-  // A stale click names a cow that has already been replaced.
-  if (event.type === 'PROBE' && getGameState().abductableId !== event.abductableId) {
-    console.log(`[STATE] Ignored ${event.type} in ${currentState}`)
-    return false
+  // A stale click names a cow that has already been replaced, or one with nothing left to extract.
+  if (event.type === 'PROBE') {
+    const state = getGameState()
+    if (state.abductableId !== event.abductableId || state.abductableSamples <= 0) {
+      console.log(`[STATE] Ignored ${event.type} in ${currentState}`)
+      return false
+    }
   }
 
   const next = nextState(currentState, event)
