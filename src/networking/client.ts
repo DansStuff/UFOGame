@@ -4,6 +4,7 @@
  */
 import { isServer } from '@dcl/sdk/network'
 import { catchUpFromGameState, hasBoundGameState, onGameStateCatchUp, type GameStateSnapshot } from '../gamestate'
+import { playProbeReaction } from '../probes'
 import { room } from './messages'
 
 /** Asks the server to probe the cow with this id. Ignored until the room is ready. */
@@ -28,6 +29,7 @@ export function setupClientRoom(): void {
   let appliedStartedAt = 0
   let appliedEndedAt = 0
   let appliedResetAt = 0
+  let appliedProbedAt = 0
 
   function noteSnapshot(state: GameStateSnapshot): void {
     if (state.phase === 'inRound' && state.startedAt > appliedStartedAt) {
@@ -61,6 +63,12 @@ export function setupClientRoom(): void {
     appliedStartedAt = 0
     appliedEndedAt = 0
     console.log(`[CLIENT] Round reset (${data.resetAt})`)
+  })
+
+  room.onMessage('notifyProbed', (data) => {
+    if (data.probedAt <= appliedProbedAt) return
+    appliedProbedAt = data.probedAt
+    playProbeReaction()
   })
 
   let requestedInitialState = false

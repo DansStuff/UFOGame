@@ -8,6 +8,7 @@ import { setupActivity } from './activity'
 import { setupGameState } from './gamestate'
 import { setupStateMachine } from './gamestate/stateMachine'
 import { setupClientRoom } from './networking/client'
+import { setupProbes } from './probes'
 import { setupSaucerFX } from './saucerFx'
 import { setupShipMotion } from './shipMotion'
 import { setupShipWind } from './shipWind'
@@ -28,5 +29,6 @@ export function main() {
   setupClientRoom()
   setupShipWind()
   setupSaucerFX()
+  setupProbes()
   setupUi()
 }

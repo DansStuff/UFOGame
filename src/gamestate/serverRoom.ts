@@ -43,6 +43,10 @@ export function notifyActivityRecall(
   )
 }
 
+export function notifyProbed(probedAt: number): void {
+  room.send('notifyProbed', { probedAt })
+}
+
 export function notifyRoundReset(resetAt: number, to?: string): void {
   const payload = { resetAt }
   if (to) {

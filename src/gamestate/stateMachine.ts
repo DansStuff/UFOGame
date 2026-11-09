@@ -7,7 +7,7 @@ import { isServer } from '@dcl/sdk/network'
 import { noteActivity } from '../activity'
 import { replaceAbductable } from '../abduction'
 import { applyRoundEnded, applyRoundReset, applyRoundStarted, getGameState, type GamePhase } from './index'
-import { notifyRoundEnd, notifyRoundReset, notifyRoundStart, setupServerInbox } from './serverRoom'
+import { notifyProbed, notifyRoundEnd, notifyRoundReset, notifyRoundStart, setupServerInbox } from './serverRoom'
 
 export type GameEvent =
   | { type: 'ROUND_START' }
@@ -58,6 +58,9 @@ function applyTransition(from: GamePhase, to: GamePhase, event: GameEvent): void
   }
 
   if (event.type === 'PROBE') {
+    notifyProbed(Date.now())
+    // Temporary: leave the current cow in place so the same one can be probed again.
+    return
     replaceAbductable()
   }
 }

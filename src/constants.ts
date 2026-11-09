@@ -132,6 +132,20 @@ export const ABDUCTABLE_CENTER_METERS_PER_SECOND = 1
 /** Acceleration toward the planet center after the beam lets go, in meters per second squared. */
 export const ABDUCTABLE_FALL_GRAVITY_METERS_PER_SECOND_SQUARED = 20
 
+// MARK: Probes
+
+/** Clip looped on Probe1–Probe4 until a probe reaction starts. */
+export const PROBE_IDLE_CLIP = 'Idle'
+
+/** One-shot clip played on one idle probe when the server echoes a probe. */
+export const PROBE_ACTION_CLIP = 'Probe1'
+
+/**
+ * How long a probe stays on the Probe1 clip, in seconds.
+ * The clip's last key is at 1.633s. This is a little longer so that pose can finish before Idle resumes.
+ */
+export const PROBE_ACTION_SECONDS = 1.64
+
 // MARK: Debug
 
 /**

@@ -371,7 +371,7 @@
                 "playing": true,
                 "weight": 1,
                 "speed": 0.8999999761581421,
-                "loop": false,
+                "loop": true,
                 "shouldReset": false
               }
             ]
@@ -473,9 +473,39 @@
             ]
           }
         },
+        "524": {
+          "json": {
+            "states": [
+              {
+                "clip": "ArmatureAction",
+                "playing": true,
+                "weight": 1,
+                "speed": 1,
+                "loop": true,
+                "shouldReset": false
+              },
+              {
+                "clip": "Point",
+                "playing": false,
+                "weight": 1,
+                "speed": 1,
+                "loop": false,
+                "shouldReset": false
+              }
+            ]
+          }
+        },
         "526": {
           "json": {
             "states": [
+              {
+                "clip": "ArmatureAction",
+                "playing": false,
+                "weight": 1,
+                "speed": 1,
+                "loop": false,
+                "shouldReset": false
+              },
               {
                 "clip": "Point",
                 "playing": true,

@@ -40,6 +40,9 @@ export const Messages = {
     x: Schemas.Float,
     y: Schemas.Float,
     z: Schemas.Float
+  }),
+  notifyProbed: Schemas.Map({
+    probedAt: Schemas.Int64
   })
 }
 
