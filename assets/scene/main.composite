@@ -205,6 +205,27 @@
             "parent": 513
           }
         },
+        "519": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "parent": 513
+          }
+        },
         "520": {
           "json": {
             "position": {
@@ -577,6 +598,13 @@
             "invisibleMeshesCollisionMask": 0
           }
         },
+        "519": {
+          "json": {
+            "src": "assets/scene/Models/CompassArrow.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
+          }
+        },
         "520": {
           "json": {
             "src": "assets/scene/Models/OuterLights.gltf",
@@ -608,13 +636,6 @@
         "524": {
           "json": {
             "src": "assets/scene/Models/RedArrow.gltf",
-            "visibleMeshesCollisionMask": 0,
-            "invisibleMeshesCollisionMask": 3
-          }
-        },
-        "525": {
-          "json": {
-            "src": "assets/scene/Models/TextPlane.gltf",
             "visibleMeshesCollisionMask": 0,
             "invisibleMeshesCollisionMask": 3
           }
@@ -676,6 +697,11 @@
             "value": "Probe4"
           }
         },
+        "519": {
+          "json": {
+            "value": "CompassArrow"
+          }
+        },
         "520": {
           "json": {
             "value": "OuterLights"
@@ -724,9 +750,9 @@
       "data": {
         "525": {
           "json": {
-            "text": "Samples remaining: 3\n",
+            "text": "1/15\n",
             "font": 0,
-            "fontSize": 5,
+            "fontSize": 8,
             "fontAutoSize": false,
             "textAlign": 4,
             "width": 1,
@@ -899,7 +925,8 @@
                   516,
                   517,
                   518,
-                  525
+                  525,
+                  519
                 ]
               },
               {
@@ -950,6 +977,10 @@
               {
                 "entity": 525,
                 "children": []
+              },
+              {
+                "entity": 519,
+                "children": []
               }
             ]
           }
@@ -998,6 +1029,9 @@
           "json": {}
         },
         "518": {
+          "json": {}
+        },
+        "519": {
           "json": {}
         },
         "520": {
@@ -1904,6 +1938,10 @@
             "email": "",
             "tags": [],
             "layout": {
+              "base": {
+                "x": 0,
+                "y": 0
+              },
               "parcels": [
                 {
                   "x": 0,
@@ -2389,11 +2427,7 @@
                   "x": 10,
                   "y": 0
                 }
-              ],
-              "base": {
-                "x": 0,
-                "y": 0
-              }
+              ]
             },
             "silenceVoiceChat": false,
             "disablePortableExperiences": false,
@@ -2405,22 +2439,19 @@
                   "x": {
                     "$case": "range",
                     "value": [
-                      89.4000015258789,
-                      92.4000015258789
+                      88.37000274658203,
+                      91.37000274658203
                     ]
                   },
                   "y": {
-                    "$case": "range",
-                    "value": [
-                      67.5,
-                      67.5
-                    ]
+                    "$case": "single",
+                    "value": 67.75
                   },
                   "z": {
                     "$case": "range",
                     "value": [
-                      79.01000213623047,
-                      82.01000213623047
+                      79.68000030517578,
+                      82.68000030517578
                     ]
                   }
                 },

@@ -14,7 +14,7 @@
 import { engine } from '@dcl/sdk/ecs'
 import { isServer } from '@dcl/sdk/network'
 import { setOnProbeAccepted } from '../networking/client'
-import { AbductableArrowSystem, RedArrowSystem } from './arrows'
+import { AbductableArrowSystem, CompassArrowSystem, RedArrowSystem } from './arrows'
 import { AbductableAngleSystem, replaceAbductable, resetLift } from './lift'
 import { resetClientCarry } from './placement'
 import { SamplesRemainingSystem } from './samplesLabel'
@@ -42,6 +42,7 @@ export function setupAbduction(): void {
   engine.addSystem(AbductableSpawnSystem)
   engine.addSystem(SpinnerSystem)
   engine.addSystem(RedArrowSystem)
+  engine.addSystem(CompassArrowSystem)
   engine.addSystem(AbductableArrowSystem)
   engine.addSystem(SamplesRemainingSystem)
 }

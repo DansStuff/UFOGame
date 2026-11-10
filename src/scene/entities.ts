@@ -1,7 +1,7 @@
 /**
  * Composite entities placed in Creator Hub and configured further in code.
  * Resolved once when the client starts, then read by the systems that drive them.
- * The two arrows do not cast shadows.
+ * The guidance arrows do not cast shadows.
  */
 import { engine, Entity, GltfNodeModifiers } from '@dcl/sdk/ecs'
 import { EntityNames } from '../../assets/scene/entity-names'
@@ -14,6 +14,7 @@ export const sceneEntities: {
   probe3: SceneEntity
   probe4: SceneEntity
   abductableArrow: SceneEntity
+  compassArrow: SceneEntity
   redArrow: SceneEntity
   outerLights: SceneEntity
   innerLights: SceneEntity
@@ -25,6 +26,7 @@ export const sceneEntities: {
   probe3: null,
   probe4: null,
   abductableArrow: null,
+  compassArrow: null,
   redArrow: null,
   outerLights: null,
   innerLights: null,
@@ -51,6 +53,7 @@ export function setupSceneEntities(): void {
   sceneEntities.probe3 = load(EntityNames.Probe3)
   sceneEntities.probe4 = load(EntityNames.Probe4)
   sceneEntities.abductableArrow = load(EntityNames.AbductableArrow)
+  sceneEntities.compassArrow = load(EntityNames.CompassArrow)
   sceneEntities.redArrow = load(EntityNames.RedArrow)
   sceneEntities.outerLights = load(EntityNames.OuterLights)
   sceneEntities.innerLights = load(EntityNames.InnerLights)
@@ -58,5 +61,6 @@ export function setupSceneEntities(): void {
   sceneEntities.beamRing = load(EntityNames.BeamRing)
 
   if (sceneEntities.abductableArrow !== null) disableCastShadows(sceneEntities.abductableArrow)
+  if (sceneEntities.compassArrow !== null) disableCastShadows(sceneEntities.compassArrow)
   if (sceneEntities.redArrow !== null) disableCastShadows(sceneEntities.redArrow)
 }

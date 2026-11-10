@@ -2,8 +2,8 @@
  * Client-only view of the saucer. The camera looks at the ship origin from behind
  * the ship, opposite the current direction of travel. With the local player at
  * the center the view is closest and least tilted; at the rim it is farthest
- * and looks down more. A small tilt leaves the heading alone, and the heading
- * eases instead of snapping.
+ * and looks down more. A small tilt leaves the heading alone. A new heading
+ * starts at rest and accelerates around the ring, then settles behind the ship.
  */
 import { engine, Entity, getWorldPosition, MainCamera, Transform, VirtualCamera } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
@@ -27,6 +27,8 @@ let shipEntity: Entity | null = null
 /** Radians. 0 flies toward +Z. The camera sits on the opposite side of the origin. */
 let heading = 0
 let targetHeading = 0
+/** Radians per second. Starts at rest so a new heading eases in. */
+let headingVelocity = 0
 
 function findShip(): Entity | null {
   if (shipEntity !== null && Transform.getOrNull(shipEntity)) return shipEntity
@@ -54,10 +56,14 @@ function easeHeading(dt: number): void {
   const step = Math.min(Math.max(dt, 0), SIMULATION_MAX_DELTA_SECONDS)
   if (CAMERA_HEADING_SMOOTH_SECONDS <= 0) {
     heading = targetHeading
+    headingVelocity = 0
     return
   }
-  const blend = 1 - Math.exp(-step / CAMERA_HEADING_SMOOTH_SECONDS)
-  heading += wrapPi(targetHeading - heading) * blend
+  // Critically damped: speed starts at zero and peaks halfway through the smooth time.
+  const omega = 2 / CAMERA_HEADING_SMOOTH_SECONDS
+  const error = wrapPi(targetHeading - heading)
+  headingVelocity += (error * omega * omega - 2 * omega * headingVelocity) * step
+  heading += headingVelocity * step
 }
 
 /** 0 at the ship center, 1 at the saucer rim. Farther out stays at 1. */
@@ -95,10 +101,12 @@ function placeCamera(camera: Entity, shipPosition: Vector3): void {
 
 export function setupCamera(): void {
   if (isServer()) return
-
+  // Temporary: skip the virtual camera so the player keeps normal camera controls.
+  /*
   shipEntity = null
   heading = 0
   targetHeading = 0
+  headingVelocity = 0
   sampleTravelTarget()
   heading = targetHeading
 
@@ -123,4 +131,5 @@ export function setupCamera(): void {
     easeHeading(dt)
     placeCamera(camera, getWorldPosition(engine, currentShip))
   })
+    */
 }

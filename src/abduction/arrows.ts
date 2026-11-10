@@ -1,11 +1,13 @@
 /**
  * Client-only guidance arrows. RedArrow rides a horizontal ring around the ship and
- * points along the horizontal direction from the ship to the cow. AbductableArrow is
- * a child of the planet, placed above the cow along the cow's up. It shows while the
- * synced angle stays inside the outer limit and outside the inner one. Inside the
- * inner limit both arrows hide. RedArrow shows past the outer limit.
+ * points along the horizontal direction from the ship to the cow. CompassArrow is a
+ * child of the ship and yaws around its local up so it stays flat on the deck while
+ * its forward points at the cow. AbductableArrow is a child of the planet,
+ * placed above the cow along the cow's up. It shows while the synced angle stays
+ * inside the outer limit and outside the inner one. Inside the inner limit every
+ * arrow hides. CompassArrow shows past that limit. RedArrow shows past the outer one.
  */
-import { engine, Entity, getWorldPosition, Transform } from '@dcl/sdk/ecs'
+import { engine, Entity, getWorldPosition, getWorldRotation, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { EntityNames } from '../../assets/scene/entity-names'
 import {
@@ -58,6 +60,42 @@ export function RedArrowSystem(): void {
   transform.position.y = RED_ARROW_RING_Y
   transform.position.z = shipPosition.z + direction.z * radius
   transform.rotation = Quaternion.lookRotation(direction, Vector3.Up())
+}
+
+/**
+ * Direction to the target in the arrow's parent space, flattened onto the deck.
+ * The result has no Y, so a look rotation around it is a yaw about local up.
+ * Returns null when the target sits on the deck normal.
+ */
+function deckDirection(arrow: Entity, target: Entity): Vector3 | null {
+  const delta = Vector3.subtract(getWorldPosition(engine, target), getWorldPosition(engine, arrow))
+  const parent = Transform.get(arrow).parent
+  const local = parent === undefined ? delta : unrotate(getWorldRotation(engine, parent), delta)
+  const length = Math.hypot(local.x, local.z)
+  if (length < 1e-4) return null
+  return Vector3.create(local.x / length, 0, local.z / length)
+}
+
+/**
+ * Yaws CompassArrow around local up so its forward points at the abductable
+ * across the deck. Pitch and roll stay at zero, so the arrow stays flat on the ship.
+ * It hides inside the inner angle.
+ */
+export function CompassArrowSystem(): void {
+  const entity = sceneEntities.compassArrow
+  if (entity === null || Transform.getOrNull(entity) === null) return
+
+  const abductable = findAbductable()
+  if (abductable === null) {
+    setVisible(entity, false)
+    return
+  }
+
+  setVisible(entity, Abductable.get(abductable).angularOffset > ARROW_HIDE_ANGLE_DEGREES)
+
+  const direction = deckDirection(entity, abductable)
+  if (direction === null) return
+  Transform.getMutable(entity).rotation = Quaternion.lookRotation(direction, Vector3.Up())
 }
 
 /** Arrow height for the model on this cow. Falls back to the first model. */

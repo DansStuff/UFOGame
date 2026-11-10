@@ -46,10 +46,37 @@ export const SHIP_TILT_SMOOTH_SECONDS = 0.4
 export const PLANET_SPIN_MAX_DEGREES_PER_SECOND = 15
 
 /**
+ * Share of full spin the ship can hold while an abduction is in progress.
+ * Steering above this eases back down to it. 1 is the usual top speed.
+ */
+export const SHIP_ABDUCTION_MAX_SPEED_FRACTION = 0.5
+
+/**
  * How quickly the displayed planet rotation catches the synced orientation.
  * Spin between updates comes from the synced angular velocity.
  */
 export const PLANET_ROTATION_BLEND_SECONDS = 0.25
+
+// MARK: Passport area
+
+/**
+ * Width and depth of the box where clicking a player does not open their passport.
+ * The saucer is about 40m across and the floor collider reaches about 43m,
+ * so this leaves room for someone standing at the rim.
+ */
+export const PASSPORT_AREA_WIDTH_METERS = 46
+
+/**
+ * Height of that box, in ship-local meters.
+ * The hull bottom is about 2m below the ship origin and the dome top is about 9m above it.
+ */
+export const PASSPORT_AREA_HEIGHT_METERS = 14
+
+/**
+ * Ship-local Y of the box center.
+ * The box extends half its height above and below this point.
+ */
+export const PASSPORT_AREA_CENTER_Y = 4
 
 // MARK: Camera
 
@@ -80,8 +107,11 @@ export const CAMERA_MAX_DISTANCE_METERS = 38
  */
 export const CAMERA_TRAVEL_DEADZONE_DEGREES = 0.5
 
-/** How quickly the camera eases around the ring to stay behind the ship. */
-export const CAMERA_HEADING_SMOOTH_SECONDS = 1
+/**
+ * How long the camera takes to accelerate into a new heading on the ring, in seconds.
+ * The move starts at rest. Larger is a slower ease-in.
+ */
+export const CAMERA_HEADING_SMOOTH_SECONDS = 1.5
 
 // MARK: Abduction
 
@@ -115,7 +145,7 @@ export const ABDUCTABLE_MODELS: AbductableModel[] = [
   {
     src: 'assets/scene/Models/Abductable/cow.glb',
     scale: 0.45,
-    samples: 15,
+    samples: 10,
     arrowLocalY: 2,
     idleClip: 'Armature|Idle',
     clips: [
@@ -139,8 +169,14 @@ export const SAMPLES_REMAINING_LABEL = 'Samples remaining:'
 /** How far the camera can be from an abductable and still show the hover text. */
 export const ABDUCTABLE_POINTER_MAX_DISTANCE_METERS = 9
 
+/**
+ * Minimum time between `requestProbe` sends from an abductable pointer click.
+ * Temporary defensive measure.
+ */
+export const ABDUCTABLE_PROBE_REQUEST_COOLDOWN_SECONDS = 0.5
+
 /** Scene-space height of the ring the direction arrow travels. */
-export const RED_ARROW_RING_Y = 55
+export const RED_ARROW_RING_Y = 45
 
 /**
  * AbductableArrow shows while the angle between the ship and the abductable,
@@ -150,10 +186,10 @@ export const RED_ARROW_RING_Y = 55
 export const ABDUCTABLE_ARROW_MAX_ANGLE_DEGREES = 42
 
 /**
- * Both arrows hide while the angle from the planet center is within this many degrees.
- * The abductable is close enough that neither indicator is needed.
+ * Guidance arrows hide while the angle from the planet center is within this many degrees.
+ * The abductable is close enough that the indicators are not needed.
  */
-export const ARROW_HIDE_ANGLE_DEGREES = 10
+export const ARROW_HIDE_ANGLE_DEGREES = 6
 
 /**
  * The abductable rises toward the ship while the angle from the planet center

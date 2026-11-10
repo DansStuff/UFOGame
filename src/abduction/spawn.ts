@@ -18,6 +18,7 @@ import {
   ABDUCTABLE_HOVER_TEXT,
   ABDUCTABLE_MODELS,
   ABDUCTABLE_POINTER_MAX_DISTANCE_METERS,
+  ABDUCTABLE_PROBE_REQUEST_COOLDOWN_SECONDS,
   PLANET_SURFACE_RADIUS_METERS
 } from '../constants'
 import { getGameState, type AbductableDirectionSnapshot } from '../gamestate'
@@ -27,6 +28,16 @@ import { hasPlacement, outwardDirection, rotationWithUp } from './geometry'
 import { placeOnPlanet, placeOnShip, resetClientCarry } from './placement'
 import { findNamed, findPlanet } from './sceneLookup'
 import { detachMooSpeaker } from './sound'
+
+/** Last time a pointer click was allowed to send `requestProbe`. Temporary defensive measure. */
+let lastProbeRequestAt = 0
+
+function sendProbeRequestFromPointer(abductableId: number): void {
+  const now = Date.now()
+  if (now - lastProbeRequestAt < ABDUCTABLE_PROBE_REQUEST_COOLDOWN_SECONDS * 1000) return
+  lastProbeRequestAt = now
+  requestProbe(abductableId)
+}
 
 function spawnAbductable(
   planet: Entity,
@@ -64,7 +75,7 @@ function spawnAbductable(
       }
     },
     () => {
-      requestProbe(id)
+      sendProbeRequestFromPointer(id)
     }
   )
   Animator.create(entity, {

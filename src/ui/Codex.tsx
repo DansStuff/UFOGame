@@ -155,19 +155,19 @@ export function Codex(props: {}) {
           }}
         >
           <UiEntity uiTransform={{ width: '100%', height: state.cellSize, margin: { bottom: 16 } }}>
-            <CodexRow cellSize={state.cellSize} />
+            <CodexRow cellSize={state.cellSize} leadLabel="Cow?" />
           </UiEntity>
           <UiEntity uiTransform={{ width: '100%', height: state.cellSize, margin: { bottom: 16 } }}>
-            <CodexRow cellSize={state.cellSize} />
+            <CodexRow cellSize={state.cellSize} leadLabel="" />
           </UiEntity>
           <UiEntity uiTransform={{ width: '100%', height: state.cellSize, margin: { bottom: 16 } }}>
-            <CodexRow cellSize={state.cellSize} />
+            <CodexRow cellSize={state.cellSize} leadLabel="" />
           </UiEntity>
           <UiEntity uiTransform={{ width: '100%', height: state.cellSize, margin: { bottom: 16 } }}>
-            <CodexRow cellSize={state.cellSize} />
+            <CodexRow cellSize={state.cellSize} leadLabel="" />
           </UiEntity>
           <UiEntity uiTransform={{ width: '100%', height: state.cellSize, margin: { bottom: 16 } }}>
-            <CodexRow cellSize={state.cellSize} />
+            <CodexRow cellSize={state.cellSize} leadLabel="" />
           </UiEntity>
         </UiEntity>
       </UiEntity>

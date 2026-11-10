@@ -8,6 +8,7 @@ export enum EntityNames {
   AbductableArrow = "AbductableArrow",
   Beam = "Beam",
   BeamRing = "BeamRing",
+  CompassArrow = "CompassArrow",
   InnerLights = "InnerLights",
   OuterLights = "OuterLights",
   Planet = "Planet",

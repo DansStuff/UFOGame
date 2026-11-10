@@ -11,6 +11,7 @@ import { setupClientRoom } from './networking/client'
 import { setupActivity } from './player/activity'
 import { setupSceneEntities } from './scene/entities'
 import { setupShipMotion } from './ship/motion'
+import { setupPassportArea } from './ship/passportArea'
 import { setupProbes } from './ship/probes'
 import { setupSaucerFX } from './ship/saucerFx'
 import { setupShipWind } from './ship/wind'
@@ -31,6 +32,7 @@ export function main() {
   }
 
   setupSceneEntities()
+  setupPassportArea()
   setupCamera()
   setupClientRoom()
   setupShipWind()

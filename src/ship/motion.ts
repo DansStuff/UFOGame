@@ -11,6 +11,7 @@ import { EntityNames } from '../../assets/scene/entity-names'
 import {
   PLANET_ROTATION_BLEND_SECONDS,
   PLANET_SPIN_MAX_DEGREES_PER_SECOND,
+  SHIP_ABDUCTION_MAX_SPEED_FRACTION,
   SHIP_CENTER_X,
   SHIP_CENTER_Z,
   SHIP_TILT_EDGE_RADIUS,
@@ -105,6 +106,15 @@ export function shipTiltQuaternion(pitch: number, roll: number): Quaternion {
   )
 }
 
+/**
+ * 1 during normal flight. While the cow is on the ship, steering cannot hold
+ * more than the abduction cap, and a faster spin eases back down to it.
+ */
+function speedFractionLimit(abductableOnShip: boolean): number {
+  if (abductableOnShip) return SHIP_ABDUCTION_MAX_SPEED_FRACTION
+  return 1
+}
+
 /** 0..1 speed already written into the synced spin, so the next step can ease from it. */
 function syncedSpeedFraction(velocity: PlanetAngularVelocitySnapshot): number {
   if (PLANET_SPIN_MAX_DEGREES_PER_SECOND <= 0) return 0
@@ -161,7 +171,7 @@ function integrateRotation(
 function ShipMotionServerSystem(dt: number): void {
   const step = Math.min(Math.max(dt, 0), SIMULATION_MAX_DELTA_SECONDS)
   const state = getGameState()
-  const targetSpeed = normalizedShipSpeed()
+  const targetSpeed = Math.min(normalizedShipSpeed(), speedFractionLimit(state.abductableOnShip))
   const pitch = smoothToward(state.shipPitch, sampledShipPitch, step, SHIP_TILT_SNAP_DEGREES)
   const roll = smoothToward(state.shipRoll, sampledShipRoll, step, SHIP_TILT_SNAP_DEGREES)
   const speed = smoothToward(syncedSpeedFraction(state.planetAngularVelocity), targetSpeed, step, SHIP_SPEED_SNAP)

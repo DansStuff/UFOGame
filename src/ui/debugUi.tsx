@@ -29,13 +29,21 @@ function returnToShip(): void {
 }
 
 const uiMenu = () => (
-  <UiEntity uiTransform={{ width: '100%', height: '100%', pointerFilter: 'none' }}>
+  <UiEntity
+    uiTransform={{
+      width: '100%',
+      height: '100%',
+      flexDirection: 'column',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      padding: { bottom: 32 },
+      pointerFilter: 'none'
+    }}
+  >
     <UiEntity
       uiTransform={{
         width: 240,
         height: 56,
-        positionType: 'absolute',
-        position: { right: 32, bottom: 32 },
         alignItems: 'center',
         justifyContent: 'center'
       }}

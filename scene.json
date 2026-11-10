@@ -146,16 +146,16 @@
       "default": true,
       "position": {
         "x": [
-          89.4000015258789,
-          92.4000015258789
+          88.37000274658203,
+          91.37000274658203
         ],
         "y": [
-          67.5,
-          67.5
+          67.75,
+          67.75
         ],
         "z": [
-          79.01000213623047,
-          82.01000213623047
+          79.68000030517578,
+          82.68000030517578
         ]
       },
       "cameraTarget": {
@@ -187,6 +187,6 @@
   "rating": "A",
   "authoritativeMultiplayer": true,
   "worldConfiguration": {
-    "name": "noprobelem.dcl.eth"
+    "name": "danl.dcl.eth"
   }
 }
