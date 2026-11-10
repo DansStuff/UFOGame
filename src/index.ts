@@ -1,4 +1,3 @@
-import { setupUi } from './ui'
 /**
  * Scene composition root. Calls each domain `setup*` and, on the client,
  * registers notify handlers. Server request handling lives in the state machine.
