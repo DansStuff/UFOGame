@@ -1,23 +1,30 @@
 /** @jsx ReactEcs.createElement */
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 
-// The driver in src/ui-behaviors.ts writes `samplesCollected` from GameState.
+// The driver in src/ui/behaviors.ts writes `samplesCollected` from GameState,
+// and shifts this bar so the label sits on the screen center. The HUD root
+// is the safe inset, so a 100% row would center inside that inset instead.
+// Rest size is a 1920-wide desktop canvas with no inset.
 export interface State {
   samplesCollected: number
+  barLeft: number
+  barWidth: number
 }
 
 export const state: State = {
-  samplesCollected: 0
+  samplesCollected: 0,
+  barLeft: 0,
+  barWidth: 1920
 }
 
 export function SamplesCollected(props: {}) {
   return (
     <UiEntity
       uiTransform={{
-        width: '100%',
+        width: state.barWidth,
         height: 64,
         positionType: 'absolute',
-        position: { top: 16 },
+        position: { top: 16, left: state.barLeft },
         justifyContent: 'center',
         alignItems: 'center',
         pointerFilter: 'none'

@@ -24,7 +24,7 @@ import { Vector3 } from '@dcl/sdk/math'
 import { onEnterScene, onLeaveScene } from '@dcl/sdk/src/players'
 import { isServer } from '@dcl/sdk/network'
 import { movePlayerTo } from '~system/RestrictedActions'
-import { EntityNames } from '../assets/scene/entity-names'
+import { EntityNames } from '../../assets/scene/entity-names'
 import {
   ACTIVITY_HEARTBEAT_SECONDS,
   ACTIVITY_IDLE_SECONDS,
@@ -33,10 +33,10 @@ import {
   SHIP_CENTER_X,
   SHIP_CENTER_Z,
   SHIP_TILT_SAFE_RADIUS
-} from './constants'
-import { notifyActivityRecall } from './gamestate/serverRoom'
-import { reportActivity } from './networking/client'
-import { room } from './networking/messages'
+} from '../constants'
+import { notifyActivityRecall } from '../gamestate/serverRoom'
+import { reportActivity } from '../networking/client'
+import { room } from '../networking/messages'
 
 const ACTIVITY_INPUTS = [
   InputAction.IA_POINTER,

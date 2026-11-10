@@ -4,7 +4,7 @@
  * request. Clients do not run this machine.
  */
 import { isServer } from '@dcl/sdk/network'
-import { noteActivity } from '../activity'
+import { noteActivity } from '../player/activity'
 import { replaceAbductable } from '../abduction'
 import {
   applyAbductableSampleTaken,

@@ -6,15 +6,19 @@ import { engine, Entity } from '@dcl/sdk/ecs'
 import ReactEcs, { ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { Color4, Vector3 } from '@dcl/sdk/math'
 import { movePlayerTo } from '~system/RestrictedActions'
-import { markActivity } from './activity'
-import { DEBUG_SPAWN_X, DEBUG_SPAWN_Y, DEBUG_SPAWN_Z } from './constants'
+import { DEBUG_SPAWN_X, DEBUG_SPAWN_Y, DEBUG_SPAWN_Z } from '../constants'
+import { markActivity } from '../player/activity'
 
 let owner: Entity | null = null
 
 export function setupDebugUi(): void {
   if (owner !== null) return
   owner = engine.addEntity()
-  ReactEcsRenderer.addUiRenderer(owner, uiMenu, { virtualWidth: 1920, virtualHeight: 1080 })
+  ReactEcsRenderer.addUiRenderer(owner, uiMenu, {
+    virtualWidth: 1920,
+    virtualHeight: 1080,
+    screenInset: 'interactable'
+  })
 }
 
 function returnToShip(): void {

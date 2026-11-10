@@ -18,13 +18,11 @@ import {
   GltfContainer,
   GltfNodeModifiers,
   MaterialTransparencyMode,
-  Name,
   Transform,
   VisibilityComponent
 } from '@dcl/sdk/ecs'
 import { Color3, Color4, Quaternion, Scalar, Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
-import { EntityNames } from '../assets/scene/entity-names'
 import {
   BEAM_RING_ALBEDO_BLUE,
   BEAM_RING_ALBEDO_GREEN,
@@ -47,8 +45,9 @@ import {
   SAUCER_LIGHTS_MAX_DEGREES_PER_SECOND,
   SAUCER_LIGHTS_MIN_DEGREES_PER_SECOND,
   SIMULATION_MAX_DELTA_SECONDS
-} from './constants'
-import { shipSpeedFraction } from './shipSpeed'
+} from '../constants'
+import { sceneEntities } from '../scene/entities'
+import { shipSpeedFraction } from './speed'
 
 type LightRing = {
   entity: Entity | null
@@ -94,13 +93,13 @@ function captureRing(ring: LightRing, entity: Entity): void {
 }
 
 function findLightRings(): void {
-  const needOuter = !ringIsLive(outerLights)
-  const needInner = !ringIsLive(innerLights)
-  if (!needOuter && !needInner) return
-
-  for (const [entity, name] of engine.getEntitiesWith(Name, Transform)) {
-    if (needOuter && name.value === EntityNames.OuterLights) captureRing(outerLights, entity)
-    else if (needInner && name.value === EntityNames.InnerLights) captureRing(innerLights, entity)
+  if (!ringIsLive(outerLights)) {
+    const entity = sceneEntities.outerLights
+    if (entity !== null && Transform.getOrNull(entity)) captureRing(outerLights, entity)
+  }
+  if (!ringIsLive(innerLights)) {
+    const entity = sceneEntities.innerLights
+    if (entity !== null && Transform.getOrNull(entity)) captureRing(innerLights, entity)
   }
 }
 
@@ -178,14 +177,16 @@ function findBeamParts(): void {
   if (needBeam) beam = null
   if (!needBeam && !needRing) return
 
-  for (const [entity, name] of engine.getEntitiesWith(Name, Transform)) {
-    if (needBeam && name.value === EntityNames.Beam) {
+  if (needBeam) {
+    const entity = sceneEntities.beam
+    if (entity !== null && Transform.getOrNull(entity)) {
       beam = entity
       disableCastShadows(entity)
-    } else if (needRing && beamRings.length === 0 && name.value === EntityNames.BeamRing) {
-      if (!captureBeamRing(entity)) continue
     }
-    if ((!needBeam || beam !== null) && beamRings.length > 0) return
+  }
+  if (needRing && beamRings.length === 0) {
+    const entity = sceneEntities.beamRing
+    if (entity !== null && Transform.getOrNull(entity)) captureBeamRing(entity)
   }
 }
 

@@ -6,10 +6,11 @@
  * disagree. A placed probe can be missing the Probe1 clip after import, so it
  * is added here.
  */
-import { Animator, engine, Entity, Name, timers, Transform } from '@dcl/sdk/ecs'
+import { Animator, Entity, timers, Transform } from '@dcl/sdk/ecs'
 import { isServer } from '@dcl/sdk/network'
-import { EntityNames } from '../assets/scene/entity-names'
-import { PROBE_ACTION_CLIP, PROBE_ACTION_SECONDS, PROBE_IDLE_CLIP } from './constants'
+import { EntityNames } from '../../assets/scene/entity-names'
+import { PROBE_ACTION_CLIP, PROBE_ACTION_SECONDS, PROBE_IDLE_CLIP } from '../constants'
+import { sceneEntities } from '../scene/entities'
 
 const PROBE_NAMES = [EntityNames.Probe1, EntityNames.Probe2, EntityNames.Probe3, EntityNames.Probe4]
 
@@ -71,24 +72,26 @@ function prepareProbe(entity: Entity): void {
   action.loop = false
 }
 
+function probeEntities(): (Entity | null)[] {
+  return [sceneEntities.probe1, sceneEntities.probe2, sceneEntities.probe3, sceneEntities.probe4]
+}
+
 function bindProbes(): void {
-  let needScan = false
-  for (const slot of slots) {
-    if (slot.entity !== null && Transform.getOrNull(slot.entity) !== null) continue
+  const entities = probeEntities()
+  for (let index = 0; index < slots.length; index++) {
+    const slot = slots[index]
+    const entity = entities[index]
+    if (entity !== null && Transform.getOrNull(entity) !== null) {
+      if (slot.entity === entity) continue
+      clearTimer(slot)
+      prepareProbe(entity)
+      slot.entity = entity
+      slot.busy = false
+      continue
+    }
     clearTimer(slot)
     slot.entity = null
     slot.busy = false
-    needScan = true
-  }
-  if (!needScan) return
-
-  for (const [entity, name] of engine.getEntitiesWith(Name, Transform)) {
-    const index = PROBE_NAMES.findIndex((probeName) => probeName === name.value)
-    if (index < 0) continue
-    const slot = slots[index]
-    if (slot.entity !== null) continue
-    prepareProbe(entity)
-    slot.entity = entity
   }
 }
 

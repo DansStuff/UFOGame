@@ -24,7 +24,11 @@ Source is grouped by domain, not by client vs server. `src/index.ts` is the comp
 - `src/constants.ts`: tunable numbers and strings. See `.cursor/rules/constants.mdc`.
 - `src/gamestate/`: synced `GameState` (late-joiner snapshot), server inbox, and the mission state machine that accepts or ignores incoming requests.
 - `src/networking/`: room message schemas and client notify handlers.
-- `src/sceneObjects.ts`: binds named composite entities (weapon consoles, mission table). Names live in `assets/scene/entity-names.ts`.
+- `src/abduction/`: the cow target: server lift and fall, client spawn and placement, guidance arrows, moo audio.
+- `src/ship/`: ship tilt and planet spin (`motion.ts`), derived speed (`speed.ts`), wind planes, saucer lights and beam, probe arm reactions.
+- `src/player/`: player heartbeat and idle recall.
+- `src/scene/entities.ts`: binds named composite entities. Names live in `assets/scene/entity-names.ts`.
+- `src/ui/`: React-ECS HUD, the debug button, and `behaviors.ts`, which feeds GameState into the HUD.
 - `scene.json`: scene metadata (parcels, spawn points, permissions). `authoritativeMultiplayer` stays enabled for the auth-server runtime.
 - `assets/`: 3D models and other content.
 

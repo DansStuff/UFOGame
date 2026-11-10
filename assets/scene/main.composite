@@ -205,27 +205,6 @@
             "parent": 513
           }
         },
-        "519": {
-          "json": {
-            "position": {
-              "x": 7.75,
-              "y": 0,
-              "z": 27
-            },
-            "rotation": {
-              "x": 0,
-              "y": 0,
-              "z": 0,
-              "w": 1
-            },
-            "scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
-            },
-            "parent": 0
-          }
-        },
         "520": {
           "json": {
             "position": {
@@ -331,6 +310,27 @@
             "parent": 0
           }
         },
+        "525": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 5.5,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 513
+          }
+        },
         "526": {
           "json": {
             "position": {
@@ -367,11 +367,27 @@
           "json": {
             "states": [
               {
-                "clip": "Idle",
-                "playing": true,
+                "clip": "0TPose",
+                "playing": false,
                 "weight": 1,
-                "speed": 0.8999999761581421,
-                "loop": true,
+                "speed": 1,
+                "loop": false,
+                "shouldReset": false
+              },
+              {
+                "clip": "Idle",
+                "playing": false,
+                "weight": 1,
+                "speed": 1,
+                "loop": false,
+                "shouldReset": false
+              },
+              {
+                "clip": "Probe1",
+                "playing": false,
+                "weight": 1,
+                "speed": 1,
+                "loop": false,
                 "shouldReset": false
               }
             ]
@@ -443,36 +459,6 @@
             ]
           }
         },
-        "519": {
-          "json": {
-            "states": [
-              {
-                "clip": "0TPose",
-                "playing": false,
-                "weight": 1,
-                "speed": 1,
-                "loop": false,
-                "shouldReset": false
-              },
-              {
-                "clip": "Idle",
-                "playing": false,
-                "weight": 1,
-                "speed": 1,
-                "loop": false,
-                "shouldReset": false
-              },
-              {
-                "clip": "Probe1",
-                "playing": false,
-                "weight": 1,
-                "speed": 1,
-                "loop": false,
-                "shouldReset": false
-              }
-            ]
-          }
-        },
         "524": {
           "json": {
             "states": [
@@ -528,6 +514,11 @@
         "protocolBuffer": "PBBillboard"
       },
       "data": {
+        "525": {
+          "json": {
+            "billboardMode": 2
+          }
+        },
         "526": {
           "json": {
             "billboardMode": 2
@@ -586,13 +577,6 @@
             "invisibleMeshesCollisionMask": 0
           }
         },
-        "519": {
-          "json": {
-            "src": "assets/scene/Models/Probe1.gltf",
-            "visibleMeshesCollisionMask": 0,
-            "invisibleMeshesCollisionMask": 3
-          }
-        },
         "520": {
           "json": {
             "src": "assets/scene/Models/OuterLights.gltf",
@@ -624,6 +608,13 @@
         "524": {
           "json": {
             "src": "assets/scene/Models/RedArrow.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
+          }
+        },
+        "525": {
+          "json": {
+            "src": "assets/scene/Models/TextPlane.gltf",
             "visibleMeshesCollisionMask": 0,
             "invisibleMeshesCollisionMask": 3
           }
@@ -685,11 +676,6 @@
             "value": "Probe4"
           }
         },
-        "519": {
-          "json": {
-            "value": "Probe1.gltf_5"
-          }
-        },
         "520": {
           "json": {
             "value": "OuterLights"
@@ -715,9 +701,62 @@
             "value": "RedArrow"
           }
         },
+        "525": {
+          "json": {
+            "value": "SamplesRemaining"
+          }
+        },
         "526": {
           "json": {
             "value": "AbductableArrow"
+          }
+        }
+      }
+    },
+    {
+      "name": "core::TextShape",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {},
+        "serializationType": "protocol-buffer",
+        "protocolBuffer": "PBTextShape"
+      },
+      "data": {
+        "525": {
+          "json": {
+            "text": "Samples remaining: 3\n",
+            "font": 0,
+            "fontSize": 5,
+            "fontAutoSize": false,
+            "textAlign": 4,
+            "width": 1,
+            "height": 1,
+            "paddingTop": 0,
+            "paddingRight": 0,
+            "paddingBottom": 0,
+            "paddingLeft": 0,
+            "lineSpacing": 0,
+            "textWrapping": false,
+            "shadowBlur": 0,
+            "shadowOffsetX": 0,
+            "shadowOffsetY": 0,
+            "outlineWidth": 0.4000000059604645,
+            "shadowColor": {
+              "r": 1,
+              "g": 1,
+              "b": 1
+            },
+            "outlineColor": {
+              "r": 0,
+              "g": 0,
+              "b": 0
+            },
+            "textColor": {
+              "r": 1,
+              "g": 1,
+              "b": 1,
+              "a": 1
+            }
           }
         }
       }
@@ -831,8 +870,7 @@
                   512,
                   513,
                   524,
-                  526,
-                  519
+                  526
                 ]
               },
               {
@@ -860,7 +898,8 @@
                   515,
                   516,
                   517,
-                  518
+                  518,
+                  525
                 ]
               },
               {
@@ -909,7 +948,7 @@
                 "children": []
               },
               {
-                "entity": 519,
+                "entity": 525,
                 "children": []
               }
             ]
@@ -961,9 +1000,6 @@
         "518": {
           "json": {}
         },
-        "519": {
-          "json": {}
-        },
         "520": {
           "json": {}
         },
@@ -980,6 +1016,9 @@
           "json": {
             "porportionalScaling": true
           }
+        },
+        "525": {
+          "json": {}
         },
         "526": {
           "json": {

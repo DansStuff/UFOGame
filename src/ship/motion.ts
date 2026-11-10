@@ -7,7 +7,7 @@
 import { engine, Entity, Name, PlayerIdentityData, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
-import { EntityNames } from '../assets/scene/entity-names'
+import { EntityNames } from '../../assets/scene/entity-names'
 import {
   PLANET_ROTATION_BLEND_SECONDS,
   PLANET_SPIN_MAX_DEGREES_PER_SECOND,
@@ -18,14 +18,14 @@ import {
   SHIP_TILT_MAX_DEGREES,
   SHIP_TILT_SMOOTH_SECONDS,
   SIMULATION_MAX_DELTA_SECONDS
-} from './constants'
+} from '../constants'
 import {
   applyShipMotion,
   getGameState,
   hasBoundGameState,
   type PlanetAngularVelocitySnapshot,
   type PlanetRotationSnapshot
-} from './gamestate'
+} from '../gamestate'
 
 /** Snap the tilt once it is this close, so easing reaches the target instead of crawling. */
 const SHIP_TILT_SNAP_DEGREES = 0.01
@@ -113,6 +113,18 @@ function syncedSpeedFraction(velocity: PlanetAngularVelocitySnapshot): number {
 }
 
 /**
+ * Scene-space flight on XZ. Positive pitch flies toward +Z. Negative roll flies toward +X.
+ * Null when the ship is level enough that it is not moving.
+ */
+export function shipTravelDirection(pitch: number, roll: number): { x: number; z: number } | null {
+  const travelX = -roll
+  const travelZ = pitch
+  const travel = Math.hypot(travelX, travelZ)
+  if (travel < 0.001) return null
+  return { x: travelX / travel, z: travelZ / travel }
+}
+
+/**
  * World-space spin, in degrees per second.
  * Direction follows the tilt: a dip toward +X flies toward +X, and the surface scrolls toward -X.
  * `speedFraction` is 0..1 from normalizedShipSpeed. Top speed scales it here.
@@ -123,15 +135,13 @@ function planetAngularVelocity(
   speedFraction: number
 ): PlanetAngularVelocitySnapshot {
   const fraction = Math.min(Math.max(speedFraction, 0), 1)
-  const travelX = -roll
-  const travelZ = pitch
-  const travel = Math.hypot(travelX, travelZ)
-  if (fraction <= 0 || travel < 0.001) return { x: 0, y: 0, z: 0 }
+  const direction = shipTravelDirection(pitch, roll)
+  if (fraction <= 0 || direction === null) return { x: 0, y: 0, z: 0 }
   const speed = fraction * PLANET_SPIN_MAX_DEGREES_PER_SECOND
   return {
-    x: (-travelZ / travel) * speed,
+    x: -direction.z * speed,
     y: 0,
-    z: (travelX / travel) * speed
+    z: direction.x * speed
   }
 }
 

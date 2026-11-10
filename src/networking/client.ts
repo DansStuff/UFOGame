@@ -4,8 +4,16 @@
  */
 import { isServer } from '@dcl/sdk/network'
 import { catchUpFromGameState, hasBoundGameState, onGameStateCatchUp, type GameStateSnapshot } from '../gamestate'
-import { playProbeReaction } from '../probes'
+import { playProbeReaction } from '../ship/probes'
 import { room } from './messages'
+
+/** Client-only reaction when the server accepts a probe. */
+let onProbeAccepted: (() => void) | null = null
+
+/** Registers the reaction for an accepted probe. The last registration wins. */
+export function setOnProbeAccepted(handler: () => void): void {
+  onProbeAccepted = handler
+}
 
 /** Asks the server to probe the cow with this id. Ignored until the room is ready. */
 export function requestProbe(abductableId: number): void {
@@ -69,6 +77,7 @@ export function setupClientRoom(): void {
     if (data.probedAt <= appliedProbedAt) return
     appliedProbedAt = data.probedAt
     playProbeReaction()
+    onProbeAccepted?.()
   })
 
   let requestedInitialState = false

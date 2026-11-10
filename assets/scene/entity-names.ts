@@ -12,11 +12,11 @@ export enum EntityNames {
   OuterLights = "OuterLights",
   Planet = "Planet",
   Probe1 = "Probe1",
-  Probe1_gltf_5 = "Probe1.gltf_5",
   Probe2 = "Probe2",
   Probe3 = "Probe3",
   Probe4 = "Probe4",
   RedArrow = "RedArrow",
+  SamplesRemaining = "SamplesRemaining",
   Ship = "Ship",
   Spotlight = "Spotlight",
 } 

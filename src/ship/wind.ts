@@ -22,7 +22,7 @@ import {
 } from '@dcl/sdk/ecs'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
-import { EntityNames } from '../assets/scene/entity-names'
+import { EntityNames } from '../../assets/scene/entity-names'
 import {
   PLANET_SPIN_MAX_DEGREES_PER_SECOND,
   SIMULATION_MAX_DELTA_SECONDS,
@@ -39,7 +39,7 @@ import {
   WIND_SPAWN_INNER_RADIUS_METERS,
   WIND_SPAWN_INTERVAL_SECONDS,
   WIND_SPAWN_OUTER_RADIUS_METERS
-} from './constants'
+} from '../constants'
 
 /** One wind plane. Age narrows it from full width to zero, then removes it. */
 export const WindPlane = engine.defineComponent('wind:Plane', {
