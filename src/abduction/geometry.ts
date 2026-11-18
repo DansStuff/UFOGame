@@ -1,6 +1,7 @@
 /** Pure math for directions on the planet sphere. No entities, no engine state. */
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { PLANET_SURFACE_RADIUS_METERS, SIMULATION_MAX_DELTA_SECONDS } from '../constants'
+import { SIMULATION_MAX_DELTA_SECONDS } from '../ship/constants'
+import { PLANET_SURFACE_RADIUS_METERS } from './constants'
 import type { AbductableDirectionSnapshot } from '../gamestate'
 
 /** Frame delta clamped so a long hitch does not jump the simulation. */

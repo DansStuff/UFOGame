@@ -1,6 +1,6 @@
 import { TextShape } from '@dcl/sdk/ecs'
 import { EntityNames } from '../../assets/scene/entity-names'
-import { SAMPLES_REMAINING_LABEL } from '../constants'
+import { SAMPLES_REMAINING_LABEL } from './constants'
 import { getGameState } from '../gamestate'
 import { Abductable, findAbductable } from './components'
 import { findNamed, setVisible } from './sceneLookup'

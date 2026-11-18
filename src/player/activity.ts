@@ -25,15 +25,13 @@ import { onEnterScene, onLeaveScene } from '@dcl/sdk/src/players'
 import { isServer } from '@dcl/sdk/network'
 import { movePlayerTo } from '~system/RestrictedActions'
 import { EntityNames } from '../../assets/scene/entity-names'
+import { SHIP_CENTER_X, SHIP_CENTER_Z, SHIP_TILT_SAFE_RADIUS } from '../ship/constants'
 import {
   ACTIVITY_HEARTBEAT_SECONDS,
   ACTIVITY_IDLE_SECONDS,
   ACTIVITY_RECALL_HEIGHT_METERS,
-  ACTIVITY_RECALL_INSET_METERS,
-  SHIP_CENTER_X,
-  SHIP_CENTER_Z,
-  SHIP_TILT_SAFE_RADIUS
-} from '../constants'
+  ACTIVITY_RECALL_INSET_METERS
+} from './constants'
 import { notifyActivityRecall } from '../gamestate/serverRoom'
 import { reportActivity } from '../networking/client'
 import { room } from '../networking/messages'

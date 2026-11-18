@@ -20,7 +20,7 @@ import {
   ABDUCTABLE_POINTER_MAX_DISTANCE_METERS,
   ABDUCTABLE_PROBE_REQUEST_COOLDOWN_SECONDS,
   PLANET_SURFACE_RADIUS_METERS
-} from '../constants'
+} from './constants'
 import { getGameState, type AbductableDirectionSnapshot } from '../gamestate'
 import { requestProbe } from '../networking/client'
 import { Abductable, findAbductable } from './components'

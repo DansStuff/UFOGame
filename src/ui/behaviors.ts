@@ -14,7 +14,7 @@ import {
   CODEX_WINDOW_BORDER,
   CODEX_WINDOW_INSET_MARGIN,
   CODEX_WINDOW_PADDING
-} from '../constants'
+} from './constants'
 import { getGameState } from '../gamestate'
 import { state as codex } from './Codex'
 import { state as samplesHud } from './SamplesCollected'

@@ -1,7 +1,7 @@
 /** Client-only tumble while the cow is off the surface. Not synced, so each client picks its own axis. */
 import { engine, Entity, Schemas, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { ABDUCTABLE_SPIN_DEGREES_PER_SECOND } from '../constants'
+import { ABDUCTABLE_SPIN_DEGREES_PER_SECOND } from './constants'
 import { randomSurfaceDirection, simulationStep } from './geometry'
 
 /** Never passed to syncEntity. `axis` is a unit direction in planet space. */

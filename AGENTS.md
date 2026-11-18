@@ -21,7 +21,8 @@ If you cannot run installs, read the skills directly at [https://github.com/dece
 
 Source is grouped by domain, not by client vs server. `src/index.ts` is the composition root: `main()` calls each domain `setup*` and returns early on the server. When behavior differs, the domain branches with `isServer()` instead of living under a `client/` or `server/` folder.
 
-- `src/constants.ts`: tunable numbers and strings. See `.cursor/rules/constants.mdc`.
+- `src/<domain>/constants.ts`: each domain keeps its own tunable numbers and strings next to the code that uses them. A domain may import another domain's constants (for example `player/` reads `SHIP_CENTER_X` from `ship/constants.ts`). There is no top-level `src/constants.ts`. See `.cursor/rules/constants.mdc`.
+- `src/camera/`: the saucer camera and its intro orbit.
 - `src/gamestate/`: synced `GameState` (late-joiner snapshot), server inbox, and the mission state machine that accepts or ignores incoming requests.
 - `src/networking/`: room message schemas and client notify handlers.
 - `src/abduction/`: the cow target: server lift and fall, client spawn and placement, guidance arrows, moo audio.

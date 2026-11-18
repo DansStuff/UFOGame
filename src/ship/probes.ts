@@ -9,7 +9,7 @@
 import { Animator, Entity, timers, Transform } from '@dcl/sdk/ecs'
 import { isServer } from '@dcl/sdk/network'
 import { EntityNames } from '../../assets/scene/entity-names'
-import { PROBE_ACTION_CLIP, PROBE_ACTION_SECONDS, PROBE_IDLE_CLIP } from '../constants'
+import { PROBE_ACTION_CLIP, PROBE_ACTION_SECONDS, PROBE_IDLE_CLIP } from './constants'
 import { sceneEntities } from '../scene/entities'
 
 const PROBE_NAMES = [EntityNames.Probe1, EntityNames.Probe2, EntityNames.Probe3, EntityNames.Probe4]

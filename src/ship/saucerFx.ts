@@ -45,7 +45,7 @@ import {
   SAUCER_LIGHTS_MAX_DEGREES_PER_SECOND,
   SAUCER_LIGHTS_MIN_DEGREES_PER_SECOND,
   SIMULATION_MAX_DELTA_SECONDS
-} from '../constants'
+} from './constants'
 import { sceneEntities } from '../scene/entities'
 import { shipSpeedFraction } from './speed'
 

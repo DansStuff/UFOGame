@@ -15,7 +15,7 @@ import {
   ABDUCTABLE_MODELS,
   ARROW_HIDE_ANGLE_DEGREES,
   RED_ARROW_RING_Y
-} from '../constants'
+} from './constants'
 import { sceneEntities } from '../scene/entities'
 import { Abductable, findAbductable, findAbductableModel } from './components'
 import { rotationWithUp, unrotate } from './geometry'

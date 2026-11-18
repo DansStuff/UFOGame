@@ -14,7 +14,7 @@ import {
   ABDUCTABLE_LIFT_METERS_PER_SECOND,
   ABDUCTABLE_MODELS,
   PLANET_SURFACE_RADIUS_METERS
-} from '../constants'
+} from './constants'
 import {
   applyAbductableAngularOffset,
   applyAbductableDirection,

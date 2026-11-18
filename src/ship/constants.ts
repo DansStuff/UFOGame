@@ -1,0 +1,209 @@
+/**
+ * Tunable numbers and strings for the ship domain. Grouped by feature with MARK comments.
+ * Prefix names so they still make sense away from the module that uses them.
+ */
+
+// MARK: Simulation
+
+/** Clamp for per-frame `dt` so a hitch cannot jump the sim too far. */
+export const SIMULATION_MAX_DELTA_SECONDS = 0.1
+
+// MARK: Ship steering
+
+/** Scene-space X of the ship. Player positions are measured from here. */
+export const SHIP_CENTER_X = 88
+/** Scene-space Z of the ship. Player positions are measured from here. */
+export const SHIP_CENTER_Z = 88
+
+/** Width of the saucer mesh. The steering edge is half of this. */
+export const SHIP_DISC_DIAMETER_METERS = 39
+
+/**
+ * Players inside this distance from the ship center are left out.
+ * If every player is inside it, the ship stays level.
+ */
+export const SHIP_TILT_SAFE_RADIUS = 5.5
+
+/**
+ * Distance from the ship center where one player's tilt contribution is at its maximum.
+ * This is the saucer rim.
+ */
+export const SHIP_TILT_EDGE_RADIUS = SHIP_DISC_DIAMETER_METERS / 2
+
+/** Largest pitch or roll. Steep enough to read, shallow enough to walk back up. */
+export const SHIP_TILT_MAX_DEGREES = 15
+
+/** How quickly the ship eases toward the tilt implied by the players. */
+export const SHIP_TILT_SMOOTH_SECONDS = 0.4
+
+/**
+ * Planet spin at full steering influence, in degrees per second.
+ * The planet radius is about 97m, so this is roughly 10 m/s of surface travel.
+ */
+export const PLANET_SPIN_MAX_DEGREES_PER_SECOND = 15
+
+/**
+ * Share of full spin the ship can hold while an abduction is in progress.
+ * Steering above this eases back down to it. 1 is the usual top speed.
+ */
+export const SHIP_ABDUCTION_MAX_SPEED_FRACTION = 0.5
+
+/**
+ * How quickly the displayed planet rotation catches the synced orientation.
+ * Spin between updates comes from the synced angular velocity.
+ */
+export const PLANET_ROTATION_BLEND_SECONDS = 0.25
+
+// MARK: Passport area
+
+/**
+ * Width and depth of the box where clicking a player does not open their passport.
+ * The saucer is about 40m across and the floor collider reaches about 43m,
+ * so this leaves room for someone standing at the rim.
+ */
+export const PASSPORT_AREA_WIDTH_METERS = 46
+
+/**
+ * Height of that box, in ship-local meters.
+ * The hull bottom is about 2m below the ship origin and the dome top is about 9m above it.
+ */
+export const PASSPORT_AREA_HEIGHT_METERS = 14
+
+/**
+ * Ship-local Y of the box center.
+ * The box extends half its height above and below this point.
+ */
+export const PASSPORT_AREA_CENTER_Y = 4
+
+// MARK: Probes
+
+/** Clip looped on Probe1–Probe4 until a probe reaction starts. */
+export const PROBE_IDLE_CLIP = 'Idle'
+
+/** One-shot clip played on one idle probe when the server echoes a probe. */
+export const PROBE_ACTION_CLIP = 'Probe1'
+
+/**
+ * How long a probe stays on the Probe1 clip, in seconds.
+ * The clip's last key is at 1.633s. This is a little longer so that pose can finish before Idle resumes.
+ */
+export const PROBE_ACTION_SECONDS = 1.64
+
+// MARK: Wind
+
+/**
+ * Apparent ship speed, in meters per second, below which no wind planes spawn.
+ * Full tilt is roughly 20 m/s at the saucer.
+ */
+export const WIND_MIN_SPEED_METERS_PER_SECOND = 2
+
+/**
+ * Seconds between wind planes at full ship speed.
+ * Slower flight waits longer, in proportion to speed / max speed.
+ */
+export const WIND_SPAWN_INTERVAL_SECONDS = 0.075
+
+/** How long a wind plane stays before it is removed. Width shrinks to zero over this time. */
+export const WIND_PLANE_LIFETIME_SECONDS = 2.2
+
+/** Width at spawn, across the direction of travel. It shrinks to zero over the plane's life. */
+export const WIND_PLANE_SIZE_METERS = 2.5
+
+/**
+ * Length along travel at full ship speed, reached halfway through a plane's life.
+ * Every live plane uses this times speed / max speed, times min(2 * age / lifetime, 1).
+ */
+export const WIND_PLANE_MAX_LENGTH_METERS = 25
+
+/**
+ * Cylindrical shell around the ship's travel axis, in meters from that axis.
+ * Planes spawn on the sides, top, and bottom, between these radii.
+ * The cylinder inside the inner radius stays empty.
+ */
+export const WIND_SPAWN_INNER_RADIUS_METERS = 22
+export const WIND_SPAWN_OUTER_RADIUS_METERS = 50
+
+/**
+ * Arc length, in meters, from the ship to the center of the spawn cylinder, along the planet surface.
+ * The step stays tangent to the planet. It does not follow the ship's tilted forward.
+ */
+export const WIND_SPAWN_AHEAD_METERS = 40
+
+/**
+ * How far a spawn may sit ahead of or behind that center, along the same surface arc.
+ * The cylinder's length is twice this.
+ */
+export const WIND_SPAWN_ALONG_HALF_LENGTH_METERS = 15
+
+export const WIND_COLOR_RED = 1
+export const WIND_COLOR_GREEN = 1
+export const WIND_COLOR_BLUE = 1
+
+/** Albedo alpha. It stays at this value for the whole life of the plane. */
+export const WIND_COLOR_ALPHA = 0.55
+
+// MARK: Saucer FX
+
+/**
+ * Light ring spin, in degrees per second, while the ship is stopped.
+ * Both rings use this. The inner ring spins the other way.
+ */
+export const SAUCER_LIGHTS_MIN_DEGREES_PER_SECOND = 5
+
+/** Light ring spin, in degrees per second, at full ship speed. */
+export const SAUCER_LIGHTS_MAX_DEGREES_PER_SECOND = 50
+
+/**
+ * The beam and its rings stay visible while the ship is below this share of full speed.
+ * 0 is stopped. 1 is full tilt.
+ */
+export const BEAM_MAX_VISIBLE_SPEED_FRACTION = 0.7
+
+/**
+ * Beam ring travel, in local meters on the saucer.
+ * Each cycle runs from the low end up to the high end, then snaps back.
+ */
+export const BEAM_RING_LOCAL_Y_START = -13
+export const BEAM_RING_LOCAL_Y_END = -0.75
+
+/** How many times per second the beam ring runs that travel. */
+export const BEAM_RING_CYCLES_PER_SECOND = 1
+
+/** Beam rings on the same travel, spaced evenly through the cycle. */
+export const BEAM_RING_COUNT = 3
+
+/**
+ * Ease-in power on the beam ring's travel. 1 is linear.
+ * Higher values leave the bottom more slowly and arrive at the top faster.
+ */
+export const BEAM_RING_EASE_IN = 1
+
+/** Uniform scale at the bottom of the beam ring's travel. */
+export const BEAM_RING_SCALE_BOTTOM = 1
+
+/** Uniform scale at the top of the beam ring's travel. */
+export const BEAM_RING_SCALE_TOP = 0.6
+
+/**
+ * Fraction of the cycle, just before the wrap, where ring alpha is forced to 0.
+ * The ring is already clear when it snaps back to the bottom.
+ */
+export const BEAM_RING_ALPHA_CLEAR_EARLY = 0.02
+
+/**
+ * Beam ring albedo, copied from BeamRing.gltf.
+ * Alpha is the opacity at the top of the travel. Progress multiplies it, so a ring is clear at the bottom.
+ */
+export const BEAM_RING_ALBEDO_RED = 0.017929963767528534
+export const BEAM_RING_ALBEDO_GREEN = 0.2982626259326935
+export const BEAM_RING_ALBEDO_BLUE = 0.03715888410806656
+export const BEAM_RING_ALPHA = 0.904144883155823
+
+/** Beam ring emissive color, copied from BeamRing.gltf. */
+export const BEAM_RING_EMISSIVE_RED = 0.0021440964511647287
+export const BEAM_RING_EMISSIVE_GREEN = 0.12422632164100289
+export const BEAM_RING_EMISSIVE_BLUE = 0.004879222882974488
+
+/** Beam ring surface, copied from BeamRing.gltf. */
+export const BEAM_RING_METALLIC = 0
+export const BEAM_RING_ROUGHNESS = 0.5

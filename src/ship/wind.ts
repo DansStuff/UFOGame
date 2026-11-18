@@ -39,7 +39,7 @@ import {
   WIND_SPAWN_INNER_RADIUS_METERS,
   WIND_SPAWN_INTERVAL_SECONDS,
   WIND_SPAWN_OUTER_RADIUS_METERS
-} from '../constants'
+} from './constants'
 
 /** One wind plane. Age narrows it from full width to zero, then removes it. */
 export const WindPlane = engine.defineComponent('wind:Plane', {

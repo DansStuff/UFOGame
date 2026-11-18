@@ -13,6 +13,7 @@ import { engine, Entity, getWorldPosition, MainCamera, Transform, VirtualCamera 
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
 import { EntityNames } from '../../assets/scene/entity-names'
+import { SHIP_TILT_EDGE_RADIUS, SIMULATION_MAX_DELTA_SECONDS } from '../ship/constants'
 import {
   CAMERA_FOV_DEGREES,
   CAMERA_HEADING_SMOOTH_SECONDS,
@@ -24,10 +25,8 @@ import {
   CAMERA_MAX_DISTANCE_METERS,
   CAMERA_MIN_ANGLE_OFF_HORIZONTAL_DEGREES,
   CAMERA_MIN_DISTANCE_METERS,
-  CAMERA_TRAVEL_DEADZONE_DEGREES,
-  SHIP_TILT_EDGE_RADIUS,
-  SIMULATION_MAX_DELTA_SECONDS
-} from '../constants'
+  CAMERA_TRAVEL_DEADZONE_DEGREES
+} from './constants'
 import { getGameState } from '../gamestate'
 import { shipTravelDirection } from '../ship/motion'
 

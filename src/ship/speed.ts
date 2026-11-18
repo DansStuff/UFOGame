@@ -2,7 +2,7 @@
  * Ship speed derived from the synced planet spin. Nothing here is written back to GameState.
  * Player positions feed that spin through normalizedShipSpeed in motion.ts.
  */
-import { BEAM_MAX_VISIBLE_SPEED_FRACTION, PLANET_SPIN_MAX_DEGREES_PER_SECOND } from '../constants'
+import { BEAM_MAX_VISIBLE_SPEED_FRACTION, PLANET_SPIN_MAX_DEGREES_PER_SECOND } from './constants'
 import { getGameState } from '../gamestate'
 
 /** 0 when the ship is stopped, 1 at full tilt. */

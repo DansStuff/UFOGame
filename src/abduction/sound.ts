@@ -1,7 +1,7 @@
 /** Client-only moo played from the cow when the server accepts a probe. */
 import { AssetLoad, AudioSource, engine, Entity, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
-import { ABDUCTABLE_MODELS, ABDUCTABLE_PROBE_VOLUME } from '../constants'
+import { ABDUCTABLE_MODELS, ABDUCTABLE_PROBE_VOLUME } from './constants'
 import { findAbductable, findAbductableModel } from './components'
 
 /** Follows the cow while a moo plays. Kept off the cow so replacing the cow does not stop the clip. */

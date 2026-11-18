@@ -5,7 +5,7 @@
  */
 import { engine, Entity, getWorldRotation, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { ABDUCTABLE_CENTER_METERS_PER_SECOND, PLANET_SURFACE_RADIUS_METERS } from '../constants'
+import { ABDUCTABLE_CENTER_METERS_PER_SECOND, PLANET_SURFACE_RADIUS_METERS } from './constants'
 import type { GameStateSnapshot } from '../gamestate'
 import { captureShipCarry, type ShipCarry } from './frames'
 import { invertQuaternion, moveToward, outwardDirection, rotationWithUp, simulationStep } from './geometry'

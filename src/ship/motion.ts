@@ -19,7 +19,7 @@ import {
   SHIP_TILT_MAX_DEGREES,
   SHIP_TILT_SMOOTH_SECONDS,
   SIMULATION_MAX_DELTA_SECONDS
-} from '../constants'
+} from './constants'
 import {
   applyShipMotion,
   getGameState,

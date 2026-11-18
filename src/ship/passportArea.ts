@@ -5,11 +5,7 @@
 import { AvatarModifierArea, AvatarModifierType, engine, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { EntityNames } from '../../assets/scene/entity-names'
-import {
-  PASSPORT_AREA_CENTER_Y,
-  PASSPORT_AREA_HEIGHT_METERS,
-  PASSPORT_AREA_WIDTH_METERS
-} from '../constants'
+import { PASSPORT_AREA_CENTER_Y, PASSPORT_AREA_HEIGHT_METERS, PASSPORT_AREA_WIDTH_METERS } from './constants'
 
 export function setupPassportArea(): void {
   const ship = engine.getEntityOrNullByName(EntityNames.Ship)
