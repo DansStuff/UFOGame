@@ -16,7 +16,6 @@ import { setupProbes } from './ship/probes'
 import { setupSaucerFX } from './ship/saucerFx'
 import { setupShipWind } from './ship/wind'
 import { registerUiBehaviors } from './ui/behaviors'
-import { setupDebugUi } from './ui/debugUi'
 import { setupUi } from './ui/index'
 
 export function main() {
@@ -40,5 +39,4 @@ export function main() {
   setupProbes()
   setupUi()
   registerUiBehaviors()
-  setupDebugUi()
 }

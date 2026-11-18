@@ -13,6 +13,10 @@ export const DEBUG_SPAWN_X = 90.9
 export const DEBUG_SPAWN_Y = 67.5
 export const DEBUG_SPAWN_Z = 80.51
 
+/** Debug button size, in virtual pixels. */
+export const DEBUG_BUTTON_WIDTH = 240
+export const DEBUG_BUTTON_HEIGHT = 56
+
 // MARK: Codex
 
 /**
@@ -33,8 +37,26 @@ export const CODEX_HEADER_HEIGHT = 64
 /** Space between the title row and the scrolling grid. */
 export const CODEX_HEADER_GAP = 16
 
-/** Horizontal margin on each side of a codex cell. */
-export const CODEX_CELL_MARGIN = 8
+/** Gap between codex cells, horizontally and vertically. */
+export const CODEX_CELL_GAP = 16
+
+/** Number of creature slots in the codex grid. */
+export const CODEX_SLOT_COUNT = 15
+
+/** Cells per codex row. */
+export const CODEX_COLUMNS = 3
+
+/** Discovered creature names, filled into the codex slots in order. Remaining slots stay blank. */
+export const CODEX_DISCOVERIES = ['Cow?']
 
 /** Room left inside the scroller for its vertical bar. */
 export const CODEX_SCROLLBAR_GUTTER = 18
+
+// MARK: Samples HUD
+
+/** Gap between the top of the safe inset and the samples pill. */
+export const SAMPLES_HUD_TOP = 16
+
+/** Samples pill size, in virtual pixels. */
+export const SAMPLES_HUD_WIDTH = 460
+export const SAMPLES_HUD_HEIGHT = 48

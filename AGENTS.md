@@ -29,7 +29,7 @@ Source is grouped by domain, not by client vs server. `src/index.ts` is the comp
 - `src/ship/`: ship tilt and planet spin (`motion.ts`), derived speed (`speed.ts`), wind planes, saucer lights and beam, probe arm reactions.
 - `src/player/`: player heartbeat and idle recall.
 - `src/scene/entities.ts`: binds named composite entities. Names live in `assets/scene/entity-names.ts`.
-- `src/ui/`: React-ECS HUD, the debug button, and `behaviors.ts`, which feeds GameState into the HUD.
+- `src/ui/`: the HUD, built with DUCK (`@stom66/dcl-ui-component-kit`). `index.tsx` calls `SetupUiComponentKit` with every layer on the `'interactable'` inset. `layers/*.layer.tsx` hold one `Layer` subclass each (samples pill, debug button, codex button and window); `theme/` holds the UFO `ThemeCustomize` and an atlas stub for custom art in `assets/images/themes/ufo/`. `behaviors.ts` feeds GameState and canvas geometry into the layers' exported state. Read the kit README and its `ui-component-kit` skill before adding a layer. Stock kit textures live in `assets/images/ui-component-kit/` and fonts in `assets/fonts/`; `npm install` refreshes them through the `postinstall` script.
 - `scene.json`: scene metadata (parcels, spawn points, permissions). `authoritativeMultiplayer` stays enabled for the auth-server runtime.
 - `assets/`: 3D models and other content.
 

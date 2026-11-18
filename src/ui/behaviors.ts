@@ -1,13 +1,14 @@
 /**
  * Writes the crew sample total onto the samples HUD, places that label on the
  * screen center, and hides the mobile controls while the codex window covers them.
- * Layout lives in src/ui. This file is the only thing that changes those values.
+ * Layout lives in src/ui/layers. This file is the only thing that changes those values.
  */
 import { engine, InputAction, TouchScreenControls, UiCanvasInformation } from '@dcl/sdk/ecs'
 import { isServer } from '@dcl/sdk/network'
 import { isMobile } from '@dcl/sdk/platform'
 import {
-  CODEX_CELL_MARGIN,
+  CODEX_CELL_GAP,
+  CODEX_COLUMNS,
   CODEX_HEADER_GAP,
   CODEX_HEADER_HEIGHT,
   CODEX_SCROLLBAR_GUTTER,
@@ -16,8 +17,8 @@ import {
   CODEX_WINDOW_PADDING
 } from './constants'
 import { getGameState } from '../gamestate'
-import { state as codex } from './Codex'
-import { state as samplesHud } from './SamplesCollected'
+import { codexLayer, codexState as codex } from './layers/codex.layer'
+import { samplesHudState as samplesHud } from './layers/samples.layer'
 
 /** Virtual canvas the renderer scales against. Mobile overrides a 16:9 size to 1600x720. */
 const CODEX_DESKTOP_VIRTUAL_WIDTH = 1920
@@ -37,9 +38,10 @@ const STOCK_HIDDEN_TOUCH_BUTTONS = [
 let codexWasOpen = false
 
 function syncCodexTouchControls(): void {
-  if (codex.open === codexWasOpen) return
-  codexWasOpen = codex.open
-  if (codex.open) {
+  const open = codexLayer.isOpen
+  if (open === codexWasOpen) return
+  codexWasOpen = open
+  if (open) {
     TouchScreenControls.hideAll()
     TouchScreenControls.hideJoystick()
     return
@@ -131,10 +133,10 @@ function placeCodexWindow(frame: CanvasFrame): void {
     1,
     codex.panelHeight - CODEX_WINDOW_PADDING * 2 - CODEX_WINDOW_BORDER * 2 - CODEX_HEADER_HEIGHT - CODEX_HEADER_GAP
   )
-  const cellGaps = CODEX_CELL_MARGIN * 6
+  const cellGaps = CODEX_CELL_GAP * (CODEX_COLUMNS - 1)
   codex.innerWidth = innerWidth
   codex.scrollHeight = scrollHeight
-  codex.cellSize = Math.max(1, Math.floor((innerWidth - CODEX_SCROLLBAR_GUTTER - cellGaps) / 3))
+  codex.cellSize = Math.max(1, Math.floor((innerWidth - CODEX_SCROLLBAR_GUTTER - cellGaps) / CODEX_COLUMNS))
 }
 
 export function registerUiBehaviors(): void {

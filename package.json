@@ -8,11 +8,13 @@
     "build": "sdk-commands build",
     "upgrade-sdk": "npm install --save-dev @dcl/sdk@latest",
     "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next",
-    "server-logs": "sdk-commands scene-insights tail"
+    "server-logs": "sdk-commands scene-insights tail",
+    "postinstall": "dcl-ui-component-kit copy-assets"
   },
   "devDependencies": {
     "@dcl/js-runtime": "7.32.1-41691874543.commit-3063788",
-    "@dcl/sdk": "7.32.1-41691874543.commit-3063788"
+    "@dcl/sdk": "7.32.1-41691874543.commit-3063788",
+    "@stom66/dcl-ui-component-kit": "0.5.0"
   },
   "overrides": {
     "@dcl/js-runtime": "7.32.1-41691874543.commit-3063788",
