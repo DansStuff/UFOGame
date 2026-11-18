@@ -38,6 +38,30 @@ export const CAMERA_TRAVEL_DEADZONE_DEGREES = 0.5
  */
 export const CAMERA_HEADING_SMOOTH_SECONDS = 1.5
 
+// MARK: Camera promo
+
+/**
+ * For promotional renders (`promo.ts`). While true the camera holds one fixed heading,
+ * ignores ship travel and where the player stands, and sits far enough out to frame the
+ * whole saucer. Set to false for the in-game camera (`gameplay.ts`).
+ */
+export const CAMERA_PROMO_MODE = true
+
+/**
+ * Promo distance from the ship origin, in meters. The saucer is 39 m across, so with a
+ * 60 degree FOV about 34 m just fits its width; this leaves some margin.
+ */
+export const CAMERA_PROMO_DISTANCE_METERS = 35
+
+/** Promo downward angle from horizontal. A little lower than gameplay, still above the deck. */
+export const CAMERA_PROMO_ANGLE_OFF_HORIZONTAL_DEGREES = 12.5
+
+/**
+ * Promo heading around the ship, in degrees. 0 sits behind the ship looking toward +Z.
+ * Positive turns the camera so the ship appears rotated by this much.
+ */
+export const CAMERA_PROMO_HEADING_DEGREES = 22.5
+
 // MARK: Camera intro
 
 /** Length of the opening fly-in, in seconds: one orbit of the ship, then the move into the gameplay view. */
