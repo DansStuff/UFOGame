@@ -113,6 +113,29 @@ export const CAMERA_TRAVEL_DEADZONE_DEGREES = 0.5
  */
 export const CAMERA_HEADING_SMOOTH_SECONDS = 1.5
 
+// MARK: Camera intro
+
+/** Length of the opening fly-in, in seconds: one orbit of the ship, then the move into the gameplay view. */
+export const CAMERA_INTRO_SECONDS = 9
+
+/**
+ * Distance from the ship origin to the camera while it orbits, in meters.
+ * The camera is clamped to the scene volume, so the orbit's ground radius
+ * (distance * cos(angle)) must stay inside it. The scene is 11x11 parcels (176 m)
+ * with the ship at its center, so the edge is 88 m out; height is capped about
+ * 73 m above the ship. 75 m at 22 degrees gives a ~70 m circle, 28 m up.
+ */
+export const CAMERA_INTRO_DISTANCE_METERS = 75
+
+/** Degrees the camera looks down from horizontal while it orbits. */
+export const CAMERA_INTRO_ANGLE_OFF_HORIZONTAL_DEGREES = 22
+
+/**
+ * Fraction of the intro, from 0 to 1, at which the camera starts moving in from the
+ * orbit distance and angle. The move finishes when the intro ends.
+ */
+export const CAMERA_INTRO_ZOOM_START_FRACTION = 0.55
+
 // MARK: Abduction
 
 /**

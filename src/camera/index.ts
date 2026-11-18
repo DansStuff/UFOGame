@@ -4,6 +4,10 @@
  * the center the view is closest and least tilted; at the rim it is farthest
  * and looks down more. A small tilt leaves the heading alone. A new heading
  * starts at rest and accelerates around the ring, then settles behind the ship.
+ *
+ * On load an intro drives the same virtual camera: it orbits the ship once from far
+ * out, then moves in and lands exactly on the gameplay view. Its system removes
+ * itself when done, and the ring system takes over with no cut.
  */
 import { engine, Entity, getWorldPosition, MainCamera, Transform, VirtualCamera } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
@@ -12,6 +16,10 @@ import { EntityNames } from '../../assets/scene/entity-names'
 import {
   CAMERA_FOV_DEGREES,
   CAMERA_HEADING_SMOOTH_SECONDS,
+  CAMERA_INTRO_ANGLE_OFF_HORIZONTAL_DEGREES,
+  CAMERA_INTRO_DISTANCE_METERS,
+  CAMERA_INTRO_SECONDS,
+  CAMERA_INTRO_ZOOM_START_FRACTION,
   CAMERA_MAX_ANGLE_OFF_HORIZONTAL_DEGREES,
   CAMERA_MAX_DISTANCE_METERS,
   CAMERA_MIN_ANGLE_OFF_HORIZONTAL_DEGREES,
@@ -29,6 +37,8 @@ let heading = 0
 let targetHeading = 0
 /** Radians per second. Starts at rest so a new heading eases in. */
 let headingVelocity = 0
+/** True while the intro system owns the camera transform. */
+let introActive = false
 
 function findShip(): Entity | null {
   if (shipEntity !== null && Transform.getOrNull(shipEntity)) return shipEntity
@@ -81,14 +91,34 @@ function lerp(from: number, to: number, t: number): number {
   return from + (to - from) * t
 }
 
-function placeCamera(camera: Entity, shipPosition: Vector3): void {
+/** Smooth 0..1 ramp with zero speed at both ends. */
+function smoothstep(t: number): number {
+  const x = Math.min(Math.max(t, 0), 1)
+  return x * x * (3 - 2 * x)
+}
+
+const DEG_TO_RAD = Math.PI / 180
+
+/** Gameplay distance (meters) and downward angle (radians) for where the local player stands. */
+function gameplayOrbit(shipPosition: Vector3): { distance: number; angle: number } {
   const t = standFactor(shipPosition)
-  const angle = (lerp(CAMERA_MIN_ANGLE_OFF_HORIZONTAL_DEGREES, CAMERA_MAX_ANGLE_OFF_HORIZONTAL_DEGREES, t) * Math.PI) / 180
-  const distance = lerp(CAMERA_MIN_DISTANCE_METERS, CAMERA_MAX_DISTANCE_METERS, t)
+  return {
+    distance: lerp(CAMERA_MIN_DISTANCE_METERS, CAMERA_MAX_DISTANCE_METERS, t),
+    angle: lerp(CAMERA_MIN_ANGLE_OFF_HORIZONTAL_DEGREES, CAMERA_MAX_ANGLE_OFF_HORIZONTAL_DEGREES, t) * DEG_TO_RAD
+  }
+}
+
+function placeCamera(camera: Entity, shipPosition: Vector3): void {
+  const orbit = gameplayOrbit(shipPosition)
+  placeCameraAt(camera, shipPosition, heading, orbit.distance, orbit.angle)
+}
+
+/** Puts the camera behind `cameraHeading`, `distance` meters out and `angle` radians above level, looking at the ship. */
+function placeCameraAt(camera: Entity, shipPosition: Vector3, cameraHeading: number, distance: number, angle: number): void {
   const horizontal = distance * Math.cos(angle)
   const vertical = distance * Math.sin(angle)
-  const travelX = Math.sin(heading)
-  const travelZ = Math.cos(heading)
+  const travelX = Math.sin(cameraHeading)
+  const travelZ = Math.cos(cameraHeading)
   const transform = Transform.getMutable(camera)
   transform.position.x = shipPosition.x - travelX * horizontal
   transform.position.y = shipPosition.y + vertical
@@ -99,6 +129,47 @@ function placeCamera(camera: Entity, shipPosition: Vector3): void {
   transform.rotation = Quaternion.lookRotation(Vector3.normalize(towardShip), Vector3.Up())
 }
 
+/**
+ * One full orbit at the intro distance, then a move in to the gameplay view. The orbit
+ * is measured from the live gameplay heading, so the last frame equals what
+ * `placeCamera` would draw and the hand-off has no jump.
+ */
+function startIntro(camera: Entity): void {
+  if (CAMERA_INTRO_SECONDS <= 0) return
+  introActive = true
+  let elapsed = 0
+
+  function CameraIntroSystem(dt: number) {
+    const ship = findShip()
+    if (ship === null) return // Hold the clock until the ship exists.
+    elapsed += Math.min(Math.max(dt, 0), SIMULATION_MAX_DELTA_SECONDS)
+    const progress = Math.min(elapsed / CAMERA_INTRO_SECONDS, 1)
+    const shipPosition = getWorldPosition(engine, ship)
+
+    if (progress >= 1) {
+      introActive = false
+      engine.removeSystem(CameraIntroSystem)
+      placeCamera(camera, shipPosition)
+      return
+    }
+
+    const orbitTurns = 1 - smoothstep(progress)
+    const zoomSpan = Math.max(1 - CAMERA_INTRO_ZOOM_START_FRACTION, 1e-6)
+    const zoom = smoothstep((progress - CAMERA_INTRO_ZOOM_START_FRACTION) / zoomSpan)
+    const gameplay = gameplayOrbit(shipPosition)
+    placeCameraAt(
+      camera,
+      shipPosition,
+      heading + orbitTurns * Math.PI * 2,
+      lerp(CAMERA_INTRO_DISTANCE_METERS, gameplay.distance, zoom),
+      lerp(CAMERA_INTRO_ANGLE_OFF_HORIZONTAL_DEGREES * DEG_TO_RAD, gameplay.angle, zoom)
+    )
+  }
+
+  CameraIntroSystem(0) // Start on the orbit pose, not the entity origin.
+  engine.addSystem(CameraIntroSystem)
+}
+
 export function setupCamera(): void {
   if (isServer()) return
   shipEntity = null
@@ -107,6 +178,7 @@ export function setupCamera(): void {
   headingVelocity = 0
   sampleTravelTarget()
   heading = targetHeading
+  introActive = false
 
   const camera = engine.addEntity()
   Transform.create(camera)
@@ -117,8 +189,9 @@ export function setupCamera(): void {
     }
   })
 
+  startIntro(camera)
   const ship = findShip()
-  if (ship !== null) placeCamera(camera, getWorldPosition(engine, ship))
+  if (ship !== null && !introActive) placeCamera(camera, getWorldPosition(engine, ship))
 
   MainCamera.createOrReplace(engine.CameraEntity, { virtualCameraEntity: camera })
 
@@ -127,6 +200,7 @@ export function setupCamera(): void {
     if (currentShip === null) return
     sampleTravelTarget()
     easeHeading(dt)
+    if (introActive) return
     placeCamera(camera, getWorldPosition(engine, currentShip))
   })
 }
