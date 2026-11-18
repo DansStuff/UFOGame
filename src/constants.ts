@@ -116,7 +116,7 @@ export const CAMERA_HEADING_SMOOTH_SECONDS = 1.5
 // MARK: Camera intro
 
 /** Length of the opening fly-in, in seconds: one orbit of the ship, then the move into the gameplay view. */
-export const CAMERA_INTRO_SECONDS = 9
+export const CAMERA_INTRO_SECONDS = 7.5
 
 /**
  * Distance from the ship origin to the camera while it orbits, in meters.
