@@ -14,7 +14,7 @@
   "devDependencies": {
     "@dcl/js-runtime": "7.32.1-41691874543.commit-3063788",
     "@dcl/sdk": "7.32.1-41691874543.commit-3063788",
-    "@stom66/dcl-ui-component-kit": "0.5.0"
+    "@stom66/dcl-ui-component-kit": "github:DansStuff/dcl-ui-component-kit#e8d97de7e05166f6a6ebe39f96b33076834c49e2"
   },
   "overrides": {
     "@dcl/js-runtime": "7.32.1-41691874543.commit-3063788",
