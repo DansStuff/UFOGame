@@ -101,8 +101,6 @@ function placeCamera(camera: Entity, shipPosition: Vector3): void {
 
 export function setupCamera(): void {
   if (isServer()) return
-  // Temporary: skip the virtual camera so the player keeps normal camera controls.
-  /*
   shipEntity = null
   heading = 0
   targetHeading = 0
@@ -131,5 +129,4 @@ export function setupCamera(): void {
     easeHeading(dt)
     placeCamera(camera, getWorldPosition(engine, currentShip))
   })
-    */
 }
