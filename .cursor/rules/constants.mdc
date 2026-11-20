@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Constants
 
-Put tunable numbers and strings in the `constants.ts` of the domain that owns them (`src/ship/constants.ts`, `src/abduction/constants.ts`, `src/camera/constants.ts`, `src/player/constants.ts`, `src/ui/constants.ts`). There is no top-level `src/constants.ts`. A new domain folder gets its own `constants.ts` when it needs one.
+Put tunable numbers and strings in the `constants.ts` of the domain that owns them (`src/ship/constants.ts`, `src/abduction/constants.ts`, `src/camera/constants.ts`, `src/player/constants.ts`, `src/cosmetics/constants.ts`, `src/ui/constants.ts`). There is no top-level `src/constants.ts`. A new domain folder gets its own `constants.ts` when it needs one.
 
 Inside each file, group values by feature. Start each group with a `// MARK:` comment so the outline can jump to it. Prefix names so they still read clearly away from the module that uses them (`HAZARD_SPAWN_INTERVAL`, not `interval`).
 
