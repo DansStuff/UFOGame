@@ -1,5 +1,5 @@
 /**
- * Opening fly-in. It orbits the ship once from far out, then moves in and lands
+ * Opening fly-in. It orbits the ship from far out, then moves in and lands
  * exactly on the pose the active camera mode wants. Its system removes itself when
  * done, and the mode's system takes over with no cut.
  */
@@ -9,6 +9,7 @@ import { SIMULATION_MAX_DELTA_SECONDS } from '../ship/constants'
 import {
   CAMERA_INTRO_ANGLE_OFF_HORIZONTAL_DEGREES,
   CAMERA_INTRO_DISTANCE_METERS,
+  CAMERA_INTRO_ORBIT_TURNS,
   CAMERA_INTRO_SECONDS,
   CAMERA_INTRO_ZOOM_START_FRACTION
 } from './constants'
@@ -50,7 +51,7 @@ export function startIntro(camera: Entity, landingPose: (shipPosition: Vector3) 
     const zoomSpan = Math.max(1 - CAMERA_INTRO_ZOOM_START_FRACTION, 1e-6)
     const zoom = smoothstep((progress - CAMERA_INTRO_ZOOM_START_FRACTION) / zoomSpan)
     placeCamera(camera, shipPosition, {
-      heading: landing.heading + orbitTurns * Math.PI * 2,
+      heading: landing.heading + orbitTurns * CAMERA_INTRO_ORBIT_TURNS * Math.PI * 2,
       distance: lerp(CAMERA_INTRO_DISTANCE_METERS, landing.distance, zoom),
       angle: lerp(CAMERA_INTRO_ANGLE_OFF_HORIZONTAL_DEGREES * DEG_TO_RAD, landing.angle, zoom)
     })

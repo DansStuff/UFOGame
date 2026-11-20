@@ -64,8 +64,14 @@ export const CAMERA_PROMO_HEADING_DEGREES = 22.5
 
 // MARK: Camera intro
 
-/** Length of the opening fly-in, in seconds: one orbit of the ship, then the move into the gameplay view. */
-export const CAMERA_INTRO_SECONDS = 7.5
+/** Length of the opening fly-in, in seconds: the orbit of the ship, then the move into the gameplay view. */
+export const CAMERA_INTRO_SECONDS = 4.5
+
+/**
+ * Full turns the camera makes around the ship during the intro. Scale this with
+ * CAMERA_INTRO_SECONDS to keep the orbit speed the same (1 turn per 7.5 s).
+ */
+export const CAMERA_INTRO_ORBIT_TURNS = 0.6
 
 /**
  * Distance from the ship origin to the camera while it orbits, in meters.
