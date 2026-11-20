@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 480 300" width="480" height="300">
+  <title>Standing in the center: the ship stays level</title>
+<defs>
+    <g id="backRibs">
+      <path d="M131,182 C138,166 150,158 160,152 C172,144 170,130 177,118 C183,106 186,93 188,86"/>
+      <path d="M349,182 C342,166 330,158 320,152 C308,144 310,130 303,118 C297,106 294,93 292,86"/>
+    </g>
+    <g id="sideRibs">
+      <path d="M56,197 C90,172 114,161 128,154 C141,147 139,133 145,122 C150,112 149,98 150,92"/>
+      <path d="M424,197 C390,172 366,161 352,154 C339,147 341,133 335,122 C330,112 331,98 330,92"/>
+    </g>
+    <g id="frontRibs">
+      <path d="M131,217 C136,192 148,176 158,168 C170,158 166,142 174,130 C182,118 186,106 188,99"/>
+      <path d="M349,217 C344,192 332,176 322,168 C310,158 314,142 306,130 C298,118 294,106 292,99"/>
+    </g>
+  </defs>
+  <g>
+<!-- back of dome -->
+    <g fill="none" stroke-linecap="round" opacity="0.45">
+      <use href="#backRibs" xlink:href="#backRibs" stroke="#2a2440" stroke-width="12"/>
+      <use href="#backRibs" xlink:href="#backRibs" stroke="#c9b8f5" stroke-width="8"/>
+    </g>
+    <ellipse cx="240" cy="92" rx="90" ry="8" fill="none" stroke="#2a2440" stroke-width="10"/>
+    <ellipse cx="240" cy="92" rx="90" ry="8" fill="none" stroke="#b9a3f0" stroke-width="6"/>
+    <g fill="none" stroke-linecap="round">
+      <use href="#sideRibs" xlink:href="#sideRibs" stroke="#2a2440" stroke-width="13"/>
+      <use href="#sideRibs" xlink:href="#sideRibs" stroke="#b9a3f0" stroke-width="9"/>
+    </g>
+    <!-- deck -->
+    <g stroke="#2a2440" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M50,200 L50,211 A190,22 0 0 0 430,211 L430,200 Z" fill="#cfcbd8"/>
+      <ellipse cx="240" cy="200" rx="190" ry="22" fill="#eeebf3"/>
+      <ellipse cx="240" cy="200" rx="165" ry="16" fill="#d8cff3" stroke-width="1.8"/>
+      <path d="M195,197 L195,201 A45,6 0 0 0 285,201 L285,197 Z" fill="#cfcbd8" stroke-width="2"/>
+      <ellipse cx="240" cy="197" rx="45" ry="6" fill="#eeebf3" stroke-width="2"/>
+    </g>
+    <!-- rim lights -->
+    <g fill="#f59ad9" stroke="#2a2440" stroke-width="2">
+      <circle cx="61" cy="213.5" r="4.5"/>
+      <circle cx="118" cy="223" r="4.5"/>
+      <circle cx="240" cy="228" r="4.5"/>
+      <circle cx="362" cy="223" r="4.5"/>
+      <circle cx="419" cy="213.5" r="4.5"/>
+    </g>
+    <!-- alien at center, arms relaxed -->
+    <g transform="translate(240 197)">
+<g stroke="#1f2a17" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <!-- antennae -->
+        <path d="M-6,-76 Q-9,-86 -14,-91" fill="none"/>
+        <path d="M6,-76 Q9,-86 14,-91" fill="none"/>
+        <circle cx="-15" cy="-93" r="3" fill="#9be37a"/>
+        <circle cx="15" cy="-93" r="3" fill="#9be37a"/>
+        <!-- legs -->
+        <path d="M-4,-18 L-6,0 L-11,0 M4,-18 L6,0 L11,0" fill="none"/>
+        <path d="M-7,-35 Q-14,-27 -13,-18 M7,-35 Q14,-27 13,-18" fill="none"/>
+<!-- body -->
+        <path d="M-7,-39 Q-10,-28 -7,-17 L7,-17 Q10,-28 7,-39 Z" fill="#9be37a"/>
+        <!-- head -->
+        <path d="M0,-40 C-10,-40 -19,-52 -19,-62 C-19,-72 -10,-78 0,-78 C10,-78 19,-72 19,-62 C19,-52 10,-40 0,-40 Z" fill="#9be37a"/>
+        <ellipse cx="-8" cy="-60" rx="6.5" ry="3.6" transform="rotate(28 -8 -60)" fill="#1f2a17"/>
+        <ellipse cx="8" cy="-60" rx="6.5" ry="3.6" transform="rotate(-28 8 -60)" fill="#1f2a17"/>
+        <path d="M-3,-47 L3,-47" fill="none" stroke-width="1.8"/>
+      </g>
+    </g>
+<!-- front of dome -->
+    <g fill="none" stroke-linecap="round">
+      <use href="#frontRibs" xlink:href="#frontRibs" stroke="#2a2440" stroke-width="13"/>
+      <use href="#frontRibs" xlink:href="#frontRibs" stroke="#b9a3f0" stroke-width="9"/>
+    </g>
+  </g>
+</svg>

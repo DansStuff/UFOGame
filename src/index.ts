@@ -5,13 +5,13 @@
 import { isServer } from '@dcl/sdk/network'
 import { setupAbduction } from './abduction'
 import { setupCamera } from './camera'
+import { setupCosmetics } from './cosmetics'
 import { setupGameState } from './gamestate'
 import { setupStateMachine } from './gamestate/stateMachine'
 import { setupClientRoom } from './networking/client'
 import { setupActivity } from './player/activity'
 import { setupSceneEntities } from './scene/entities'
 import { setupShipMotion } from './ship/motion'
-import { setupPassportArea } from './ship/passportArea'
 import { setupProbes } from './ship/probes'
 import { setupSaucerFX } from './ship/saucerFx'
 import { setupShipWind } from './ship/wind'
@@ -31,12 +31,12 @@ export function main() {
   }
 
   setupSceneEntities()
-  setupPassportArea()
   setupCamera()
   setupClientRoom()
   setupShipWind()
   setupSaucerFX()
   setupProbes()
+  setupCosmetics()
   setupUi()
   registerUiBehaviors()
 }

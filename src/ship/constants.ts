@@ -54,27 +54,6 @@ export const SHIP_ABDUCTION_MAX_SPEED_FRACTION = 0.5
  */
 export const PLANET_ROTATION_BLEND_SECONDS = 0.25
 
-// MARK: Passport area
-
-/**
- * Width and depth of the box where clicking a player does not open their passport.
- * The saucer is about 40m across and the floor collider reaches about 43m,
- * so this leaves room for someone standing at the rim.
- */
-export const PASSPORT_AREA_WIDTH_METERS = 46
-
-/**
- * Height of that box, in ship-local meters.
- * The hull bottom is about 2m below the ship origin and the dome top is about 9m above it.
- */
-export const PASSPORT_AREA_HEIGHT_METERS = 14
-
-/**
- * Ship-local Y of the box center.
- * The box extends half its height above and below this point.
- */
-export const PASSPORT_AREA_CENTER_Y = 4
-
 // MARK: Probes
 
 /** Clip looped on Probe1–Probe4 until a probe reaction starts. */
