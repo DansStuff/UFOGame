@@ -36,8 +36,8 @@ export const AVATAR_AREA_CENTER_Y = 4
 
 // MARK: Alien head
 
-/** Grey alien head worn by every player. Source: `blender/AlienHead.blend`. */
-export const ALIEN_HEAD_MODEL_SRC = 'assets/Models/alien_head.glb'
+/** Grey alien head worn by every player. Source: `blender/mcp_models.blend`, AlienHead collection. */
+export const ALIEN_HEAD_MODEL_SRC = 'assets/scene/Models/Cosmetics/alien_head.glb'
 
 /** Head bone, so the model follows head turns and the walk cycle. */
 export const ALIEN_HEAD_ANCHOR = AvatarAnchorPointType.AAPT_HEAD

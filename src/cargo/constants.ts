@@ -23,7 +23,7 @@ export type CargoModel = {
 
 export const CARGO_MODELS: Record<CargoKind, CargoModel> = {
   cornCob: {
-    // 1.5 m long in the file, origin at the bottom center. Source: blender/Landmarks.blend, CornCob collection.
+    // 1.5 m long in the file, origin at the bottom center. Source: blender/mcp_models.blend, CornCob collection.
     src: 'assets/scene/Models/Cargo/corn_cob.glb',
     // About 4.5 m long and 2.2 m tall on the deck.
     scale: 3,

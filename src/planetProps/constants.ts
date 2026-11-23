@@ -43,7 +43,7 @@ export const PLANET_PROPS: Record<PlanetPropKind, PlanetPropConfig> = {
     zoneRadiusDegrees: 2.5,
     // Debounce: no new tabloids until the last batch has played out.
     cooldownSeconds: TABLOID_BATCH_SECONDS,
-    // About 4.5 m wide, 3.3 m tall in the file. Source: blender/Landmarks.blend, Newsstand collection.
+    // About 4.5 m wide, 3.3 m tall in the file. Source: blender/mcp_models.blend, Newsstand collection.
     model: 'assets/scene/Models/PlanetProps/newsstand.glb',
     modelScale: NEWSSTAND_MODEL_SCALE,
     size: { x: 1.5, y: 2.5, z: 1 },

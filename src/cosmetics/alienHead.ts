@@ -1,4 +1,4 @@
-/** The grey alien head worn by every player. Source: `blender/AlienHead.blend`. */
+/** The grey alien head worn by every player. Source: `blender/mcp_models.blend`, AlienHead collection (originally `blender/AlienHead.blend`). */
 import { GltfContainer, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { ALIEN_HEAD_ANCHOR, ALIEN_HEAD_MODEL_SRC, ALIEN_HEAD_OFFSET, ALIEN_HEAD_SCALE } from './constants'
