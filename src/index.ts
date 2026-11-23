@@ -15,6 +15,7 @@ import { setupShipMotion } from './ship/motion'
 import { setupProbes } from './ship/probes'
 import { setupSaucerFX } from './ship/saucerFx'
 import { setupShipWind } from './ship/wind'
+import { setupSurfaceZones } from './surfaceZones'
 import { registerUiBehaviors } from './ui/behaviors'
 import { setupUi } from './ui/index'
 
@@ -22,6 +23,7 @@ export function main() {
   setupGameState()
   setupStateMachine()
   setupShipMotion()
+  setupSurfaceZones()
   setupAbduction()
   setupActivity()
 
