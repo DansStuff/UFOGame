@@ -27,7 +27,7 @@ import {
   type PlanetAngularVelocitySnapshot,
   type PlanetRotationSnapshot
 } from '../gamestate'
-import { getCargoItems } from '../cargo/state'
+import { getLandedCargoItems } from '../cargo/state'
 
 /** Snap the tilt once it is this close, so easing reaches the target instead of crawling. */
 const SHIP_TILT_SNAP_DEGREES = 0.01
@@ -64,14 +64,14 @@ function tiltContribution(distance: number): number {
 
 /**
  * Everything weighing on the deck, as offsets from the ship center: each player in the
- * scene, and each cargo item, which weighs the same as one player standing at its spot.
+ * scene, and each landed cargo item, which weighs the same as one player standing at its spot.
  */
 function deckWeights(): Array<{ x: number; z: number }> {
   const weights: Array<{ x: number; z: number }> = []
   for (const [, , transform] of engine.getEntitiesWith(PlayerIdentityData, Transform)) {
     weights.push({ x: transform.position.x - SHIP_CENTER_X, z: transform.position.z - SHIP_CENTER_Z })
   }
-  for (const item of getCargoItems()) weights.push({ x: item.x, z: item.z })
+  for (const item of getLandedCargoItems(Date.now())) weights.push({ x: item.x, z: item.z })
   return weights
 }
 

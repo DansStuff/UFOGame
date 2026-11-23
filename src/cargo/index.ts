@@ -4,21 +4,20 @@
  *
  * Server: `addCargo` places an item at a random deck spot outside the safe radius,
  * `removeCargo` takes it off when a nearby player asks. The list is synced in `CargoState`.
+ * An item weighs on steering once its arrival has had time to play.
  * Client: mirrors the synced list as models parented to the ship. Items that arrive
- * after this client's first look rise up from under the hull. Pressing E near one
- * asks the server to remove it.
+ * after this client's first look ride the beam up and are spat onto the deck
+ * (`arrival.ts`). Pressing E near one asks the server to remove it.
  */
 import {
   ColliderLayer,
-  EasingFunction,
   engine,
   Entity,
   GltfContainer,
   InputAction,
   PlayerIdentityData,
   pointerEventsSystem,
-  Transform,
-  Tween
+  Transform
 } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
@@ -26,9 +25,8 @@ import { EntityNames } from '../../assets/scene/entity-names'
 import { findNamed } from '../abduction/sceneLookup'
 import { requestRemoveCargo } from '../networking/client'
 import { SHIP_CENTER_X, SHIP_CENTER_Z } from '../ship/constants'
+import { CargoArrivalSystem, cancelArrival, resetArrivals, startArrival } from './arrival'
 import {
-  CARGO_ARRIVAL_SECONDS,
-  CARGO_ARRIVAL_START_Y,
   CARGO_DECK_MAX_RADIUS,
   CARGO_DECK_MIN_RADIUS,
   CARGO_MIN_SPACING_METERS,
@@ -66,7 +64,14 @@ function pickDeckSpot(existing: CargoItem[]): { x: number; z: number } {
 export function addCargo(kind: CargoKind): CargoItem {
   const items = getCargoItems()
   const spot = pickDeckSpot(items)
-  const item: CargoItem = { id: nextCargoId++, kind, x: spot.x, z: spot.z, yaw: Math.random() * 360 }
+  const item: CargoItem = {
+    id: nextCargoId++,
+    kind,
+    x: spot.x,
+    z: spot.z,
+    yaw: Math.random() * 360,
+    addedAt: Date.now()
+  }
   writeCargoItems([...items, item])
   return item
 }
@@ -113,21 +118,18 @@ function sendRemoveRequest(cargoId: number): void {
 function showItem(ship: Entity, item: CargoItem, arriving: boolean): Entity {
   const model = CARGO_MODELS[item.kind]
   const entity = engine.addEntity()
-  const deckSpot = Vector3.create(item.x, 0, item.z)
-  const start = Vector3.create(0, CARGO_ARRIVAL_START_Y, 0)
   Transform.create(entity, {
     parent: ship,
-    position: arriving ? start : deckSpot,
-    rotation: Quaternion.fromEulerDegrees(0, item.yaw, 0)
+    position: Vector3.create(item.x, 0, item.z),
+    rotation: Quaternion.fromEulerDegrees(0, item.yaw, 0),
+    scale: Vector3.create(model.scale, model.scale, model.scale)
   })
   GltfContainer.create(entity, {
     src: model.src,
     visibleMeshesCollisionMask: ColliderLayer.CL_POINTER,
     invisibleMeshesCollisionMask: 0
   })
-  if (arriving) {
-    Tween.setMove(entity, start, deckSpot, CARGO_ARRIVAL_SECONDS * 1000, EasingFunction.EF_EASEOUTQUAD)
-  }
+  if (arriving) startArrival(entity, ship, item)
   pointerEventsSystem.onProximityDown(
     {
       entity,
@@ -144,6 +146,7 @@ function showItem(ship: Entity, item: CargoItem, arriving: boolean): Entity {
 
 function hideItem(id: number, entity: Entity): void {
   pointerEventsSystem.removeOnProximityDown(entity)
+  cancelArrival(entity)
   engine.removeEntity(entity)
   shown.delete(id)
 }
@@ -170,9 +173,11 @@ export function setupCargo(): void {
   seededFromSnapshot = false
   lastRemoveRequestAt = 0
   resetCargoState()
+  resetArrivals()
   if (isServer()) {
     createCargoState()
     return
   }
   engine.addSystem(CargoMirrorSystem)
+  engine.addSystem(CargoArrivalSystem)
 }
