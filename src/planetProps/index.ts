@@ -2,10 +2,10 @@
  * Corn fields and newsstands scattered on the planet surface.
  *
  * Server: scatters every prop once on load and registers each as a surface zone.
- * Flying over a corn field abducts its one cob onto the deck (see `cargo/`) and marks
- * the field depleted in the synced `PlanetPropState`. Flying over a newsstand tells every
- * client to throw tabloids at the screen (`tabloids/`); a newsstand is then unavailable
- * until its tabloids have played out, then works again.
+ * Flying over a corn field abducts a cob onto the deck (see `cargo/`); flying over a
+ * newsstand tells every client to throw tabloids at the screen (`tabloids/`). Either way
+ * the prop is then unavailable in the synced `PlanetPropState` for its kind's
+ * `cooldownSeconds`, after which it can be used again.
  * Each client asks for the layout when it loads (`requestInitialState`) and gets it
  * back in `notifyPlanetProps`.
  * Client: parents each prop to the planet, so it spins with the surface (a model when the
@@ -21,7 +21,6 @@ import { randomSurfaceDirection, rotationWithUp } from '../abduction/geometry'
 import { findPlanet } from '../abduction/sceneLookup'
 import { notifyPlanetProps, notifyTabloids } from '../gamestate/serverRoom'
 import { setOnPlanetProps, type PlanetPropMessage } from '../networking/client'
-import { TABLOID_BATCH_SECONDS } from '../tabloids/constants'
 import { addSurfaceZone, onSurfaceZoneEnter } from '../surfaceZones'
 import { cosOfDegrees, isWithinCos } from '../surfaceZones/geometry'
 import {
@@ -32,9 +31,10 @@ import {
 } from './constants'
 import {
   createPlanetPropState,
-  depletePlanetProp,
   isPlanetPropAvailable,
-  resetPlanetPropState
+  PlanetPropCooldownSystem,
+  resetPlanetPropState,
+  takePlanetProp
 } from './state'
 
 export type PlanetProp = {
@@ -53,15 +53,10 @@ function isKind(value: string): value is PlanetPropKind {
 // MARK: Server
 
 let serverProps: PlanetProp[] = []
-/** Server clock, ms, when each newsstand can throw tabloids again. Missing means available. */
-const newsstandAvailableAt = new Map<number, number>()
 
-/** Debounce: a newsstand is unavailable until its last batch of tabloids has played out. */
-function takeNewsstand(id: number): boolean {
-  const now = Date.now()
-  if (now < (newsstandAvailableAt.get(id) ?? 0)) return false
-  newsstandAvailableAt.set(id, now + TABLOID_BATCH_SECONDS * 1000)
-  return true
+/** Takes the prop for its kind's cooldown. False when it is still cooling down. */
+function takeProp(id: number, kind: PlanetPropKind): boolean {
+  return takePlanetProp(id, PLANET_PROPS[kind].cooldownSeconds)
 }
 
 /** A random direction at least the minimum separation from every placed prop, if one turns up. */
@@ -113,15 +108,16 @@ function setupServer(): void {
     })
   }
   onSurfaceZoneEnter('cornField', (zone) => {
-    if (!depletePlanetProp(zone.id)) return
+    if (!takeProp(zone.id, 'cornField')) return
     const cob = addCargo('cornCob')
     console.log(`[SERVER] Corn field ${zone.id} gave up cob ${cob.id}`)
   })
   onSurfaceZoneEnter('newsstand', (zone) => {
-    if (!takeNewsstand(zone.id)) return
+    if (!takeProp(zone.id, 'newsstand')) return
     console.log(`[SERVER] Ship flew over newsstand ${zone.id}`)
     notifyTabloids(zone.id)
   })
+  engine.addSystem(PlanetPropCooldownSystem)
   console.log(`[SERVER] Scattered ${serverProps.length} planet props`)
 }
 
@@ -211,7 +207,6 @@ function receiveProps(messages: PlanetPropMessage[]): void {
 
 export function setupPlanetProps(): void {
   serverProps = []
-  newsstandAvailableAt.clear()
   pendingProps = null
   spawned.length = 0
   resetPlanetPropState()
