@@ -24,6 +24,10 @@ export const Messages = {
   requestActivity: Schemas.Map({
     reportedAt: Schemas.Int64
   }),
+  requestRemoveCargo: Schemas.Map({
+    requestedAt: Schemas.Int64,
+    cargoId: Schemas.Int
+  }),
 
   // Server → Client
   notifyRoundStart: Schemas.Map({

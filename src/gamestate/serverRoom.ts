@@ -11,6 +11,7 @@ export type ServerInboxHandlers = {
   onInitialState: (playerAddress: string) => void
   onProbe: (playerAddress: string, abductableId: number) => void
   onActivity: (playerAddress: string) => void
+  onRemoveCargo: (playerAddress: string, cargoId: number) => void
 }
 
 export function notifyRoundStart(startedAt: number, to?: string): void {
@@ -91,5 +92,10 @@ export function setupServerInbox(handlers: ServerInboxHandlers): void {
   room.onMessage('requestActivity', (_data, context) => {
     if (!context) return
     handlers.onActivity(context.from)
+  })
+
+  room.onMessage('requestRemoveCargo', (data, context) => {
+    if (!context) return
+    handlers.onRemoveCargo(context.from, data.cargoId)
   })
 }

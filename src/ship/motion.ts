@@ -27,6 +27,7 @@ import {
   type PlanetAngularVelocitySnapshot,
   type PlanetRotationSnapshot
 } from '../gamestate'
+import { getCargoItems } from '../cargo/state'
 
 /** Snap the tilt once it is this close, so easing reaches the target instead of crawling. */
 const SHIP_TILT_SNAP_DEGREES = 0.01
@@ -62,9 +63,22 @@ function tiltContribution(distance: number): number {
 }
 
 /**
- * Players currently in the scene, averaged, mapped to a ship speed.
- * People inside the safe radius are left out. If nobody is outside it, the speed is 0.
- * Each other player adds a push toward the side they stand on. That push is 0 just
+ * Everything weighing on the deck, as offsets from the ship center: each player in the
+ * scene, and each cargo item, which weighs the same as one player standing at its spot.
+ */
+function deckWeights(): Array<{ x: number; z: number }> {
+  const weights: Array<{ x: number; z: number }> = []
+  for (const [, , transform] of engine.getEntitiesWith(PlayerIdentityData, Transform)) {
+    weights.push({ x: transform.position.x - SHIP_CENTER_X, z: transform.position.z - SHIP_CENTER_Z })
+  }
+  for (const item of getCargoItems()) weights.push({ x: item.x, z: item.z })
+  return weights
+}
+
+/**
+ * Players and cargo on the deck, averaged, mapped to a ship speed.
+ * Weights inside the safe radius are left out. If nothing is outside it, the speed is 0.
+ * Each other weight adds a push toward the side it is on. That push is 0 just
  * outside the safe radius and 1 at the saucer edge, rising in a straight line.
  * The returned speed is the length of the averaged pushes, clamped to 0..1.
  * Top speed is applied by the caller.
@@ -76,9 +90,7 @@ export function normalizedShipSpeed(): number {
   let sumX = 0
   let sumZ = 0
   let count = 0
-  for (const [, , transform] of engine.getEntitiesWith(PlayerIdentityData, Transform)) {
-    const x = transform.position.x - SHIP_CENTER_X
-    const z = transform.position.z - SHIP_CENTER_Z
+  for (const { x, z } of deckWeights()) {
     const distance = Math.hypot(x, z)
     if (distance <= SHIP_TILT_SAFE_RADIUS) continue
     const push = tiltContribution(distance) / distance

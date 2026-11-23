@@ -6,6 +6,7 @@
 import { isServer } from '@dcl/sdk/network'
 import { noteActivity } from '../player/activity'
 import { replaceAbductable } from '../abduction'
+import { removeCargo } from '../cargo'
 import { publishPlanetProps } from '../planetProps'
 import {
   applyAbductableSampleTaken,
@@ -140,6 +141,13 @@ export function setupStateMachine(): void {
     onActivity: (from) => {
       noteActivity(from)
       console.log(`[SERVER] Activity reported by ${from}`)
+    },
+    onRemoveCargo: (from, cargoId) => {
+      if (removeCargo(from, cargoId)) {
+        console.log(`[SERVER] Cargo ${cargoId} removed by ${from}`)
+      } else {
+        console.log(`[SERVER] Ignored cargo ${cargoId} removal from ${from}`)
+      }
     }
   })
 }

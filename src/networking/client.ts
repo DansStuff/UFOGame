@@ -31,6 +31,12 @@ export function requestProbe(abductableId: number): void {
   room.send('requestProbe', { requestedAt: Date.now(), abductableId })
 }
 
+/** Asks the server to take this item off the deck. Ignored until the room is ready. */
+export function requestRemoveCargo(cargoId: number): void {
+  if (isServer() || !room.isReady()) return
+  room.send('requestRemoveCargo', { requestedAt: Date.now(), cargoId })
+}
+
 /**
  * Tells the server this client had input during the last heartbeat window.
  * Returns false when the room cannot take the message yet, so the caller can retry.

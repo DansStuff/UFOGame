@@ -5,6 +5,7 @@
 import { isServer } from '@dcl/sdk/network'
 import { setupAbduction } from './abduction'
 import { setupCamera } from './camera'
+import { setupCargo } from './cargo'
 import { setupCosmetics } from './cosmetics'
 import { setupGameState } from './gamestate'
 import { setupStateMachine } from './gamestate/stateMachine'
@@ -26,6 +27,7 @@ export function main() {
   setupShipMotion()
   setupSurfaceZones()
   setupAbduction()
+  setupCargo()
   setupPlanetProps()
   setupActivity()
 
