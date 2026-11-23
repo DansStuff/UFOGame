@@ -15,6 +15,16 @@ export function setOnProbeAccepted(handler: () => void): void {
   onProbeAccepted = handler
 }
 
+export type PlanetPropMessage = { id: number; kind: string; x: number; y: number; z: number }
+
+/** Client-only reaction to the prop layout. */
+let onPlanetProps: ((props: PlanetPropMessage[]) => void) | null = null
+
+/** Registers the reaction to the prop layout. The last registration wins. */
+export function setOnPlanetProps(handler: (props: PlanetPropMessage[]) => void): void {
+  onPlanetProps = handler
+}
+
 /** Asks the server to probe the cow with this id. Ignored until the room is ready. */
 export function requestProbe(abductableId: number): void {
   if (isServer() || !room.isReady()) return
@@ -78,6 +88,13 @@ export function setupClientRoom(): void {
     appliedProbedAt = data.probedAt
     playProbeReaction()
     onProbeAccepted?.()
+  })
+
+  let appliedPlanetPropsAt = 0
+  room.onMessage('notifyPlanetProps', (data) => {
+    if (data.sentAt <= appliedPlanetPropsAt) return
+    appliedPlanetPropsAt = data.sentAt
+    onPlanetProps?.(data.props)
   })
 
   let requestedInitialState = false

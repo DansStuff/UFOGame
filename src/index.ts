@@ -9,6 +9,7 @@ import { setupCosmetics } from './cosmetics'
 import { setupGameState } from './gamestate'
 import { setupStateMachine } from './gamestate/stateMachine'
 import { setupClientRoom } from './networking/client'
+import { setupPlanetProps } from './planetProps'
 import { setupActivity } from './player/activity'
 import { setupSceneEntities } from './scene/entities'
 import { setupShipMotion } from './ship/motion'
@@ -25,6 +26,7 @@ export function main() {
   setupShipMotion()
   setupSurfaceZones()
   setupAbduction()
+  setupPlanetProps()
   setupActivity()
 
   if (isServer()) {

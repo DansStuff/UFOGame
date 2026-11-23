@@ -43,6 +43,19 @@ export const Messages = {
   }),
   notifyProbed: Schemas.Map({
     probedAt: Schemas.Int64
+  }),
+  /** Every prop on the planet. Sent to one client in reply to requestInitialState. */
+  notifyPlanetProps: Schemas.Map({
+    sentAt: Schemas.Int64,
+    props: Schemas.Array(
+      Schemas.Map({
+        id: Schemas.Int,
+        kind: Schemas.String,
+        x: Schemas.Float,
+        y: Schemas.Float,
+        z: Schemas.Float
+      })
+    )
   })
 }
 

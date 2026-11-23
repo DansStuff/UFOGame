@@ -6,6 +6,7 @@
 import { isServer } from '@dcl/sdk/network'
 import { noteActivity } from '../player/activity'
 import { replaceAbductable } from '../abduction'
+import { publishPlanetProps } from '../planetProps'
 import {
   applyAbductableSampleTaken,
   applyRoundEnded,
@@ -129,6 +130,7 @@ export function setupStateMachine(): void {
     onInitialState: (from) => {
       console.log(`[SERVER] Initial state requested by ${from}`)
       publishPhase(from)
+      publishPlanetProps(from)
     },
     onProbe: (from, abductableId) => {
       if (processEvent({ type: 'PROBE', abductableId })) {
