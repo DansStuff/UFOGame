@@ -2486,7 +2486,7 @@
               }
             ],
             "skyboxConfig": {
-              "fixedTime": 86340,
+              "fixedTime": 50400,
               "transitionMode": 0
             },
             "creator": "",
