@@ -28,11 +28,12 @@ import {
   TABLOID_SPIN_TURNS,
   TABLOID_STAGGER_SECONDS,
   TABLOID_START_SCALE,
-  TABLOID_TEXTURE
+  TABLOID_TEXTURES
 } from './constants'
 
 type Tabloid = {
   key: number
+  texture: string
   /** Clock time, seconds, when the approach starts. */
   startAt: number
   centerXPercent: number
@@ -83,12 +84,27 @@ function rotatedUvs(degrees: number): number[] {
   return uvs
 }
 
+/** The covers in random order. */
+function shuffledTextures(): string[] {
+  const textures = [...TABLOID_TEXTURES]
+  for (let i = textures.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const swap = textures[i]
+    textures[i] = textures[j]
+    textures[j] = swap
+  }
+  return textures
+}
+
 function throwTabloids(): void {
   const count = Math.floor(randomBetween(TABLOID_COUNT_MIN, TABLOID_COUNT_MAX + 1))
+  // Different covers within a batch while there are enough to go round.
+  const textures = shuffledTextures()
   for (let i = 0; i < count; i++) {
     const direction = Math.random() < 0.5 ? -1 : 1
     tabloids.push({
       key: nextKey++,
+      texture: textures[i % textures.length],
       startAt: clock + i * TABLOID_STAGGER_SECONDS,
       centerXPercent: randomBetween(TABLOID_CENTER_MIN_PERCENT, TABLOID_CENTER_MAX_PERCENT),
       centerYPercent: randomBetween(TABLOID_CENTER_MIN_PERCENT, TABLOID_CENTER_MAX_PERCENT),
@@ -142,7 +158,7 @@ function TabloidView(props: { tabloid: Tabloid; key: number }) {
       }}
       uiBackground={{
         textureMode: 'stretch',
-        texture: { src: TABLOID_TEXTURE, wrapMode: 'clamp' },
+        texture: { src: tabloid.texture, wrapMode: 'clamp' },
         uvs: rotatedUvs(pose.degrees),
         color: { r: 1, g: 1, b: 1, a: pose.opacity }
       }}
