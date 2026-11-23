@@ -6,7 +6,7 @@
 /**
  * Tabloid covers. Each is a 1024 px square with the page centered inside a transparent
  * margin (page diagonal 96% of the square), so the page never clips while its UVs spin.
- * Desaturated to 75% and saved as palette PNGs to keep them small.
+ * Greyscale, saved as palette PNGs to keep them small.
  * Sources (full size, not deployed): references/tabloids.
  */
 export const TABLOID_TEXTURES = [
