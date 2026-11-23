@@ -45,7 +45,7 @@ export const CAMERA_HEADING_SMOOTH_SECONDS = 1.5
  * ignores ship travel and where the player stands, and sits far enough out to frame the
  * whole saucer. Set to false for the in-game camera (`gameplay.ts`).
  */
-export const CAMERA_PROMO_MODE = true
+export const CAMERA_PROMO_MODE = false
 
 /**
  * Promo distance from the ship origin, in meters. The saucer is 39 m across, so with a
