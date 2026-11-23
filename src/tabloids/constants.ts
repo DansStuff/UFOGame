@@ -4,14 +4,15 @@
  */
 
 /**
- * Tabloid covers. Each is a 1024 px square with the page centered (600 x 778) inside a
- * transparent margin, so the page never clips while its UVs spin. Palette PNGs to keep
- * them small. Sources (full size, not deployed): references/tabloids.
+ * Tabloid covers. Each is a 1024 px square with the page centered inside a transparent
+ * margin (page diagonal 96% of the square), so the page never clips while its UVs spin.
+ * Desaturated to 75% and saved as palette PNGs to keep them small.
+ * Sources (full size, not deployed): references/tabloids.
  */
 export const TABLOID_TEXTURES = [
-  'assets/images/tabloids/tabloid_cow_energy.png',
-  'assets/images/tabloids/tabloid_grocery_abduction.png',
-  'assets/images/tabloids/tabloid_small_town.png'
+  'assets/images/tabloids/tabloid_celebrity_scandal.png',
+  'assets/images/tabloids/tabloid_alien_wedding.png',
+  'assets/images/tabloids/tabloid_farmer_surprise.png'
 ]
 
 /** Tabloids per newsstand, inclusive. */
@@ -32,7 +33,7 @@ export const TABLOID_LIFE_SECONDS = TABLOID_APPROACH_SECONDS + TABLOID_HOLD_SECO
 /** One newsstand's whole batch, last tabloid's fade included. The server debounces each newsstand for this long. */
 export const TABLOID_BATCH_SECONDS = (TABLOID_COUNT_MAX - 1) * TABLOID_STAGGER_SECONDS + TABLOID_LIFE_SECONDS
 
-/** Side of the square box holding the page. The page fills about 59% x 76% of it. */
+/** Side of the square box holding the page. The page fills about 60-70% of its width. */
 export const TABLOID_BOX_MIN_PIXELS = 1000
 export const TABLOID_BOX_MAX_PIXELS = 1150
 /** Starting size as a fraction of the final size. */
