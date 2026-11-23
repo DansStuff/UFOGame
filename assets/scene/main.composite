@@ -212,16 +212,16 @@
               "y": 0,
               "z": 0
             },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
             "rotation": {
               "x": 0,
               "y": 0,
               "z": 0,
               "w": 1
-            },
-            "scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
             },
             "parent": 513
           }
@@ -1588,7 +1588,7 @@
       }
     },
     {
-      "name": "inspector::SceneMetadata-v5",
+      "name": "inspector::SceneMetadata-v6",
       "jsonSchema": {
         "type": "object",
         "properties": {
@@ -1922,6 +1922,26 @@
               "type": "boolean",
               "serializationType": "boolean"
             }
+          },
+          "multiplayerServer": {
+            "type": "boolean",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "boolean",
+              "serializationType": "boolean"
+            }
+          },
+          "logsPermissions": {
+            "type": "array",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "serializationType": "utf8-string"
+              },
+              "serializationType": "array"
+            }
           }
         },
         "serializationType": "map"
@@ -1938,10 +1958,6 @@
             "email": "",
             "tags": [],
             "layout": {
-              "base": {
-                "x": 0,
-                "y": 0
-              },
               "parcels": [
                 {
                   "x": 0,
@@ -2427,7 +2443,11 @@
                   "x": 10,
                   "y": 0
                 }
-              ]
+              ],
+              "base": {
+                "x": 0,
+                "y": 0
+              }
             },
             "silenceVoiceChat": false,
             "disablePortableExperiences": false,
@@ -2444,8 +2464,11 @@
                     ]
                   },
                   "y": {
-                    "$case": "single",
-                    "value": 67.75
+                    "$case": "range",
+                    "value": [
+                      67.75,
+                      67.75
+                    ]
                   },
                   "z": {
                     "$case": "range",
@@ -2468,7 +2491,9 @@
             },
             "creator": "",
             "disableNearbyVoiceChat": false,
-            "hideLandscapeTerrain": true
+            "hideLandscapeTerrain": true,
+            "multiplayerServer": true,
+            "logsPermissions": []
           }
         }
       }
