@@ -1,15 +1,19 @@
 /**
  * Corn fields and newsstands scattered on the planet surface.
  *
- * Server: scatters every prop once on load, registers each as a surface zone, and
- * logs when the ship flies over one. Each client asks for the layout when it loads
- * (`requestInitialState`) and gets it back in `notifyPlanetProps`.
- * Client: parents a placeholder cube per prop to the planet, so it spins with the surface.
+ * Server: scatters every prop once on load and registers each as a surface zone.
+ * Flying over a corn field abducts its one cob onto the deck (see `cargo/`) and marks
+ * the field depleted in the synced `PlanetPropState`. Newsstands only log for now.
+ * Each client asks for the layout when it loads (`requestInitialState`) and gets it
+ * back in `notifyPlanetProps`.
+ * Client: parents a placeholder cube per prop to the planet, so it spins with the surface,
+ * and polls the synced state to switch each prop between its available and depleted look.
  */
 import { engine, Entity, Material, MeshRenderer, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
 import { PLANET_SURFACE_RADIUS_METERS } from '../abduction/constants'
+import { addCargo } from '../cargo'
 import { randomSurfaceDirection, rotationWithUp } from '../abduction/geometry'
 import { findPlanet } from '../abduction/sceneLookup'
 import { notifyPlanetProps } from '../gamestate/serverRoom'
@@ -22,6 +26,12 @@ import {
   PLANET_PROPS,
   type PlanetPropKind
 } from './constants'
+import {
+  createPlanetPropState,
+  depletePlanetProp,
+  isPlanetPropAvailable,
+  resetPlanetPropState
+} from './state'
 
 export type PlanetProp = {
   id: number
@@ -78,6 +88,7 @@ export function publishPlanetProps(to: string): void {
 }
 
 function setupServer(): void {
+  createPlanetPropState()
   serverProps = scatterProps()
   for (const prop of serverProps) {
     addSurfaceZone({
@@ -87,23 +98,42 @@ function setupServer(): void {
       radiusDegrees: PLANET_PROPS[prop.kind].zoneRadiusDegrees
     })
   }
-  for (const kind of KINDS) {
-    onSurfaceZoneEnter(kind, (zone) => {
-      console.log(`[SERVER] Ship flew over ${zone.kind} ${zone.id}`)
-    })
-  }
+  onSurfaceZoneEnter('cornField', (zone) => {
+    if (!depletePlanetProp(zone.id)) return
+    const cob = addCargo('cornCob')
+    console.log(`[SERVER] Corn field ${zone.id} gave up cob ${cob.id}`)
+  })
+  onSurfaceZoneEnter('newsstand', (zone) => {
+    console.log(`[SERVER] Ship flew over newsstand ${zone.id}`)
+  })
   console.log(`[SERVER] Scattered ${serverProps.length} planet props`)
 }
 
 // MARK: Client
 
+type ShownProp = {
+  entity: Entity
+  prop: PlanetProp
+  /** Look currently applied. Null until the first poll. */
+  available: boolean | null
+}
+
 /** Layout from the server, waiting for the planet entity. Null once spawned. */
 let pendingProps: PlanetProp[] | null = null
-const spawned: Entity[] = []
+const spawned: ShownProp[] = []
 
 function removeSpawned(): void {
-  for (const entity of spawned) engine.removeEntity(entity)
+  for (const shown of spawned) engine.removeEntity(shown.entity)
   spawned.length = 0
+}
+
+/**
+ * Switches a prop between its available and depleted look.
+ * Placeholder: recolors the cube. Real models swap or hide nodes here.
+ */
+function applyAvailability(shown: ShownProp, available: boolean): void {
+  const config = PLANET_PROPS[shown.prop.kind]
+  Material.setPbrMaterial(shown.entity, { albedoColor: available ? config.color : config.depletedColor })
 }
 
 function spawnProp(planet: Entity, prop: PlanetProp): Entity {
@@ -117,7 +147,6 @@ function spawnProp(planet: Entity, prop: PlanetProp): Entity {
     scale: Vector3.create(config.size.x, config.size.y, config.size.z)
   })
   MeshRenderer.setBox(entity)
-  Material.setPbrMaterial(entity, { albedoColor: config.color })
   return entity
 }
 
@@ -126,8 +155,18 @@ function PlanetPropSpawnSystem(): void {
   const planet = findPlanet()
   if (planet === null) return
   removeSpawned()
-  for (const prop of pendingProps) spawned.push(spawnProp(planet, prop))
+  for (const prop of pendingProps) spawned.push({ entity: spawnProp(planet, prop), prop, available: null })
   pendingProps = null
+}
+
+/** Polls the synced state and applies a prop's look when its availability changes. */
+function PlanetPropAvailabilitySystem(): void {
+  for (const shown of spawned) {
+    const available = isPlanetPropAvailable(shown.prop.id)
+    if (available === shown.available) continue
+    shown.available = available
+    applyAvailability(shown, available)
+  }
 }
 
 /** Replaces any props already shown. A repeat of the same layout respawns the same cubes. */
@@ -146,10 +185,12 @@ export function setupPlanetProps(): void {
   serverProps = []
   pendingProps = null
   spawned.length = 0
+  resetPlanetPropState()
   if (isServer()) {
     setupServer()
     return
   }
   setOnPlanetProps(receiveProps)
   engine.addSystem(PlanetPropSpawnSystem)
+  engine.addSystem(PlanetPropAvailabilitySystem)
 }
