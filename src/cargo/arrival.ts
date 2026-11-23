@@ -81,7 +81,7 @@ export function startArrival(entity: Entity, ship: Entity, item: CargoItem): voi
   const arrival: Arrival = {
     elapsed: 0,
     startY: -surfaceDepthBelow(ship),
-    deckSpot: Vector3.create(item.x, 0, item.z),
+    deckSpot: Vector3.create(item.x, model.restY, item.z),
     landed: Quaternion.fromEulerDegrees(0, item.yaw, 0),
     spinAxis: randomAxis(),
     centerOffset: Vector3.create(0, model.centerY * model.scale, 0)

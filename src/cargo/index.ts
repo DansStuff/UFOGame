@@ -2,7 +2,7 @@
  * Cargo: items abducted onto the ship deck. Each item weighs on steering like one
  * player standing at its spot (see `normalizedShipSpeed` in `ship/motion.ts`).
  *
- * Server: `addCargo` places an item at a random deck spot outside the safe radius,
+ * Server: `addCargo` places an item at a random deck spot near the rim,
  * `removeCargo` takes it off when a nearby player asks. The list is synced in `CargoState`.
  * An item weighs on steering once its arrival has had time to play.
  * Client: mirrors the synced list as models parented to the ship. Items that arrive
@@ -120,7 +120,7 @@ function showItem(ship: Entity, item: CargoItem, arriving: boolean): Entity {
   const entity = engine.addEntity()
   Transform.create(entity, {
     parent: ship,
-    position: Vector3.create(item.x, 0, item.z),
+    position: Vector3.create(item.x, model.restY, item.z),
     rotation: Quaternion.fromEulerDegrees(0, item.yaw, 0),
     scale: Vector3.create(model.scale, model.scale, model.scale)
   })

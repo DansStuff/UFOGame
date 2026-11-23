@@ -15,6 +15,8 @@ export type CargoModel = {
    * bottom edge so the item rests on the deck; the arrival tumble spins around this middle.
    */
   centerY: number
+  /** Ship-local height of the origin when resting on the deck, meters. Negative sinks it into the deck. */
+  restY: number
   /** Text shown next to the proximity prompt. */
   removeHoverText: string
 }
@@ -27,12 +29,15 @@ export const CARGO_MODELS: Record<CargoKind, CargoModel> = {
     scale: 3,
     // The file is 0.737 m tall.
     centerY: 0.37,
+    restY: -0.5,
     removeHoverText: 'Toss corn'
   }
 }
 
-/** Cargo lands at least this far from the ship center, so it always counts toward steering. */
-export const CARGO_DECK_MIN_RADIUS = SHIP_TILT_SAFE_RADIUS + 1
+/** Cargo lands in the outer part of the deck: this fraction of the ship radius, measured in from the rim. */
+export const CARGO_DECK_OUTER_FRACTION = 0.25
+/** Cargo lands at least this far from the ship center, well outside the safe radius, so it pulls hard on steering. */
+export const CARGO_DECK_MIN_RADIUS = Math.max(SHIP_TILT_EDGE_RADIUS * (1 - CARGO_DECK_OUTER_FRACTION), SHIP_TILT_SAFE_RADIUS + 1)
 /** Cargo lands at most this far from the ship center, so a scaled cob stays clear of the rim wall. */
 export const CARGO_DECK_MAX_RADIUS = SHIP_TILT_EDGE_RADIUS - 3
 /** Cargo items are kept at least this far apart when placed, measured between origins. */
