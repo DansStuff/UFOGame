@@ -25,6 +25,14 @@ export function setOnPlanetProps(handler: (props: PlanetPropMessage[]) => void):
   onPlanetProps = handler
 }
 
+/** Client-only reaction to flying over a newsstand. */
+let onTabloids: ((newsstandId: number) => void) | null = null
+
+/** Registers the reaction to flying over a newsstand. The last registration wins. */
+export function setOnTabloids(handler: (newsstandId: number) => void): void {
+  onTabloids = handler
+}
+
 /** Asks the server to probe the cow with this id. Ignored until the room is ready. */
 export function requestProbe(abductableId: number): void {
   if (isServer() || !room.isReady()) return
@@ -101,6 +109,14 @@ export function setupClientRoom(): void {
     if (data.sentAt <= appliedPlanetPropsAt) return
     appliedPlanetPropsAt = data.sentAt
     onPlanetProps?.(data.props)
+  })
+
+  let appliedTabloidsAt = 0
+  room.onMessage('notifyTabloids', (data) => {
+    // Strictly older only: two newsstands can fire in the same millisecond.
+    if (data.sentAt < appliedTabloidsAt) return
+    appliedTabloidsAt = data.sentAt
+    onTabloids?.(data.newsstandId)
   })
 
   let requestedInitialState = false

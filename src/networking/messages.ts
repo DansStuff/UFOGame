@@ -60,6 +60,11 @@ export const Messages = {
         z: Schemas.Float
       })
     )
+  }),
+  /** The ship flew over a newsstand. Sent to everyone; each client throws tabloids at the screen. */
+  notifyTabloids: Schemas.Map({
+    sentAt: Schemas.Int64,
+    newsstandId: Schemas.Int
   })
 }
 

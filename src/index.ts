@@ -18,6 +18,7 @@ import { setupProbes } from './ship/probes'
 import { setupSaucerFX } from './ship/saucerFx'
 import { setupShipWind } from './ship/wind'
 import { setupSurfaceZones } from './surfaceZones'
+import { setupTabloids } from './tabloids'
 import { registerUiBehaviors } from './ui/behaviors'
 import { setupUi } from './ui/index'
 
@@ -43,6 +44,7 @@ export function main() {
   setupSaucerFX()
   setupProbes()
   setupCosmetics()
+  setupTabloids()
   setupUi()
   registerUiBehaviors()
 }

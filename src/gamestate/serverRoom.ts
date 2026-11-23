@@ -54,6 +54,10 @@ export function notifyPlanetProps(props: PlanetPropPayload[], to: string): void 
   room.send('notifyPlanetProps', { sentAt: Date.now(), props }, { to: [to] })
 }
 
+export function notifyTabloids(newsstandId: number): void {
+  room.send('notifyTabloids', { sentAt: Date.now(), newsstandId })
+}
+
 export function notifyRoundReset(resetAt: number, to?: string): void {
   const payload = { resetAt }
   if (to) {

@@ -3,21 +3,25 @@
  *
  * Server: scatters every prop once on load and registers each as a surface zone.
  * Flying over a corn field abducts its one cob onto the deck (see `cargo/`) and marks
- * the field depleted in the synced `PlanetPropState`. Newsstands only log for now.
+ * the field depleted in the synced `PlanetPropState`. Flying over a newsstand tells every
+ * client to throw tabloids at the screen (`tabloids/`); a newsstand is then unavailable
+ * until its tabloids have played out, then works again.
  * Each client asks for the layout when it loads (`requestInitialState`) and gets it
  * back in `notifyPlanetProps`.
- * Client: parents a placeholder cube per prop to the planet, so it spins with the surface,
+ * Client: parents each prop to the planet, so it spins with the surface (a model when the
+ * kind has one, otherwise a placeholder cube),
  * and polls the synced state to switch each prop between its available and depleted look.
  */
-import { engine, Entity, Material, MeshRenderer, Transform } from '@dcl/sdk/ecs'
+import { engine, Entity, GltfContainer, Material, MeshRenderer, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
 import { PLANET_SURFACE_RADIUS_METERS } from '../abduction/constants'
 import { addCargo } from '../cargo'
 import { randomSurfaceDirection, rotationWithUp } from '../abduction/geometry'
 import { findPlanet } from '../abduction/sceneLookup'
-import { notifyPlanetProps } from '../gamestate/serverRoom'
+import { notifyPlanetProps, notifyTabloids } from '../gamestate/serverRoom'
 import { setOnPlanetProps, type PlanetPropMessage } from '../networking/client'
+import { TABLOID_BATCH_SECONDS } from '../tabloids/constants'
 import { addSurfaceZone, onSurfaceZoneEnter } from '../surfaceZones'
 import { cosOfDegrees, isWithinCos } from '../surfaceZones/geometry'
 import {
@@ -49,6 +53,16 @@ function isKind(value: string): value is PlanetPropKind {
 // MARK: Server
 
 let serverProps: PlanetProp[] = []
+/** Server clock, ms, when each newsstand can throw tabloids again. Missing means available. */
+const newsstandAvailableAt = new Map<number, number>()
+
+/** Debounce: a newsstand is unavailable until its last batch of tabloids has played out. */
+function takeNewsstand(id: number): boolean {
+  const now = Date.now()
+  if (now < (newsstandAvailableAt.get(id) ?? 0)) return false
+  newsstandAvailableAt.set(id, now + TABLOID_BATCH_SECONDS * 1000)
+  return true
+}
 
 /** A random direction at least the minimum separation from every placed prop, if one turns up. */
 function pickDirection(placed: PlanetProp[], cosSeparation: number): Vector3 {
@@ -104,7 +118,9 @@ function setupServer(): void {
     console.log(`[SERVER] Corn field ${zone.id} gave up cob ${cob.id}`)
   })
   onSurfaceZoneEnter('newsstand', (zone) => {
+    if (!takeNewsstand(zone.id)) return
     console.log(`[SERVER] Ship flew over newsstand ${zone.id}`)
+    notifyTabloids(zone.id)
   })
   console.log(`[SERVER] Scattered ${serverProps.length} planet props`)
 }
@@ -133,12 +149,24 @@ function removeSpawned(): void {
  */
 function applyAvailability(shown: ShownProp, available: boolean): void {
   const config = PLANET_PROPS[shown.prop.kind]
+  if (config.model) return
   Material.setPbrMaterial(shown.entity, { albedoColor: available ? config.color : config.depletedColor })
 }
 
 function spawnProp(planet: Entity, prop: PlanetProp): Entity {
   const config = PLANET_PROPS[prop.kind]
   const entity = engine.addEntity()
+  if (config.model) {
+    Transform.create(entity, {
+      parent: planet,
+      // The model's origin is at its base.
+      position: Vector3.scale(prop.direction, PLANET_SURFACE_RADIUS_METERS),
+      rotation: rotationWithUp(prop.direction),
+      scale: Vector3.create(config.modelScale ?? 1, config.modelScale ?? 1, config.modelScale ?? 1)
+    })
+    GltfContainer.create(entity, { src: config.model, visibleMeshesCollisionMask: 0, invisibleMeshesCollisionMask: 0 })
+    return entity
+  }
   Transform.create(entity, {
     parent: planet,
     // Half the height past the surface, so the cube sits on it.
@@ -183,6 +211,7 @@ function receiveProps(messages: PlanetPropMessage[]): void {
 
 export function setupPlanetProps(): void {
   serverProps = []
+  newsstandAvailableAt.clear()
   pendingProps = null
   spawned.length = 0
   resetPlanetPropState()

@@ -11,12 +11,19 @@ export type PlanetPropConfig = {
   count: number
   /** The ship is over this prop within this many degrees, measured from the planet center. 1 degree is about 1.7 m on the surface. */
   zoneRadiusDegrees: number
+  /** GLB with its origin at the base. Kinds without one show a placeholder cube. */
+  model?: string
+  /** Uniform scale applied to `model`. */
+  modelScale?: number
   /** Placeholder cube size. */
   size: { x: number; y: number; z: number }
   color: Color4
   /** Placeholder color once the prop has nothing left to give. */
   depletedColor: Color4
 }
+
+/** Newsstand size multiplier. At 2 it is about 9 m wide and 6.6 m tall. */
+export const NEWSSTAND_MODEL_SCALE = 2
 
 export const PLANET_PROPS: Record<PlanetPropKind, PlanetPropConfig> = {
   cornField: {
@@ -29,6 +36,9 @@ export const PLANET_PROPS: Record<PlanetPropKind, PlanetPropConfig> = {
   newsstand: {
     count: 15,
     zoneRadiusDegrees: 2.5,
+    // About 4.5 m wide, 3.3 m tall in the file. Source: blender/Landmarks.blend, Newsstand collection.
+    model: 'assets/scene/Models/PlanetProps/newsstand.glb',
+    modelScale: NEWSSTAND_MODEL_SCALE,
     size: { x: 1.5, y: 2.5, z: 1 },
     color: Color4.create(0.4, 0.38, 0.15, 1),
     depletedColor: Color4.create(0.25, 0.24, 0.12, 1)
