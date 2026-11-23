@@ -8,3 +8,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .editor
+# Compiled from assets/scene/main.composite on every build
+main.crdt
