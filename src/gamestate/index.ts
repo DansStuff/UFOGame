@@ -36,7 +36,6 @@ export function defaultGameState(): GameStateSnapshot {
     planetAngularVelocity: { x: 0, y: 0, z: 0 },
     abductableDirection: { x: 0, y: 0, z: 0 },
     abductableId: 0,
-    abductableAngularOffset: 0,
     abductableYOffset: 0,
     abductableOnShip: false,
     abductableSamples: 0,
@@ -69,7 +68,6 @@ function readSnapshot(): GameStateSnapshot {
     planetAngularVelocity: copyAngularVelocity(state.planetAngularVelocity),
     abductableDirection: copyDirection(state.abductableDirection),
     abductableId: state.abductableId,
-    abductableAngularOffset: state.abductableAngularOffset,
     abductableYOffset: state.abductableYOffset,
     abductableOnShip: state.abductableOnShip,
     abductableSamples: state.abductableSamples,
@@ -202,11 +200,6 @@ export function applyAbductableDirection(direction: AbductableDirectionSnapshot)
 /** Server-only. True parents the abductable to the ship. False parents it to the planet. */
 export function applyAbductableOnShip(onShip: boolean): void {
   GameState.getMutable(stateEntityOrThrow()).abductableOnShip = onShip
-}
-
-/** Server-only. Degrees from the planet center. 0 is directly under the ship. */
-export function applyAbductableAngularOffset(degrees: number): void {
-  GameState.getMutable(stateEntityOrThrow()).abductableAngularOffset = degrees
 }
 
 /** Server-only. Meters along local up, past the surface. The id stays the same. */

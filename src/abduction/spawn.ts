@@ -43,7 +43,6 @@ function spawnAbductable(
   planet: Entity,
   direction: AbductableDirectionSnapshot,
   id: number,
-  angularOffset: number,
   yOffset: number,
   samples: number
 ): void {
@@ -52,7 +51,7 @@ function spawnAbductable(
 
   const outward = outwardDirection(direction)
   const entity = engine.addEntity()
-  Abductable.create(entity, { id, angularOffset, yOffset, samples })
+  Abductable.create(entity, { id, yOffset, samples })
   Transform.create(entity, {
     parent: planet,
     // Local to the planet entity, so the scene position is that entity's position plus this offset.
@@ -123,7 +122,6 @@ export function AbductableSpawnSystem(dt: number): void {
       planet,
       state.abductableDirection,
       state.abductableId,
-      state.abductableAngularOffset,
       state.abductableYOffset,
       state.abductableSamples
     )
@@ -133,7 +131,6 @@ export function AbductableSpawnSystem(dt: number): void {
 
   const component = Abductable.getMutable(existing)
   component.id = state.abductableId
-  component.angularOffset = state.abductableAngularOffset
   component.yOffset = state.abductableYOffset
   component.samples = state.abductableSamples
 

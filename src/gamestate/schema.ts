@@ -25,11 +25,6 @@ export const GameState = engine.defineComponent('game:State', {
   /** 0 until the server places one. Increments each time a new one is placed. */
   abductableId: Schemas.Int,
   /**
-   * Degrees between the ship and the abductable, measured from the planet center.
-   * 0 is directly under the ship. The server writes this whenever it changes.
-   */
-  abductableAngularOffset: Schemas.Float,
-  /**
    * Meters above the planet surface.
    * On the planet this is added to the surface radius. On the ship it is added to the
    * ship-local height captured when the lift started. After a release it falls back to 0.
@@ -79,7 +74,6 @@ export type GameStateSnapshot = {
   planetAngularVelocity: PlanetAngularVelocitySnapshot
   abductableDirection: AbductableDirectionSnapshot
   abductableId: number
-  abductableAngularOffset: number
   abductableYOffset: number
   abductableOnShip: boolean
   abductableSamples: number

@@ -1,10 +1,9 @@
 import { engine, Entity, GltfContainer, Schemas } from '@dcl/sdk/ecs'
 import { ABDUCTABLE_MODELS } from './constants'
 
-/** The cow. `samples` is how many probes it has left. `angularOffset` is degrees from the ship. `yOffset` is meters along local up past the surface. */
+/** The cow. `samples` is how many probes it has left. `yOffset` is meters along local up past the surface. */
 export const Abductable = engine.defineComponent('abductable:Target', {
   id: Schemas.Int,
-  angularOffset: Schemas.Float,
   yOffset: Schemas.Float,
   samples: Schemas.Int
 })

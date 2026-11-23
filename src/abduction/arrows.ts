@@ -3,9 +3,10 @@
  * points along the horizontal direction from the ship to the cow. CompassArrow is a
  * child of the ship and yaws around its local up so it stays flat on the deck while
  * its forward points at the cow. AbductableArrow is a child of the planet,
- * placed above the cow along the cow's up. It shows while the synced angle stays
+ * placed above the cow along the cow's up. It shows while the angle stays
  * inside the outer limit and outside the inner one. Inside the inner limit every
  * arrow hides. CompassArrow shows past that limit. RedArrow shows past the outer one.
+ * The angle is measured here from world positions, so it matches the planet this client shows.
  */
 import { engine, Entity, getWorldPosition, getWorldRotation, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
@@ -17,9 +18,25 @@ import {
   RED_ARROW_RING_Y
 } from './constants'
 import { sceneEntities } from '../scene/entities'
-import { Abductable, findAbductable, findAbductableModel } from './components'
+import { findAbductable, findAbductableModel } from './components'
 import { rotationWithUp, unrotate } from './geometry'
 import { findNamed, findPlanet, setVisible } from './sceneLookup'
+import { angleBetweenDegrees, directionFromCenter } from '../surfaceZones/geometry'
+
+/**
+ * Degrees between the ship and the cow, measured from the planet center.
+ * 0 is directly under the ship. Null until the ship and planet are found.
+ */
+function abductableAngleDegrees(abductable: Entity): number | null {
+  const ship = findNamed(EntityNames.Ship)
+  const planet = findPlanet()
+  if (ship === null || planet === null) return null
+  const center = getWorldPosition(engine, planet)
+  const toShip = directionFromCenter(center, getWorldPosition(engine, ship))
+  const toCow = directionFromCenter(center, getWorldPosition(engine, abductable))
+  if (toShip === null || toCow === null) return null
+  return angleBetweenDegrees(toShip, toCow)
+}
 
 /**
  * Horizontal direction the ship must fly. Y is ignored.
@@ -91,7 +108,8 @@ export function CompassArrowSystem(): void {
     return
   }
 
-  setVisible(entity, Abductable.get(abductable).angularOffset > ARROW_HIDE_ANGLE_DEGREES)
+  const angleDegrees = abductableAngleDegrees(abductable)
+  if (angleDegrees !== null) setVisible(entity, angleDegrees > ARROW_HIDE_ANGLE_DEGREES)
 
   const direction = deckDirection(entity, abductable)
   if (direction === null) return
@@ -141,7 +159,8 @@ export function AbductableArrowSystem(): void {
 
   const planet = findPlanet()
   if (arrow !== null && planet !== null) placeAbductableArrow(arrow, abductable, planet)
-  const angleDegrees = Abductable.get(abductable).angularOffset
+  const angleDegrees = abductableAngleDegrees(abductable)
+  if (angleDegrees === null) return
   const hideBoth = angleDegrees <= ARROW_HIDE_ANGLE_DEGREES
   const showAbductableArrow = !hideBoth && angleDegrees <= ABDUCTABLE_ARROW_MAX_ANGLE_DEGREES
   if (arrow !== null) setVisible(arrow, showAbductableArrow)

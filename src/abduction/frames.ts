@@ -55,25 +55,3 @@ export function captureShipCarry(planet: Entity, ship: Entity, state: GameStateS
   const local = shipLocalFromState(planet, ship, state)
   return { localX: local.x, localZ: local.z, baseY: local.y - state.abductableYOffset }
 }
-
-/**
- * Angle in degrees between the ship and the abductable, measured from the planet center.
- * Both directions are normalized. 0 is directly under the ship. 180 is the far side.
- * The abductable direction is planet-local and is turned by the synced `planetRotation`.
- */
-export function angleFromPlanetCenter(
-  planet: Entity,
-  ship: Entity,
-  direction: AbductableDirectionSnapshot,
-  planetRotation: PlanetRotationSnapshot
-): number | null {
-  const toShip = Vector3.subtract(getWorldPosition(engine, ship), getWorldPosition(engine, planet))
-  if (Vector3.lengthSquared(toShip) < 1e-8) return null
-
-  const toAbductable = Vector3.rotate(Vector3.create(direction.x, direction.y, direction.z), planetRotation)
-  if (Vector3.lengthSquared(toAbductable) < 1e-8) return null
-
-  const dot = Vector3.dot(Vector3.normalize(toShip), Vector3.normalize(toAbductable))
-  const clamped = Math.min(1, Math.max(-1, dot))
-  return Math.acos(clamped) * (180 / Math.PI)
-}

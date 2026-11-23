@@ -1,5 +1,5 @@
 /**
- * Server-only. Publishes the angle between ship and cow from the synced planet spin.
+ * Server-only. Checks whether the ship is over the cow with the shared surface-zone math.
  * A lift starts within the angle limit while the abduction beam is on, and the cow
  * then rides the ship. The beam follows ship speed, so flying too fast turns it off,
  * which releases the cow to fall onto the planet where the ship carried it.
@@ -16,7 +16,6 @@ import {
   PLANET_SURFACE_RADIUS_METERS
 } from './constants'
 import {
-  applyAbductableAngularOffset,
   applyAbductableDirection,
   applyAbductableOnShip,
   applyAbductablePlacement,
@@ -26,15 +25,17 @@ import {
 } from '../gamestate'
 import { abductionBeamOn } from '../ship/speed'
 import {
-  angleFromPlanetCenter,
   captureShipCarry,
   planetDirectionOfWorld,
   tiltOf,
   worldOfShipLocal,
   type ShipCarry
 } from './frames'
-import { hasPlacement, randomSurfaceDirection, sameDirection, simulationStep } from './geometry'
+import { hasPlacement, outwardDirection, randomSurfaceDirection, sameDirection, simulationStep } from './geometry'
 import { findNamed, findPlanet } from './sceneLookup'
+import { cosOfDegrees, isWithinCos, shipPlanetDirection } from '../surfaceZones/geometry'
+
+const LIFT_MAX_COS = cosOfDegrees(ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES)
 
 let serverCarry: ShipCarry | null = null
 
@@ -116,9 +117,8 @@ export function AbductableAngleSystem(dt: number): void {
   const planet = findPlanet()
   if (ship === null || planet === null) return
 
-  const angleDegrees = angleFromPlanetCenter(planet, ship, state.abductableDirection, state.planetRotation)
-  if (angleDegrees === null) return
-  if (angleDegrees !== state.abductableAngularOffset) applyAbductableAngularOffset(angleDegrees)
+  const shipDirection = shipPlanetDirection(planet, ship, state.planetRotation)
+  if (shipDirection === null) return
 
   if (state.abductableOnShip) {
     if (serverCarry === null) serverCarry = captureShipCarry(planet, ship, state)
@@ -136,7 +136,8 @@ export function AbductableAngleSystem(dt: number): void {
     return
   }
 
-  if (angleDegrees > ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES || !abductionBeamOn()) return
+  const overCow = isWithinCos(shipDirection, outwardDirection(state.abductableDirection), LIFT_MAX_COS)
+  if (!overCow || !abductionBeamOn()) return
   fallSpeedMetersPerSecond = 0
   serverCarry = captureShipCarry(planet, ship, state)
   applyAbductableOnShip(true)
