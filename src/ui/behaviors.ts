@@ -1,6 +1,7 @@
 /**
  * Writes the crew sample total onto the samples HUD, places that label on the
- * screen center, and hides the mobile controls while a popup covers them.
+ * screen center, advances the tutorial flipbook, and hides the mobile controls
+ * while a popup covers them.
  * Layout lives in src/ui/layers. This file is the only thing that changes those values.
  */
 import { engine, InputAction, TouchScreenControls, UiCanvasInformation } from '@dcl/sdk/ecs'
@@ -62,7 +63,8 @@ function placeSamplesCollectedBar(): void {
 
 export function registerUiBehaviors(): void {
   if (isServer()) return
-  engine.addSystem(function UiBehaviorSystem() {
+  engine.addSystem(function UiBehaviorSystem(dt: number) {
+    tutorialLayer.tick(dt)
     samplesHud.samplesCollected = getGameState().samplesCollected
     placeSamplesCollectedBar()
     syncPopupTouchControls()

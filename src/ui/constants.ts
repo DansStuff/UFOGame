@@ -37,23 +37,37 @@ export const SAMPLES_HUD_HEIGHT = 48
 // MARK: Tutorial
 
 /**
- * One tutorial page. `aspect` is the image's width ÷ height (1920x1080 is 16 / 9);
- * the scene cannot read a texture's size, so leave it out only when the image
- * matches TUTORIAL_DEFAULT_ASPECT.
+ * One tutorial page, played as a looping flipbook.
+ * - `frames`: image paths. A single frame is a still page.
+ * - `sequence`: indices into `frames`, in play order; repeats are fine
+ *   (`[0, 1, 2, 1]` ping-pongs). Defaults to every frame in order. Bad indices are skipped.
+ * - `fps`: frames of `sequence` shown per second. Defaults to TUTORIAL_DEFAULT_FPS.
+ * - `aspect`: the images' width ÷ height (1920x1080 is 16 / 9). The scene cannot read
+ *   a texture's size, so leave it out only when they match TUTORIAL_DEFAULT_ASPECT.
  */
-export type TutorialImage = { src: string; aspect?: number }
+export type TutorialPage = {
+  frames: string[]
+  sequence?: number[]
+  fps?: number
+  aspect?: number
+}
 
 /** Width ÷ height used for any tutorial page that does not set its own `aspect`. */
 export const TUTORIAL_DEFAULT_ASPECT = 1
 
+/** Flipbook speed for any tutorial page that does not set its own `fps`. */
+export const TUTORIAL_DEFAULT_FPS = 6
+
 /**
  * Tutorial pages, shown in this order. Files live in assets/images/tutorial/ and are
  * numbered to match; the scene cannot list a folder at runtime, so add new pages here.
+ * Example animated page:
+ *   { frames: ['assets/images/tutorial/02_1.png', 'assets/images/tutorial/02_2.png'], sequence: [0, 0, 1], fps: 4 }
  */
-export const TUTORIAL_IMAGES: TutorialImage[] = [
-  { src: 'assets/images/tutorial/01.png' },
-  { src: 'assets/images/tutorial/02.png' },
-  { src: 'assets/images/tutorial/03.png' }
+export const TUTORIAL_PAGES: TutorialPage[] = [
+  { frames: ['assets/images/tutorial/01.png'] },
+  { frames: ['assets/images/tutorial/02.png'] },
+  { frames: ['assets/images/tutorial/03.png'] }
 ]
 
 /** Padding inside the tutorial popup, in virtual pixels. The image fits inside it. */
