@@ -17,40 +17,13 @@ export const DEBUG_SPAWN_Z = 80.51
 export const DEBUG_BUTTON_WIDTH = 240
 export const DEBUG_BUTTON_HEIGHT = 56
 
-// MARK: Codex
+// MARK: Redeem
 
-/**
- * Gap, in virtual pixels, between the codex window and the edge of the
- * largest screen-centered rectangle that still fits in the safe inset.
- */
-export const CODEX_WINDOW_INSET_MARGIN = 32
+/** Padding inside the redeem samples window, in virtual pixels. */
+export const REDEEM_PADDING = 24
 
-/** Padding inside the codex window, in virtual pixels. */
-export const CODEX_WINDOW_PADDING = 24
-
-/** Border width of the codex window. The inner layout subtracts it. */
-export const CODEX_WINDOW_BORDER = 2
-
-/** Title row height inside the codex window. */
-export const CODEX_HEADER_HEIGHT = 64
-
-/** Space between the title row and the scrolling grid. */
-export const CODEX_HEADER_GAP = 16
-
-/** Gap between codex cells, horizontally and vertically. */
-export const CODEX_CELL_GAP = 16
-
-/** Number of creature slots in the codex grid. */
-export const CODEX_SLOT_COUNT = 15
-
-/** Cells per codex row. */
-export const CODEX_COLUMNS = 3
-
-/** Discovered creature names, filled into the codex slots in order. Remaining slots stay blank. */
-export const CODEX_DISCOVERIES = ['Cow?']
-
-/** Room left inside the scroller for its vertical bar. */
-export const CODEX_SCROLLBAR_GUTTER = 18
+/** Title row height inside the redeem samples window. */
+export const REDEEM_HEADER_HEIGHT = 64
 
 // MARK: Samples HUD
 

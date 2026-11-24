@@ -7,7 +7,7 @@ import type { ThemeCustomize } from '@stom66/dcl-ui-component-kit'
  */
 export const theme: ThemeCustomize = {
   colors: {
-    // Panel fill behind <Background /> (codex window).
+    // Panel fill behind <Background /> (popup windows).
     body: Color4.create(0.05, 0.07, 0.09, 0.96),
     // Chips, cells and the samples pill.
     dark: Color4.create(0.08, 0.12, 0.14, 0.94),
@@ -17,7 +17,7 @@ export const theme: ThemeCustomize = {
     primary: Color4.create(0.12, 0.18, 0.16, 1),
     // Window and button trim.
     secondary: Color4.create(0.45, 0.75, 0.55, 1),
-    // Codex cell trim.
+    // Accent trim. Unused for now.
     tertiary: Color4.create(0.4, 0.62, 0.48, 1)
   },
   typography: {
