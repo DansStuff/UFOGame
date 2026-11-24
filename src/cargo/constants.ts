@@ -30,7 +30,7 @@ export const CARGO_MODELS: Record<CargoKind, CargoModel> = {
     // The file is 0.737 m tall.
     centerY: 0.37,
     restY: -0.5,
-    removeHoverText: 'Toss corn'
+    removeHoverText: 'Eat corn'
   }
 }
 

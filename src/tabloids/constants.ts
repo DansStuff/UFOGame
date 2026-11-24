@@ -23,8 +23,8 @@ export const TABLOID_COUNT_MAX = 3
 export const TABLOID_APPROACH_SECONDS = 0.5
 /** Stuck to the screen before fading. */
 export const TABLOID_HOLD_SECONDS = 4
-/** Quick fade at the end. */
-export const TABLOID_FADE_SECONDS = 0.25
+/** Fade at the end. */
+export const TABLOID_FADE_SECONDS = 1.25
 /** Each tabloid starts this much after the previous one, so they land one after another. */
 export const TABLOID_STAGGER_SECONDS = 0.1
 

@@ -60,7 +60,7 @@ export const NAMEPLATE_ANCHOR = AvatarAnchorPointType.AAPT_NAME_TAG
 export const NAMEPLATE_OFFSET = Vector3.create(0, 1.1, 0)
 
 /** World units: 10 is about 1 m tall. */
-export const NAMEPLATE_FONT_SIZE = 6
+export const NAMEPLATE_FONT_SIZE = 8.4
 
 export const NAMEPLATE_TEXT_COLOR = Color4.White()
 
