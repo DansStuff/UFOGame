@@ -1,7 +1,8 @@
 /**
  * Opening fly-in. It orbits the ship from far out, then moves in and lands
  * exactly on the pose the active camera mode wants. Its system removes itself when
- * done, and the mode's system takes over with no cut.
+ * done, and the mode's system takes over with no cut. `onIntroFinished` lets
+ * other domains react to the landing (the tutorial popup opens then).
  */
 import { engine, Entity, getWorldPosition } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
@@ -16,10 +17,32 @@ import {
 import { CameraPose, DEG_TO_RAD, findShip, lerp, placeCamera, smoothstep } from './rig'
 
 let introActive = false
+let introFinished = false
+let finishedHandlers: Array<() => void> = []
 
 /** True while the intro system owns the camera transform. */
 export function isIntroActive(): boolean {
   return introActive
+}
+
+/**
+ * Runs `handler` once when the fly-in lands, or right away if it already has
+ * (or the intro is disabled).
+ */
+export function onIntroFinished(handler: () => void): void {
+  if (introFinished) {
+    handler()
+    return
+  }
+  finishedHandlers.push(handler)
+}
+
+function finishIntro(): void {
+  introActive = false
+  introFinished = true
+  const handlers = finishedHandlers
+  finishedHandlers = []
+  for (const handler of handlers) handler()
 }
 
 /**
@@ -28,7 +51,11 @@ export function isIntroActive(): boolean {
  */
 export function startIntro(camera: Entity, landingPose: (shipPosition: Vector3) => CameraPose): void {
   introActive = false
-  if (CAMERA_INTRO_SECONDS <= 0) return
+  introFinished = false
+  if (CAMERA_INTRO_SECONDS <= 0) {
+    finishIntro()
+    return
+  }
   introActive = true
   let elapsed = 0
 
@@ -41,9 +68,9 @@ export function startIntro(camera: Entity, landingPose: (shipPosition: Vector3) 
     const landing = landingPose(shipPosition)
 
     if (progress >= 1) {
-      introActive = false
       engine.removeSystem(CameraIntroSystem)
       placeCamera(camera, shipPosition, landing)
+      finishIntro()
       return
     }
 

@@ -77,6 +77,7 @@ function pageFrame(page: TutorialPage, elapsed: number): TutorialFrame | undefin
 /**
  * Centered tutorial popup. Fills DUCK's Default zone (the middle half of the screen)
  * with one page image and a Next button; the last page's button reads Done and closes.
+ * Hidden until src/ui/behaviors.ts opens it when the camera fly-in lands.
  * The image keeps its aspect and is centered in the space above the button. Each page is a
  * looping flipbook (see TutorialPage); src/ui/behaviors.ts advances it with tick().
  */
@@ -90,7 +91,7 @@ class TutorialLayer extends Layer {
       id: 'tutorial',
       zone: ZoneType.Default,
       canBeHidden: true,
-      startHidden: TUTORIAL_PAGES.length === 0,
+      startHidden: true,
       zIndex: 20
     })
   }

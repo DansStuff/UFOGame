@@ -1,10 +1,12 @@
 /**
- * Writes the crew sample total onto the samples HUD, advances the tutorial
- * flipbook, and hides the mobile controls while a popup covers them.
+ * Writes the crew sample total onto the samples HUD, opens the tutorial when the
+ * camera fly-in lands, advances its flipbook, and hides the mobile controls while
+ * a popup covers them.
  * Layout lives in src/ui/layers. This file is the only thing that changes those values.
  */
 import { engine, InputAction, TouchScreenControls } from '@dcl/sdk/ecs'
 import { isServer } from '@dcl/sdk/network'
+import { onIntroFinished } from '../camera/intro'
 import { getGameState } from '../gamestate'
 import { redeemLayer } from './layers/redeem.layer'
 import { samplesHudState as samplesHud } from './layers/samples.layer'
@@ -38,6 +40,7 @@ function syncPopupTouchControls(): void {
 
 export function registerUiBehaviors(): void {
   if (isServer()) return
+  onIntroFinished(() => tutorialLayer.open())
   engine.addSystem(function UiBehaviorSystem(dt: number) {
     tutorialLayer.tick(dt)
     samplesHud.samplesCollected = getGameState().samplesCollected
