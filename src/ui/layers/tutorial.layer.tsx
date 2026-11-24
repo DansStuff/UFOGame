@@ -18,7 +18,7 @@ import {
   TUTORIAL_PAGES,
   TUTORIAL_PADDING
 } from '../constants'
-import type { TutorialPage } from '../constants'
+import type { TutorialFrame, TutorialPage } from '../constants'
 
 /** Size of DUCK's Default zone, which this layer fills: half the virtual canvas each way. */
 const TUTORIAL_ZONE_WIDTH = '50vw'
@@ -46,13 +46,25 @@ function pageSequence(page: TutorialPage): number[] {
   return valid.length > 0 ? valid : page.frames.map((_, i) => i)
 }
 
-/** Frame image to show `elapsed` seconds into the page. The sequence loops. */
-function pageFrameSrc(page: TutorialPage, elapsed: number): string {
+/** UiBackground UVs, bottom-left vertex first, clockwise. Mirrored swaps left and right. */
+const UVS_NORMAL = [0, 0, 0, 1, 1, 1, 1, 0]
+const UVS_XMIRROR = [1, 0, 1, 1, 0, 1, 0, 0]
+
+function frameSrc(frame: TutorialFrame): string {
+  return typeof frame === 'string' ? frame : frame.src
+}
+
+function frameXMirror(frame: TutorialFrame): boolean {
+  return typeof frame !== 'string' && frame.xmirror === true
+}
+
+/** Frame to show `elapsed` seconds into the page. The sequence loops. */
+function pageFrame(page: TutorialPage, elapsed: number): TutorialFrame | undefined {
   const sequence = pageSequence(page)
-  if (sequence.length === 0) return ''
+  if (sequence.length === 0) return
   const fps = page.fps !== undefined && page.fps > 0 ? page.fps : TUTORIAL_DEFAULT_FPS
   const step = Math.floor(elapsed * fps) % sequence.length
-  return page.frames[sequence[step]] ?? ''
+  return page.frames[sequence[step]]
 }
 
 // MARK: TutorialLayer
@@ -111,7 +123,9 @@ class TutorialLayer extends Layer {
     const theme = getTheme()
     const isLast = this.page >= TUTORIAL_PAGES.length - 1
     const page = TUTORIAL_PAGES[this.page]
-    const src = page ? pageFrameSrc(page, this.elapsed) : ''
+    const frame = page ? pageFrame(page, this.elapsed) : undefined
+    const src = frame ? frameSrc(frame) : ''
+    const uvs = frame && frameXMirror(frame) ? UVS_XMIRROR : UVS_NORMAL
     const size = fitTutorialImage(page?.aspect ?? TUTORIAL_DEFAULT_ASPECT)
     return (
       <Column
@@ -131,14 +145,14 @@ class TutorialLayer extends Layer {
           <UiEntity
             key="tutorial_image"
             uiTransform={{ width: size.width, height: size.height, flexShrink: 0 }}
-            uiBackground={{ textureMode: 'stretch', texture: { src } }}
+            uiBackground={{ textureMode: 'stretch', texture: { src }, uvs }}
           />
-          {(page?.frames ?? []).map((frame, i) => (
+          {(page?.frames ?? []).map((preload, i) => (
             // Invisible 1px copies of every frame so the textures load before the flipbook reaches them.
             <UiEntity
               key={`tutorial_preload_${i}`}
               uiTransform={{ width: 1, height: 1, positionType: 'absolute', position: { left: 0, top: 0 } }}
-              uiBackground={{ textureMode: 'stretch', texture: { src: frame }, color: { r: 1, g: 1, b: 1, a: 0 } }}
+              uiBackground={{ textureMode: 'stretch', texture: { src: frameSrc(preload) }, color: { r: 1, g: 1, b: 1, a: 0 } }}
             />
           ))}
         </UiEntity>

@@ -37,8 +37,14 @@ export const SAMPLES_HUD_HEIGHT = 48
 // MARK: Tutorial
 
 /**
+ * One flipbook frame: an image path, or `{ src, xmirror: true }` to show that image
+ * flipped left to right (done with UVs, so no mirrored copy of the file is needed).
+ */
+export type TutorialFrame = string | { src: string; xmirror?: boolean }
+
+/**
  * One tutorial page, played as a looping flipbook.
- * - `frames`: image paths. A single frame is a still page.
+ * - `frames`: the page's frames (see TutorialFrame). A single frame is a still page.
  * - `sequence`: indices into `frames`, in play order; repeats are fine
  *   (`[0, 1, 2, 1]` ping-pongs). Defaults to every frame in order. Bad indices are skipped.
  * - `fps`: frames of `sequence` shown per second. Defaults to TUTORIAL_DEFAULT_FPS.
@@ -46,7 +52,7 @@ export const SAMPLES_HUD_HEIGHT = 48
  *   a texture's size, so leave it out only when they match TUTORIAL_DEFAULT_ASPECT.
  */
 export type TutorialPage = {
-  frames: string[]
+  frames: TutorialFrame[]
   sequence?: number[]
   fps?: number
   aspect?: number
@@ -61,8 +67,17 @@ export const TUTORIAL_DEFAULT_FPS = 6
 /**
  * Tutorial pages, shown in this order. Files live in assets/images/tutorial/ and are
  * numbered to match; the scene cannot list a folder at runtime, so add new pages here.
- * Example animated page:
- *   { frames: ['assets/images/tutorial/02_1.png', 'assets/images/tutorial/02_2.png'], sequence: [0, 0, 1], fps: 4 }
+ * Example animated page that rocks the ship right, back to center, then left (TutRight mirrored):
+ *   {
+ *     frames: [
+ *       'assets/images/tutorial/TutCenter.png',
+ *       'assets/images/tutorial/TutRight.png',
+ *       { src: 'assets/images/tutorial/TutRight.png', xmirror: true }
+ *     ],
+ *     sequence: [0, 1, 0, 2],
+ *     fps: 2,
+ *     aspect: 4 / 3
+ *   }
  */
 export const TUTORIAL_PAGES: TutorialPage[] = [
   { frames: ['assets/images/tutorial/01.png'] },
