@@ -10,7 +10,7 @@ import {
   ZoneType,
   getTheme
 } from '@stom66/dcl-ui-component-kit'
-import { withClick } from '../../sfx'
+import { playSfx, withClick } from '../../sfx'
 import { POPUP_PANEL_HEIGHT, POPUP_PANEL_WIDTH, REDEEM_HEADER_HEIGHT, REDEEM_PADDING } from '../constants'
 
 // MARK: RedeemLayer
@@ -38,11 +38,13 @@ class RedeemLayer extends Layer {
 
   open(): void {
     if (this.isOpen) return
+    playSfx('uiWhooshIn')
     this.show()
   }
 
   close(): void {
     if (!this.isOpen) return
+    playSfx('uiWhooshOut')
     this.hide()
   }
 
