@@ -16,7 +16,9 @@ export type PlanetPropConfig = {
   cooldownSeconds: number
   /** GLB with its origin at the base. Kinds without one show a placeholder cube. */
   model?: string
-  /** Uniform scale applied to `model`. */
+  /** GLB shown instead of `model` while the prop is cooling down. Same origin and scale. Without one, `model` stays as is. */
+  depletedModel?: string
+  /** Uniform scale applied to `model` and `depletedModel`. */
   modelScale?: number
   /** Placeholder cube size. */
   size: { x: number; y: number; z: number }
@@ -28,12 +30,20 @@ export type PlanetPropConfig = {
 /** Newsstand size multiplier. At 2 it is about 9 m wide and 6.6 m tall. */
 export const NEWSSTAND_MODEL_SCALE = 2
 
+/** Corn field size multiplier. At 2.5 it is about 7 m wide and 7.4 m tall. */
+export const CORN_FIELD_MODEL_SCALE = 2.5
+
 export const PLANET_PROPS: Record<PlanetPropKind, PlanetPropConfig> = {
   cornField: {
     count: 15,
     zoneRadiusDegrees: 4,
     // A field grows a new cob this long after giving one up.
     cooldownSeconds: 5,
+    // Seven plants, about 2.7 m wide and 2.95 m tall in the file. The picked variant is the same plants without cobs.
+    // Source: blender/mcp_models.blend, CornField collection (blender/scripts/corn_field.py).
+    model: 'assets/scene/Models/PlanetProps/cornField.glb',
+    depletedModel: 'assets/scene/Models/PlanetProps/cornField_picked.glb',
+    modelScale: CORN_FIELD_MODEL_SCALE,
     size: { x: 8, y: 1, z: 8 },
     color: Color4.create(0.95, 0.82, 0.15, 1),
     depletedColor: Color4.create(0.45, 0.33, 0.18, 1)

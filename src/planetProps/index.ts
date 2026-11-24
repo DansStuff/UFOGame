@@ -10,7 +10,8 @@
  * back in `notifyPlanetProps`.
  * Client: parents each prop to the planet, so it spins with the surface (a model when the
  * kind has one, otherwise a placeholder cube),
- * and polls the synced state to switch each prop between its available and depleted look.
+ * and polls the synced state to switch each prop between its available and depleted look:
+ * the depleted model when the kind has one, a cube recolor for placeholders.
  */
 import { engine, Entity, GltfContainer, Material, MeshRenderer, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
@@ -18,7 +19,7 @@ import { isServer } from '@dcl/sdk/network'
 import { PLANET_SURFACE_RADIUS_METERS } from '../abduction/constants'
 import { addCargo } from '../cargo'
 import { randomSurfaceDirection, rotationWithUp } from '../abduction/geometry'
-import { findPlanet } from '../abduction/sceneLookup'
+import { findPlanet, setVisible } from '../abduction/sceneLookup'
 import { notifyPlanetProps, notifyTabloids } from '../gamestate/serverRoom'
 import { setOnPlanetProps, type PlanetPropMessage } from '../networking/client'
 import { addSurfaceZone, onSurfaceZoneEnter } from '../surfaceZones'
@@ -126,6 +127,11 @@ function setupServer(): void {
 type ShownProp = {
   entity: Entity
   prop: PlanetProp
+  /**
+   * Set when the kind has a `depletedModel`: both models are children of `entity`,
+   * loaded up front, and availability toggles which one is visible.
+   */
+  models: { available: Entity; depleted: Entity } | null
   /** Look currently applied. Null until the first poll. */
   available: boolean | null
 }
@@ -135,21 +141,40 @@ let pendingProps: PlanetProp[] | null = null
 const spawned: ShownProp[] = []
 
 function removeSpawned(): void {
-  for (const shown of spawned) engine.removeEntity(shown.entity)
+  for (const shown of spawned) {
+    if (shown.models !== null) {
+      engine.removeEntity(shown.models.available)
+      engine.removeEntity(shown.models.depleted)
+    }
+    engine.removeEntity(shown.entity)
+  }
   spawned.length = 0
 }
 
 /**
  * Switches a prop between its available and depleted look.
- * Placeholder: recolors the cube. Real models swap or hide nodes here.
+ * Kinds with a `depletedModel` show it instead of `model`; placeholders recolor the cube.
+ * A model without a depleted variant keeps its look.
  */
 function applyAvailability(shown: ShownProp, available: boolean): void {
   const config = PLANET_PROPS[shown.prop.kind]
+  if (shown.models !== null) {
+    setVisible(shown.models.available, available)
+    setVisible(shown.models.depleted, !available)
+    return
+  }
   if (config.model) return
   Material.setPbrMaterial(shown.entity, { albedoColor: available ? config.color : config.depletedColor })
 }
 
-function spawnProp(planet: Entity, prop: PlanetProp): Entity {
+function addModel(parent: Entity, src: string): Entity {
+  const entity = engine.addEntity()
+  Transform.create(entity, { parent })
+  GltfContainer.create(entity, { src, visibleMeshesCollisionMask: 0, invisibleMeshesCollisionMask: 0 })
+  return entity
+}
+
+function spawnProp(planet: Entity, prop: PlanetProp): ShownProp {
   const config = PLANET_PROPS[prop.kind]
   const entity = engine.addEntity()
   if (config.model) {
@@ -160,8 +185,14 @@ function spawnProp(planet: Entity, prop: PlanetProp): Entity {
       rotation: rotationWithUp(prop.direction),
       scale: Vector3.create(config.modelScale ?? 1, config.modelScale ?? 1, config.modelScale ?? 1)
     })
+    if (config.depletedModel) {
+      const available = addModel(entity, config.model)
+      const depleted = addModel(entity, config.depletedModel)
+      setVisible(depleted, false)
+      return { entity, prop, models: { available, depleted }, available: null }
+    }
     GltfContainer.create(entity, { src: config.model, visibleMeshesCollisionMask: 0, invisibleMeshesCollisionMask: 0 })
-    return entity
+    return { entity, prop, models: null, available: null }
   }
   Transform.create(entity, {
     parent: planet,
@@ -171,7 +202,7 @@ function spawnProp(planet: Entity, prop: PlanetProp): Entity {
     scale: Vector3.create(config.size.x, config.size.y, config.size.z)
   })
   MeshRenderer.setBox(entity)
-  return entity
+  return { entity, prop, models: null, available: null }
 }
 
 function PlanetPropSpawnSystem(): void {
@@ -179,7 +210,7 @@ function PlanetPropSpawnSystem(): void {
   const planet = findPlanet()
   if (planet === null) return
   removeSpawned()
-  for (const prop of pendingProps) spawned.push({ entity: spawnProp(planet, prop), prop, available: null })
+  for (const prop of pendingProps) spawned.push(spawnProp(planet, prop))
   pendingProps = null
 }
 
