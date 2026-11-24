@@ -8,7 +8,8 @@ import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { ABDUCTABLE_CENTER_METERS_PER_SECOND, PLANET_SURFACE_RADIUS_METERS } from './constants'
 import type { GameStateSnapshot } from '../gamestate'
 import { captureShipCarry, type ShipCarry } from './frames'
-import { invertQuaternion, moveToward, outwardDirection, rotationWithUp, simulationStep } from './geometry'
+import { moveToward, outwardDirection, simulationStep } from './geometry'
+import { invertQuaternion, rotationWithUp } from '../sphere/geometry'
 import { syncSpinner } from './spinner'
 
 type ClientCarry = ShipCarry & { id: number }

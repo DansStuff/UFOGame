@@ -18,12 +18,18 @@ import { Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
 import { PLANET_SURFACE_RADIUS_METERS } from '../abduction/constants'
 import { addCargo } from '../cargo'
-import { randomSurfaceDirection, rotationWithUp } from '../abduction/geometry'
 import { findPlanet, setVisible } from '../abduction/sceneLookup'
 import { notifyPlanetProps, notifyTabloids } from '../gamestate/serverRoom'
 import { setOnPlanetProps, type PlanetPropMessage } from '../networking/client'
+import {
+  clearArea,
+  cosOfDegrees,
+  isWithinCos,
+  pickClearDirection,
+  rotationWithUp,
+  type ClearArea
+} from '../sphere/geometry'
 import { addSurfaceZone, onSurfaceZoneEnter } from '../surfaceZones'
-import { cosOfDegrees, isWithinCos } from '../surfaceZones/geometry'
 import {
   PLANET_PROP_MIN_SEPARATION_DEGREES,
   PLANET_PROP_PLACEMENT_ATTEMPTS,
@@ -62,44 +68,35 @@ function takeProp(id: number, kind: PlanetPropKind): boolean {
   return takePlanetProp(id, PLANET_PROPS[kind].cooldownSeconds)
 }
 
-/** An area scattered props never land in: a direction and the cosine of its radius. */
-type ClearArea = { direction: Vector3; cosRadius: number }
-
 /**
- * A random direction outside every clear area and at least the minimum separation
- * from every placed prop. If no pick keeps the separation, the first pick outside the
- * clear areas is used; a clear area is never broken.
+ * Fixed props first, then every scattered prop: never in the ship spawn area or a fixed prop's
+ * `clearDegrees` (hard), and at least the minimum separation from placed props when a pick allows (soft).
  */
-function pickDirection(placed: PlanetProp[], cosSeparation: number, clear: ClearArea[], spawn: Vector3): Vector3 {
-  let fallback: Vector3 | null = null
-  for (let attempt = 0; attempt < PLANET_PROP_PLACEMENT_ATTEMPTS; attempt++) {
-    const random = randomSurfaceDirection()
-    const candidate = Vector3.create(random.x, random.y, random.z)
-    if (clear.some((area) => isWithinCos(area.direction, candidate, area.cosRadius))) continue
-    if (fallback === null) fallback = candidate
-    if (!placed.some((prop) => isWithinCos(prop.direction, candidate, cosSeparation))) return candidate
-  }
-  // Every pick landed in a clear area: the opposite side of the planet from spawn is outside the spawn area.
-  return fallback ?? Vector3.scale(spawn, -1)
-}
-
 function scatterProps(): PlanetProp[] {
   const cosSeparation = cosOfDegrees(PLANET_PROP_MIN_SEPARATION_DEGREES)
   const spawn = shipSpawnDirection()
-  const clear: ClearArea[] = [{ direction: spawn, cosRadius: cosOfDegrees(PLANET_PROP_SHIP_SPAWN_CLEAR_DEGREES) }]
+  const clear: ClearArea[] = [clearArea(spawn, PLANET_PROP_SHIP_SPAWN_CLEAR_DEGREES)]
   const props: PlanetProp[] = []
   let nextId = 1
-  // Fixed props first, so the scattered ones keep clear of them.
   for (const { kind, direction } of landmarks()) {
     props.push({ id: nextId++, kind, direction })
     const clearDegrees = PLANET_PROPS[kind].clearDegrees
-    if (clearDegrees) clear.push({ direction, cosRadius: cosOfDegrees(clearDegrees) })
+    if (clearDegrees) clear.push(clearArea(direction, clearDegrees))
   }
+  const isSpacedOut = (candidate: Vector3): boolean =>
+    !props.some((prop) => isWithinCos(prop.direction, candidate, cosSeparation))
   for (const kind of KINDS) {
     const config = PLANET_PROPS[kind]
     if (config.fixed) continue
     for (let i = 0; i < config.count; i++) {
-      props.push({ id: nextId++, kind, direction: pickDirection(props, cosSeparation, clear, spawn) })
+      const direction = pickClearDirection({
+        clear,
+        attempts: PLANET_PROP_PLACEMENT_ATTEMPTS,
+        prefer: isSpacedOut,
+        // Opposite the spawn point: outside the spawn area, and the signs sit 90 degrees from spawn.
+        fallback: Vector3.scale(spawn, -1)
+      })
+      props.push({ id: nextId++, kind, direction })
     }
   }
   return props

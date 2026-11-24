@@ -19,9 +19,8 @@ import {
 } from './constants'
 import { sceneEntities } from '../scene/entities'
 import { findAbductable, findAbductableModel } from './components'
-import { rotationWithUp, unrotate } from './geometry'
+import { angleBetweenDegrees, directionFromCenter, rotationWithUp, unrotate } from '../sphere/geometry'
 import { findNamed, findPlanet, setVisible } from './sceneLookup'
-import { angleBetweenDegrees, directionFromCenter } from '../surfaceZones/geometry'
 
 /**
  * Degrees between the ship and the cow, measured from the planet center.

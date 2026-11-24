@@ -15,7 +15,8 @@ import { EntityNames } from '../../assets/scene/entity-names'
 import { findNamed, findPlanet } from '../abduction/sceneLookup'
 import { getGameState } from '../gamestate'
 import { SURFACE_ZONE_EXIT_MARGIN_DEGREES } from './constants'
-import { cosOfDegrees, isWithinCos, shipPlanetDirection } from './geometry'
+import { cosOfDegrees, isWithinCos } from '../sphere/geometry'
+import { shipPlanetDirection } from './geometry'
 
 export type SurfaceZone = {
   id: number

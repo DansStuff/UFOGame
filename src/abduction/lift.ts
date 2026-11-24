@@ -22,7 +22,6 @@ import {
   applyAbductablePlacement,
   applyAbductableYOffset,
   getGameState,
-  type AbductableDirectionSnapshot,
   type GameStateSnapshot
 } from '../gamestate'
 import { abductionBeamOn } from '../ship/speed'
@@ -33,10 +32,11 @@ import {
   worldOfShipLocal,
   type ShipCarry
 } from './frames'
-import { hasPlacement, outwardDirection, randomSurfaceDirection, sameDirection, simulationStep } from './geometry'
+import { hasPlacement, outwardDirection, sameDirection, simulationStep } from './geometry'
 import { findNamed, findPlanet } from './sceneLookup'
-import { isInLandmarkZone, shipSpawnDirection } from '../planetProps/landmarks'
-import { cosOfDegrees, isWithinCos, shipPlanetDirection } from '../surfaceZones/geometry'
+import { landmarkZones, shipSpawnDirection } from '../planetProps/landmarks'
+import { cosOfDegrees, isWithinCos, pickClearDirection } from '../sphere/geometry'
+import { shipPlanetDirection } from '../surfaceZones/geometry'
 
 const LIFT_MAX_COS = cosOfDegrees(ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES)
 
@@ -50,23 +50,16 @@ export function resetLift(): void {
   fallSpeedMetersPerSecond = 0
 }
 
-/**
- * A random surface direction outside every landmark sign's zone. If every pick lands in one,
- * the point opposite the ship spawn is used: the signs sit 90 degrees from spawn, so it is clear of them.
- */
-function pickAbductableDirection(): AbductableDirectionSnapshot {
-  for (let attempt = 0; attempt < ABDUCTABLE_PLACEMENT_ATTEMPTS; attempt++) {
-    const random = randomSurfaceDirection()
-    if (!isInLandmarkZone(Vector3.create(random.x, random.y, random.z))) return random
-  }
-  const opposite = Vector3.scale(shipSpawnDirection(), -1)
-  return { x: opposite.x, y: opposite.y, z: opposite.z }
-}
-
 /** Drops the current cow and places a new one on the surface, never inside a landmark sign's zone. */
 export function replaceAbductable(): void {
   resetLift()
-  applyAbductablePlacement(pickAbductableDirection(), ABDUCTABLE_MODELS[0]?.samples ?? 0)
+  const direction = pickClearDirection({
+    clear: landmarkZones(),
+    attempts: ABDUCTABLE_PLACEMENT_ATTEMPTS,
+    // Opposite the spawn point: the signs sit 90 degrees from spawn, so it is clear of them.
+    fallback: Vector3.scale(shipSpawnDirection(), -1)
+  })
+  applyAbductablePlacement(direction, ABDUCTABLE_MODELS[0]?.samples ?? 0)
 }
 
 /** Meters from the surface to just above the ship, along a ray from the planet center. */

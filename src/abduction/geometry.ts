@@ -1,5 +1,9 @@
-/** Pure math for directions on the planet sphere. No entities, no engine state. */
-import { Quaternion, Vector3 } from '@dcl/sdk/math'
+/**
+ * Cow-specific math: its synced direction, its position along that ray, and simulation steps.
+ * General sphere math (random directions, angles, rotations) lives in `sphere/geometry.ts`.
+ * No entities, no engine state.
+ */
+import { Vector3 } from '@dcl/sdk/math'
 import { SIMULATION_MAX_DELTA_SECONDS } from '../ship/constants'
 import { PLANET_SURFACE_RADIUS_METERS } from './constants'
 import type { AbductableDirectionSnapshot } from '../gamestate'
@@ -7,14 +11,6 @@ import type { AbductableDirectionSnapshot } from '../gamestate'
 /** Frame delta clamped so a long hitch does not jump the simulation. */
 export function simulationStep(dt: number): number {
   return Math.min(Math.max(dt, 0), SIMULATION_MAX_DELTA_SECONDS)
-}
-
-/** Uniform direction on the sphere. Stored in planet space. */
-export function randomSurfaceDirection(): AbductableDirectionSnapshot {
-  const z = Math.random() * 2 - 1
-  const angle = Math.random() * Math.PI * 2
-  const ring = Math.sqrt(Math.max(0, 1 - z * z))
-  return { x: ring * Math.cos(angle), y: ring * Math.sin(angle), z }
 }
 
 /** A zero direction means the server has not placed a cow yet. */
@@ -33,23 +29,6 @@ export function outwardDirection(direction: AbductableDirectionSnapshot): Vector
 /** Planet-local position of the cow along its ray, `yOffset` meters past the surface. */
 export function cowPlanetLocal(direction: AbductableDirectionSnapshot, yOffset: number): Vector3 {
   return Vector3.scale(outwardDirection(direction), PLANET_SURFACE_RADIUS_METERS + yOffset)
-}
-
-/** Local +Y points along `outward`. Twist around that axis does not matter for the pull. */
-export function rotationWithUp(outward: Vector3): Quaternion {
-  const reference = Math.abs(outward.y) < 0.9 ? Vector3.Up() : Vector3.Right()
-  const forward = Vector3.normalize(Vector3.cross(reference, outward))
-  return Quaternion.lookRotation(forward, outward)
-}
-
-/** Unit quaternions invert by conjugation. */
-export function invertQuaternion(rotation: Quaternion): Quaternion {
-  const normalized = Quaternion.normalize(rotation)
-  return Quaternion.create(-normalized.x, -normalized.y, -normalized.z, normalized.w)
-}
-
-export function unrotate(rotation: Quaternion, vector: Vector3): Vector3 {
-  return Vector3.rotate(vector, invertQuaternion(rotation))
 }
 
 export function moveToward(current: number, target: number, maxStep: number): number {

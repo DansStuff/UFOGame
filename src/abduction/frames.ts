@@ -7,7 +7,8 @@ import { engine, Entity, getWorldPosition } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import type { AbductableDirectionSnapshot, GameStateSnapshot, PlanetRotationSnapshot } from '../gamestate'
 import { shipTiltQuaternion } from '../ship/motion'
-import { cowPlanetLocal, unrotate } from './geometry'
+import { cowPlanetLocal } from './geometry'
+import { unrotate } from '../sphere/geometry'
 
 /** Ship-local XZ captured at the grab, and the Y that corresponds to a y offset of 0. Not synced. */
 export type ShipCarry = {

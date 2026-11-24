@@ -2,7 +2,8 @@
 import { engine, Entity, Schemas, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { ABDUCTABLE_SPIN_DEGREES_PER_SECOND } from './constants'
-import { randomSurfaceDirection, simulationStep } from './geometry'
+import { simulationStep } from './geometry'
+import { randomSurfaceDirection } from '../sphere/geometry'
 
 /** Never passed to syncEntity. `axis` is a unit direction in planet space. */
 export const Spinner = engine.defineComponent('abductable:Spinner', {
