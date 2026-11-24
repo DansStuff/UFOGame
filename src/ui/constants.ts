@@ -97,7 +97,7 @@ export const TUTORIAL_PAGES: TutorialPage[] = [
       'assets/images/tutorial/alien_cow_probe_flipbook_frame_2.png'
     ],
     sequence: [0, 1],
-    fps: 2,
+    fps: 1.25,
     aspect: 3 / 2
   },
   { title: 'Redeem (coming soon)', frames: [] }
