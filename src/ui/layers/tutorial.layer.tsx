@@ -134,7 +134,10 @@ class TutorialLayer extends Layer {
     const src = frame ? frameSrc(frame) : ''
     const uvs = frame && frameXMirror(frame) ? UVS_XMIRROR : UVS_NORMAL
     const title = page?.title ?? ''
-    const size = fitTutorialImage(page?.aspect ?? TUTORIAL_DEFAULT_ASPECT, title !== '')
+    const hasImage = src !== ''
+    // A text-only page shows its title centered where the image would be.
+    const titleOnTop = title !== '' && hasImage
+    const size = fitTutorialImage(page?.aspect ?? TUTORIAL_DEFAULT_ASPECT, titleOnTop)
     return (
       <Column
         key="tutorial_popup"
@@ -146,7 +149,7 @@ class TutorialLayer extends Layer {
         pointerFilter="block"
       >
         <Background key="tutorial_chrome" borderColor={theme.colors.secondary} borderRadius={theme.border.radiusSmall} />
-        {title !== '' ? (
+        {titleOnTop ? (
           <H2
             key="tutorial_title"
             value={title}
@@ -161,11 +164,15 @@ class TutorialLayer extends Layer {
           key="tutorial_image_area"
           uiTransform={{ width: '100%', flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
         >
-          <UiEntity
-            key="tutorial_image"
-            uiTransform={{ width: size.width, height: size.height, flexShrink: 0 }}
-            uiBackground={{ textureMode: 'stretch', texture: { src }, uvs }}
-          />
+          {hasImage ? (
+            <UiEntity
+              key="tutorial_image"
+              uiTransform={{ width: size.width, height: size.height, flexShrink: 0 }}
+              uiBackground={{ textureMode: 'stretch', texture: { src }, uvs }}
+            />
+          ) : (
+            <H2 key="tutorial_text" value={title} width="100%" fontColor={theme.colors.light} textAlign="middle-center" />
+          )}
           {(page?.frames ?? []).map((preload, i) => (
             // Invisible 1px copies of every frame so the textures load before the flipbook reaches them.
             <UiEntity

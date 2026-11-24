@@ -48,7 +48,8 @@ export type TutorialFrame = string | { src: string; xmirror?: boolean }
 /**
  * One tutorial page, played as a looping flipbook.
  * - `title`: optional text shown above the image.
- * - `frames`: the page's frames (see TutorialFrame). A single frame is a still page.
+ * - `frames`: the page's frames (see TutorialFrame). A single frame is a still page;
+ *   an empty list is a text-only page with its title centered in the panel.
  * - `sequence`: indices into `frames`, in play order; repeats are fine
  *   (`[0, 1, 2, 1]` ping-pongs). Defaults to every frame in order. Bad indices are skipped.
  * - `fps`: frames of `sequence` shown per second. Defaults to TUTORIAL_DEFAULT_FPS.
@@ -98,7 +99,8 @@ export const TUTORIAL_PAGES: TutorialPage[] = [
     sequence: [0, 1],
     fps: 2,
     aspect: 3 / 2
-  }
+  },
+  { title: 'Redeem (coming soon)', frames: [] }
 ]
 
 /** Padding inside the tutorial popup, in virtual pixels. The image fits inside it. */
