@@ -170,18 +170,21 @@ export const BEAM_RING_SCALE_TOP = 0.6
 export const BEAM_RING_ALPHA_CLEAR_EARLY = 0.02
 
 /**
- * Beam ring albedo, copied from BeamRing.gltf.
+ * Beam ring albedo: bright green.
  * Alpha is the opacity at the top of the travel. Progress multiplies it, so a ring is clear at the bottom.
  */
-export const BEAM_RING_ALBEDO_RED = 0.017929963767528534
-export const BEAM_RING_ALBEDO_GREEN = 0.2982626259326935
-export const BEAM_RING_ALBEDO_BLUE = 0.03715888410806656
+export const BEAM_RING_ALBEDO_RED = 0.2
+export const BEAM_RING_ALBEDO_GREEN = 1
+export const BEAM_RING_ALBEDO_BLUE = 0.2
 export const BEAM_RING_ALPHA = 0.904144883155823
 
-/** Beam ring emissive color, copied from BeamRing.gltf. */
-export const BEAM_RING_EMISSIVE_RED = 0.0021440964511647287
-export const BEAM_RING_EMISSIVE_GREEN = 0.12422632164100289
-export const BEAM_RING_EMISSIVE_BLUE = 0.004879222882974488
+/** Beam ring emissive color: bright green glow. */
+export const BEAM_RING_EMISSIVE_RED = 0.15
+export const BEAM_RING_EMISSIVE_GREEN = 1
+export const BEAM_RING_EMISSIVE_BLUE = 0.15
+
+/** Beam ring glow strength. Raise for more bloom, lower if it washes out. */
+export const BEAM_RING_EMISSIVE_INTENSITY = 3
 
 /** Beam ring surface, copied from BeamRing.gltf. */
 export const BEAM_RING_METALLIC = 0

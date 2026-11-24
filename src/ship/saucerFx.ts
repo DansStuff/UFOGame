@@ -34,6 +34,7 @@ import {
   BEAM_RING_EASE_IN,
   BEAM_RING_EMISSIVE_BLUE,
   BEAM_RING_EMISSIVE_GREEN,
+  BEAM_RING_EMISSIVE_INTENSITY,
   BEAM_RING_EMISSIVE_RED,
   BEAM_RING_LOCAL_Y_END,
   BEAM_RING_LOCAL_Y_START,
@@ -232,7 +233,7 @@ function placeBeamRing(entity: Entity, phase: number): void {
                 beamRingAlpha(phase, travel)
               ),
               emissiveColor: Color3.create(BEAM_RING_EMISSIVE_RED, BEAM_RING_EMISSIVE_GREEN, BEAM_RING_EMISSIVE_BLUE),
-              emissiveIntensity: 1,
+              emissiveIntensity: BEAM_RING_EMISSIVE_INTENSITY,
               metallic: BEAM_RING_METALLIC,
               roughness: BEAM_RING_ROUGHNESS,
               transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND,
