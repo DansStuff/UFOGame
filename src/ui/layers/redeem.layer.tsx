@@ -10,18 +10,18 @@ import {
   ZoneType,
   getTheme
 } from '@stom66/dcl-ui-component-kit'
-import { REDEEM_HEADER_HEIGHT, REDEEM_PADDING } from '../constants'
+import { POPUP_PANEL_HEIGHT, POPUP_PANEL_WIDTH, REDEEM_HEADER_HEIGHT, REDEEM_PADDING } from '../constants'
 
 // MARK: RedeemLayer
 /**
- * Placeholder sample redeem window. Fills DUCK's Default zone (the middle half of
- * the screen) with a title row and a close button; the body is a stand-in for now.
+ * Placeholder sample redeem window, POPUP_PANEL_WIDTH x POPUP_PANEL_HEIGHT centered on
+ * the FullScreen zone, with a title row and a close button; the body is a stand-in for now.
  */
 class RedeemLayer extends Layer {
   constructor() {
     super({
       id: 'redeem',
-      zone: ZoneType.Default,
+      zone: ZoneType.FullScreen,
       canBeHidden: true,
       startHidden: true,
       showFrom: 'bottom',
@@ -50,8 +50,8 @@ class RedeemLayer extends Layer {
     return (
       <Column
         key="redeem_window"
-        width="100%"
-        height="100%"
+        width={POPUP_PANEL_WIDTH}
+        height={POPUP_PANEL_HEIGHT}
         spacing={0}
         padding={REDEEM_PADDING}
         alignItems="flex-start"

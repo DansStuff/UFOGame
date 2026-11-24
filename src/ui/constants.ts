@@ -17,6 +17,12 @@ export const DEBUG_SPAWN_Z = 80.51
 export const DEBUG_BUTTON_WIDTH = 240
 export const DEBUG_BUTTON_HEIGHT = 56
 
+// MARK: Popups
+
+/** Size of the tutorial and redeem popups, centered on the screen, as a share of screen width and height. */
+export const POPUP_PANEL_WIDTH = '75vw'
+export const POPUP_PANEL_HEIGHT = '75vh'
+
 // MARK: HUD buttons
 
 /** Side of each square top-right button (Tutorial, Redeem Samples), as a share of screen height. */
@@ -114,10 +120,6 @@ export const TUTORIAL_PAGES: TutorialPage[] = [
   },
   { title: 'Redeem (coming soon)', frames: [] }
 ]
-
-/** Tutorial panel size, centered on the screen, as a share of screen width and height. */
-export const TUTORIAL_PANEL_WIDTH = '75vw'
-export const TUTORIAL_PANEL_HEIGHT = '75vh'
 
 /** Padding inside the tutorial popup, in virtual pixels. The image fits inside it. */
 export const TUTORIAL_PADDING = 16
