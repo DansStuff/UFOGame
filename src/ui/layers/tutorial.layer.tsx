@@ -179,7 +179,7 @@ class TutorialLayer extends Layer {
           height={TUTORIAL_BUTTON_HEIGHT}
           margin={{ top: TUTORIAL_BUTTON_GAP }}
           spacing={0}
-          justifyContent="flex-end"
+          justifyContent="center"
         >
           <ButtonText
             key="btn_tutorial_next"
