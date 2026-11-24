@@ -19,6 +19,10 @@ export type CargoModel = {
   restY: number
   /** Text shown next to the proximity prompt. */
   removeHoverText: string
+  /** Ship-local height of the tutorial arrow's tip while the item rests on the deck. */
+  arrowY: number
+  /** Tutorial arrow scale, a bit smaller than the cow's (TUTORIAL_ARROW_COW_SCALE). */
+  arrowScale: number
 }
 
 export const CARGO_MODELS: Record<CargoKind, CargoModel> = {
@@ -30,7 +34,10 @@ export const CARGO_MODELS: Record<CargoKind, CargoModel> = {
     // The file is 0.737 m tall.
     centerY: 0.37,
     restY: -0.5,
-    removeHoverText: 'Eat corn'
+    removeHoverText: 'Eat corn',
+    // The cob's top sits about 1.7 m above the deck.
+    arrowY: 2.5,
+    arrowScale: 3.5
   }
 }
 

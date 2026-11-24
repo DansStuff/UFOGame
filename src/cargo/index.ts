@@ -7,7 +7,8 @@
  * An item weighs on steering once its arrival has had time to play.
  * Client: mirrors the synced list as models parented to the ship. Items that arrive
  * after this client's first look ride the beam up and are spat onto the deck
- * (`arrival.ts`). Pressing E near one asks the server to remove it.
+ * (`arrival.ts`). Once an item rests on the deck a tutorial arrow points at it.
+ * Pressing E near one asks the server to remove it.
  */
 import {
   ColliderLayer,
@@ -25,7 +26,8 @@ import { EntityNames } from '../../assets/scene/entity-names'
 import { findNamed } from '../abduction/sceneLookup'
 import { requestRemoveCargo } from '../networking/client'
 import { SHIP_CENTER_X, SHIP_CENTER_Z } from '../ship/constants'
-import { CargoArrivalSystem, cancelArrival, resetArrivals, startArrival } from './arrival'
+import { createTutorialArrow, removeTutorialArrow } from '../tutorialArrow'
+import { CargoArrivalSystem, cancelArrival, isArriving, resetArrivals, startArrival } from './arrival'
 import {
   CARGO_DECK_MAX_RADIUS,
   CARGO_DECK_MIN_RADIUS,
@@ -104,6 +106,8 @@ export function removeCargo(playerAddress: string, cargoId: number): boolean {
 // MARK: Client
 
 const shown = new Map<number, Entity>()
+/** Tutorial arrows over items resting on the deck, by item id. */
+const arrows = new Map<number, Entity>()
 /** False until the first synced list has been mirrored, so items already aboard do not replay their arrival. */
 let seededFromSnapshot = false
 let lastRemoveRequestAt = 0
@@ -144,7 +148,20 @@ function showItem(ship: Entity, item: CargoItem, arriving: boolean): Entity {
   return entity
 }
 
+/** Points a tutorial arrow down at the item. Arrows are children of the ship, so the cob's scale and yaw do not touch them. */
+function showArrow(ship: Entity, item: CargoItem): Entity {
+  const model = CARGO_MODELS[item.kind]
+  return createTutorialArrow({
+    parent: ship,
+    position: Vector3.create(item.x, model.arrowY, item.z),
+    scale: model.arrowScale
+  })
+}
+
 function hideItem(id: number, entity: Entity): void {
+  const arrow = arrows.get(id)
+  if (arrow !== undefined) removeTutorialArrow(arrow)
+  arrows.delete(id)
   pointerEventsSystem.removeOnProximityDown(entity)
   cancelArrival(entity)
   engine.removeEntity(entity)
@@ -162,7 +179,12 @@ function CargoMirrorSystem(): void {
     if (!present.has(id)) hideItem(id, entity)
   }
   for (const item of items) {
-    if (!shown.has(item.id)) shown.set(item.id, showItem(ship, item, seededFromSnapshot))
+    let entity = shown.get(item.id)
+    if (entity === undefined) {
+      entity = showItem(ship, item, seededFromSnapshot)
+      shown.set(item.id, entity)
+    }
+    if (!arrows.has(item.id) && !isArriving(entity)) arrows.set(item.id, showArrow(ship, item))
   }
   seededFromSnapshot = true
 }
@@ -170,6 +192,7 @@ function CargoMirrorSystem(): void {
 export function setupCargo(): void {
   nextCargoId = 1
   shown.clear()
+  arrows.clear()
   seededFromSnapshot = false
   lastRemoveRequestAt = 0
   resetCargoState()

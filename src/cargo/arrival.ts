@@ -90,6 +90,11 @@ export function startArrival(entity: Entity, ship: Entity, item: CargoItem): voi
   applyPose(entity, arrival, beamPose(arrival, 0))
 }
 
+/** True while the item rides the beam or flies onto the deck. */
+export function isArriving(entity: Entity): boolean {
+  return arrivals.has(entity)
+}
+
 export function cancelArrival(entity: Entity): void {
   arrivals.delete(entity)
 }
