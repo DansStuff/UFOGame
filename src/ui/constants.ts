@@ -60,3 +60,25 @@ export const SAMPLES_HUD_TOP = 16
 /** Samples pill size, in virtual pixels. */
 export const SAMPLES_HUD_WIDTH = 460
 export const SAMPLES_HUD_HEIGHT = 48
+
+// MARK: Tutorial
+
+/**
+ * Tutorial pages, shown in this order. Files live in assets/images/tutorial/ and are
+ * numbered to match; the scene cannot list a folder at runtime, so add new pages here.
+ */
+export const TUTORIAL_IMAGES = [
+  'assets/images/tutorial/01.png',
+  'assets/images/tutorial/02.png',
+  'assets/images/tutorial/03.png'
+]
+
+/** Padding inside the tutorial popup, in virtual pixels. */
+export const TUTORIAL_PADDING = 16
+
+/** Gap between the tutorial image and the button row. */
+export const TUTORIAL_BUTTON_GAP = 12
+
+/** Next / Done button size, in virtual pixels. */
+export const TUTORIAL_BUTTON_WIDTH = 200
+export const TUTORIAL_BUTTON_HEIGHT = 56
