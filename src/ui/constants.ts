@@ -67,20 +67,21 @@ export const TUTORIAL_DEFAULT_FPS = 6
 /**
  * Tutorial pages, shown in this order. Files live in assets/images/tutorial/ and are
  * numbered to match; the scene cannot list a folder at runtime, so add new pages here.
- * Example animated page that rocks the ship right, back to center, then left (TutRight mirrored):
- *   {
- *     frames: [
- *       'assets/images/tutorial/TutCenter.png',
- *       'assets/images/tutorial/TutRight.png',
- *       { src: 'assets/images/tutorial/TutRight.png', xmirror: true }
- *     ],
- *     sequence: [0, 1, 0, 2],
- *     fps: 2,
- *     aspect: 4 / 3
- *   }
+ * Frames are picked by index in `sequence`; repeat an index to hold it longer.
  */
 export const TUTORIAL_PAGES: TutorialPage[] = [
-  { frames: ['assets/images/tutorial/01.png'] },
+  {
+    // Ship rocking: center, right, mirrored center, mirrored right.
+    frames: [
+      'assets/images/tutorial/TutCenter.png',
+      'assets/images/tutorial/TutRight.png',
+      { src: 'assets/images/tutorial/TutCenter.png', xmirror: true },
+      { src: 'assets/images/tutorial/TutRight.png', xmirror: true }
+    ],
+    sequence: [0, 1, 2, 3],
+    fps: 2,
+    aspect: 4 / 3
+  },
   { frames: ['assets/images/tutorial/02.png'] },
   { frames: ['assets/images/tutorial/03.png'] }
 ]
