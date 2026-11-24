@@ -64,14 +64,17 @@ function frameXMirror(frame: TutorialFrame): boolean {
   return typeof frame !== 'string' && frame.xmirror === true
 }
 
-/** Frame to show `elapsed` seconds into the page. The sequence loops. */
-function pageFrame(page: TutorialPage, elapsed: number): TutorialFrame | undefined {
+/** Index into `page.frames` to show `elapsed` seconds into the page, or -1 for none. The sequence loops. */
+function pageFrameIndex(page: TutorialPage, elapsed: number): number {
   const sequence = pageSequence(page)
-  if (sequence.length === 0) return
+  if (sequence.length === 0) return -1
   const fps = page.fps !== undefined && page.fps > 0 ? page.fps : TUTORIAL_DEFAULT_FPS
   const step = Math.floor(elapsed * fps) % sequence.length
-  return page.frames[sequence[step]]
+  return sequence[step]
 }
+
+const FRAME_SHOWN = { r: 1, g: 1, b: 1, a: 1 }
+const FRAME_HIDDEN = { r: 1, g: 1, b: 1, a: 0 }
 
 // MARK: TutorialLayer
 /**
@@ -79,7 +82,8 @@ function pageFrame(page: TutorialPage, elapsed: number): TutorialFrame | undefin
  * with one page image and a Next button; the last page's button reads Done and closes.
  * Hidden until src/ui/behaviors.ts opens it when the camera fly-in lands.
  * The image keeps its aspect and is centered in the space above the button. Each page is a
- * looping flipbook (see TutorialPage); src/ui/behaviors.ts advances it with tick().
+ * looping flipbook (see TutorialPage); src/ui/behaviors.ts advances it with tick(). All of a
+ * page's frames are drawn stacked and the flipbook only changes which one is opaque.
  */
 class TutorialLayer extends Layer {
   private page = 0
@@ -130,11 +134,10 @@ class TutorialLayer extends Layer {
     const theme = getTheme()
     const isLast = this.page >= TUTORIAL_PAGES.length - 1
     const page = TUTORIAL_PAGES[this.page]
-    const frame = page ? pageFrame(page, this.elapsed) : undefined
-    const src = frame ? frameSrc(frame) : ''
-    const uvs = frame && frameXMirror(frame) ? UVS_XMIRROR : UVS_NORMAL
+    const frames = page?.frames ?? []
+    const shownFrame = page ? pageFrameIndex(page, this.elapsed) : -1
     const title = page?.title ?? ''
-    const hasImage = src !== ''
+    const hasImage = shownFrame >= 0
     // A text-only page shows its title centered where the image would be.
     const titleOnTop = title !== '' && hasImage
     const size = fitTutorialImage(page?.aspect ?? TUTORIAL_DEFAULT_ASPECT, titleOnTop)
@@ -165,22 +168,30 @@ class TutorialLayer extends Layer {
           uiTransform={{ width: '100%', flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
         >
           {hasImage ? (
-            <UiEntity
-              key="tutorial_image"
-              uiTransform={{ width: size.width, height: size.height, flexShrink: 0 }}
-              uiBackground={{ textureMode: 'stretch', texture: { src }, uvs }}
-            />
+            // Every frame stays mounted on its own texture, stacked in one box; only the
+            // current one is opaque. Swapping a single image's src blanked for a frame.
+            <UiEntity key="tutorial_image" uiTransform={{ width: size.width, height: size.height, flexShrink: 0 }}>
+              {frames.map((frame, i) => (
+                <UiEntity
+                  key={`tutorial_frame_${this.page}_${i}`}
+                  uiTransform={{
+                    width: '100%',
+                    height: '100%',
+                    positionType: 'absolute',
+                    position: { left: 0, top: 0 }
+                  }}
+                  uiBackground={{
+                    textureMode: 'stretch',
+                    texture: { src: frameSrc(frame) },
+                    uvs: frameXMirror(frame) ? UVS_XMIRROR : UVS_NORMAL,
+                    color: i === shownFrame ? FRAME_SHOWN : FRAME_HIDDEN
+                  }}
+                />
+              ))}
+            </UiEntity>
           ) : (
             <H2 key="tutorial_text" value={title} width="100%" fontColor={theme.colors.light} textAlign="middle-center" />
           )}
-          {(page?.frames ?? []).map((preload, i) => (
-            // Invisible 1px copies of every frame so the textures load before the flipbook reaches them.
-            <UiEntity
-              key={`tutorial_preload_${i}`}
-              uiTransform={{ width: 1, height: 1, positionType: 'absolute', position: { left: 0, top: 0 } }}
-              uiBackground={{ textureMode: 'stretch', texture: { src: frameSrc(preload) }, color: { r: 1, g: 1, b: 1, a: 0 } }}
-            />
-          ))}
         </UiEntity>
         <Row
           key="tutorial_actions"
