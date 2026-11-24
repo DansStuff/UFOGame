@@ -138,6 +138,10 @@ export const TUTORIAL_BUTTON_FONT_SIZE = 32
 
 /** Gap between the tutorial title, image and button row. */
 export const TUTORIAL_BUTTON_GAP = 12
+/** The panel grows to this scale and back each time the page changes. */
+export const TUTORIAL_PAGE_PULSE_SCALE = 1.04
+/** Seconds for the page-change pulse, grow and shrink together. */
+export const TUTORIAL_PAGE_PULSE_SECONDS = 0.2
 
 /** Next / Done button size, in virtual pixels. */
 export const TUTORIAL_BUTTON_WIDTH = 350

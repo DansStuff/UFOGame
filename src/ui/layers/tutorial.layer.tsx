@@ -5,9 +5,11 @@ import {
   Column,
   H2,
   Layer,
+  Pulse,
   Row,
   ZoneType,
   getTheme,
+  playOnce,
   sizeValueToPixels
 } from '@stom66/dcl-ui-component-kit'
 import { playSfx, withClick } from '../../sfx'
@@ -16,6 +18,8 @@ import {
   POPUP_PANEL_WIDTH,
   TUTORIAL_BUTTON_FONT_SIZE,
   TUTORIAL_BUTTON_GAP,
+  TUTORIAL_PAGE_PULSE_SCALE,
+  TUTORIAL_PAGE_PULSE_SECONDS,
   TUTORIAL_BUTTON_HEIGHT,
   TUTORIAL_BUTTON_WIDTH,
   TUTORIAL_DEFAULT_ASPECT,
@@ -78,6 +82,9 @@ const FRAME_SHOWN = { r: 1, g: 1, b: 1, a: 1 }
 const FRAME_HIDDEN = { r: 1, g: 1, b: 1, a: 0 }
 
 // MARK: TutorialLayer
+/** DUCK playback id for the page-change pulse. */
+const PAGE_PULSE_ID = 'tutorial_page_pulse'
+
 /**
  * Centered tutorial popup, POPUP_PANEL_WIDTH x POPUP_PANEL_HEIGHT on the FullScreen zone,
  * with one page image and a Next button; the last page's button reads Done and closes.
@@ -127,6 +134,7 @@ class TutorialLayer extends Layer {
     }
     this.page++
     this.elapsed = 0
+    playOnce(PAGE_PULSE_ID)
   }
 
   /** Advances the current page's flipbook. Called once per frame. */
@@ -146,85 +154,113 @@ class TutorialLayer extends Layer {
     const titleOnTop = title !== '' && hasImage
     const size = fitTutorialImage(page?.aspect ?? TUTORIAL_DEFAULT_ASPECT, titleOnTop)
     return (
-      <Column
-        key="tutorial_popup"
-        width={POPUP_PANEL_WIDTH}
-        height={POPUP_PANEL_HEIGHT}
-        spacing={0}
-        padding={TUTORIAL_PADDING}
-        alignItems="center"
-        pointerFilter="block"
+      // Idle until next() fires it once. Pulse resizes the panel itself, so the frame
+      // swells and settles while the image and text keep their size.
+      <Pulse
+        key="tutorial_page_pulse"
+        id={PAGE_PULSE_ID}
+        playing={false}
+        looping={false}
+        burstCount={1}
+        duration={TUTORIAL_PAGE_PULSE_SECONDS}
+        scaleMin={1}
+        scaleMax={TUTORIAL_PAGE_PULSE_SCALE}
       >
-        <Background key="tutorial_chrome" borderColor={theme.colors.secondary} borderRadius={theme.border.radiusSmall} />
-        {titleOnTop ? (
-          <H2
-            key="tutorial_title"
-            value={title}
-            width="100%"
-            height={TUTORIAL_TITLE_HEIGHT}
-            fontSize={TUTORIAL_TITLE_FONT_SIZE}
-            margin={{ bottom: TUTORIAL_BUTTON_GAP }}
-            fontColor={theme.colors.light}
-            textAlign="middle-center"
-          />
-        ) : null}
-        <UiEntity
-          key="tutorial_image_area"
-          uiTransform={{ width: '100%', flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+        <Column
+          key="tutorial_popup"
+          width={POPUP_PANEL_WIDTH}
+          height={POPUP_PANEL_HEIGHT}
+          // The Pulse wrapper keeps the unscaled size; without this the panel shrinks back
+          // to it along the wrapper's row axis and only grows vertically.
+          flexShrink={0}
+          spacing={0}
+          padding={TUTORIAL_PADDING}
+          alignItems="center"
+          pointerFilter="block"
         >
-          {hasImage ? (
-            // Every frame stays mounted on its own texture, stacked in one box; only the
-            // current one is opaque. Swapping a single image's src blanked for a frame.
-            <UiEntity key="tutorial_image" uiTransform={{ width: size.width, height: size.height, flexShrink: 0 }}>
-              {frames.map((frame, i) => (
-                <UiEntity
-                  key={`tutorial_frame_${this.page}_${i}`}
-                  uiTransform={{
-                    width: '100%',
-                    height: '100%',
-                    positionType: 'absolute',
-                    position: { left: 0, top: 0 }
-                  }}
-                  uiBackground={{
-                    textureMode: 'stretch',
-                    texture: { src: frameSrc(frame) },
-                    uvs: frameXMirror(frame) ? UVS_XMIRROR : UVS_NORMAL,
-                    color: i === shownFrame ? FRAME_SHOWN : FRAME_HIDDEN
-                  }}
-                />
-              ))}
-            </UiEntity>
-          ) : (
+          <Background key="tutorial_chrome" borderColor={theme.colors.secondary} borderRadius={theme.border.radiusSmall} />
+          {titleOnTop ? (
             <H2
-              key="tutorial_text"
+              key="tutorial_title"
               value={title}
               width="100%"
+              height={TUTORIAL_TITLE_HEIGHT}
               fontSize={TUTORIAL_TITLE_FONT_SIZE}
+              margin={{ bottom: TUTORIAL_BUTTON_GAP }}
               fontColor={theme.colors.light}
               textAlign="middle-center"
             />
-          )}
-        </UiEntity>
-        <Row
-          key="tutorial_actions"
-          height={TUTORIAL_BUTTON_HEIGHT}
-          margin={{ top: TUTORIAL_BUTTON_GAP }}
-          spacing={0}
-          justifyContent="center"
-        >
-          <ButtonText
-            key="btn_tutorial_next"
-            id="btn_tutorial_next"
-            textLabel={isLast ? 'Done' : 'Next'}
-            width={TUTORIAL_BUTTON_WIDTH}
+          ) : null}
+          <UiEntity
+            key="tutorial_image_area"
+            uiTransform={{ width: '100%', flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+          >
+            {hasImage ? (
+              // Every frame stays mounted on its own texture, stacked in one box; only the
+              // current one is opaque. Swapping a single image's src blanked for a frame.
+              // Same playback id as the panel's Pulse, so the image swells in step with it.
+              <Pulse
+                key="tutorial_image_pulse"
+                id={PAGE_PULSE_ID}
+                playing={false}
+                looping={false}
+                burstCount={1}
+                duration={TUTORIAL_PAGE_PULSE_SECONDS}
+                scaleMin={1}
+                scaleMax={TUTORIAL_PAGE_PULSE_SCALE}
+              >
+                <UiEntity key="tutorial_image" uiTransform={{ width: size.width, height: size.height, flexShrink: 0 }}>
+                  {frames.map((frame, i) => (
+                    <UiEntity
+                      key={`tutorial_frame_${this.page}_${i}`}
+                      uiTransform={{
+                        width: '100%',
+                        height: '100%',
+                        positionType: 'absolute',
+                        position: { left: 0, top: 0 }
+                      }}
+                      uiBackground={{
+                        textureMode: 'stretch',
+                        texture: { src: frameSrc(frame) },
+                        uvs: frameXMirror(frame) ? UVS_XMIRROR : UVS_NORMAL,
+                        color: i === shownFrame ? FRAME_SHOWN : FRAME_HIDDEN
+                      }}
+                    />
+                  ))}
+                </UiEntity>
+              </Pulse>
+            ) : (
+              <H2
+                key="tutorial_text"
+                value={title}
+                width="100%"
+                fontSize={TUTORIAL_TITLE_FONT_SIZE}
+                fontColor={theme.colors.light}
+                textAlign="middle-center"
+              />
+            )}
+          </UiEntity>
+          <Row
+            key="tutorial_actions"
             height={TUTORIAL_BUTTON_HEIGHT}
-            fontSize={TUTORIAL_BUTTON_FONT_SIZE}
-            borderColor={theme.colors.secondary}
-            fontColor={theme.colors.light}
-            callback={withClick(() => this.next())}
-          />
-        </Row>
-      </Column>
+            margin={{ top: TUTORIAL_BUTTON_GAP }}
+            spacing={0}
+            justifyContent="center"
+          >
+            <ButtonText
+              key="btn_tutorial_next"
+              id="btn_tutorial_next"
+              textLabel={isLast ? 'Done' : 'Next'}
+              width={TUTORIAL_BUTTON_WIDTH}
+              height={TUTORIAL_BUTTON_HEIGHT}
+              fontSize={TUTORIAL_BUTTON_FONT_SIZE}
+              borderColor={theme.colors.secondary}
+              fontColor={theme.colors.light}
+              callback={withClick(() => this.next())}
+            />
+          </Row>
+        </Column>
+      </Pulse>
     )
   }
 }
