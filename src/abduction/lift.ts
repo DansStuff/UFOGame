@@ -13,6 +13,7 @@ import {
   ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES,
   ABDUCTABLE_LIFT_METERS_PER_SECOND,
   ABDUCTABLE_MODELS,
+  ABDUCTABLE_PLACEMENT_ATTEMPTS,
   PLANET_SURFACE_RADIUS_METERS
 } from './constants'
 import {
@@ -21,6 +22,7 @@ import {
   applyAbductablePlacement,
   applyAbductableYOffset,
   getGameState,
+  type AbductableDirectionSnapshot,
   type GameStateSnapshot
 } from '../gamestate'
 import { abductionBeamOn } from '../ship/speed'
@@ -33,6 +35,7 @@ import {
 } from './frames'
 import { hasPlacement, outwardDirection, randomSurfaceDirection, sameDirection, simulationStep } from './geometry'
 import { findNamed, findPlanet } from './sceneLookup'
+import { isInLandmarkZone, shipSpawnDirection } from '../planetProps/landmarks'
 import { cosOfDegrees, isWithinCos, shipPlanetDirection } from '../surfaceZones/geometry'
 
 const LIFT_MAX_COS = cosOfDegrees(ABDUCTABLE_LIFT_MAX_ANGLE_DEGREES)
@@ -47,10 +50,23 @@ export function resetLift(): void {
   fallSpeedMetersPerSecond = 0
 }
 
-/** Drops the current cow and places a new one on the surface. */
+/**
+ * A random surface direction outside every landmark sign's zone. If every pick lands in one,
+ * the point opposite the ship spawn is used: the signs sit 90 degrees from spawn, so it is clear of them.
+ */
+function pickAbductableDirection(): AbductableDirectionSnapshot {
+  for (let attempt = 0; attempt < ABDUCTABLE_PLACEMENT_ATTEMPTS; attempt++) {
+    const random = randomSurfaceDirection()
+    if (!isInLandmarkZone(Vector3.create(random.x, random.y, random.z))) return random
+  }
+  const opposite = Vector3.scale(shipSpawnDirection(), -1)
+  return { x: opposite.x, y: opposite.y, z: opposite.z }
+}
+
+/** Drops the current cow and places a new one on the surface, never inside a landmark sign's zone. */
 export function replaceAbductable(): void {
   resetLift()
-  applyAbductablePlacement(randomSurfaceDirection(), ABDUCTABLE_MODELS[0]?.samples ?? 0)
+  applyAbductablePlacement(pickAbductableDirection(), ABDUCTABLE_MODELS[0]?.samples ?? 0)
 }
 
 /** Meters from the surface to just above the ship, along a ray from the planet center. */

@@ -11,6 +11,12 @@
  */
 export const PLANET_SURFACE_RADIUS_METERS = 97
 
+/**
+ * Random picks for a new cow's spot before falling back to the point opposite the ship spawn.
+ * A pick is rejected inside a landmark sign's zone (`zoneRadiusDegrees` in planetProps/constants.ts).
+ */
+export const ABDUCTABLE_PLACEMENT_ATTEMPTS = 30
+
 /** One abductable model. The uniform scale, the sample count, the arrow height, and the clips belong to that file. */
 export type AbductableModel = {
   src: string

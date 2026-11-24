@@ -19,13 +19,11 @@ import { isServer } from '@dcl/sdk/network'
 import { PLANET_SURFACE_RADIUS_METERS } from '../abduction/constants'
 import { addCargo } from '../cargo'
 import { randomSurfaceDirection, rotationWithUp } from '../abduction/geometry'
-import { EntityNames } from '../../assets/scene/entity-names'
-import { findNamed, findPlanet, setVisible } from '../abduction/sceneLookup'
-import { getGameState } from '../gamestate'
+import { findPlanet, setVisible } from '../abduction/sceneLookup'
 import { notifyPlanetProps, notifyTabloids } from '../gamestate/serverRoom'
 import { setOnPlanetProps, type PlanetPropMessage } from '../networking/client'
 import { addSurfaceZone, onSurfaceZoneEnter } from '../surfaceZones'
-import { cosOfDegrees, isWithinCos, shipPlanetDirection } from '../surfaceZones/geometry'
+import { cosOfDegrees, isWithinCos } from '../surfaceZones/geometry'
 import {
   PLANET_PROP_MIN_SEPARATION_DEGREES,
   PLANET_PROP_PLACEMENT_ATTEMPTS,
@@ -33,6 +31,7 @@ import {
   PLANET_PROPS,
   type PlanetPropKind
 } from './constants'
+import { landmarks, shipSpawnDirection } from './landmarks'
 import {
   createPlanetPropState,
   isPlanetPropAvailable,
@@ -63,44 +62,44 @@ function takeProp(id: number, kind: PlanetPropKind): boolean {
   return takePlanetProp(id, PLANET_PROPS[kind].cooldownSeconds)
 }
 
-/**
- * Planet-local direction under the ship when the server loads. Straight up when the
- * ship or planet is missing, which is where the composite puts the ship.
- */
-function shipSpawnDirection(): Vector3 {
-  const planet = findPlanet()
-  const ship = findNamed(EntityNames.Ship)
-  const direction = planet !== null && ship !== null ? shipPlanetDirection(planet, ship, getGameState().planetRotation) : null
-  return direction ?? Vector3.create(0, 1, 0)
-}
+/** An area scattered props never land in: a direction and the cosine of its radius. */
+type ClearArea = { direction: Vector3; cosRadius: number }
 
 /**
- * A random direction outside the ship spawn area and at least the minimum separation
+ * A random direction outside every clear area and at least the minimum separation
  * from every placed prop. If no pick keeps the separation, the first pick outside the
- * spawn area is used; the spawn area is never broken.
+ * clear areas is used; a clear area is never broken.
  */
-function pickDirection(placed: PlanetProp[], cosSeparation: number, spawn: Vector3, cosSpawnClear: number): Vector3 {
+function pickDirection(placed: PlanetProp[], cosSeparation: number, clear: ClearArea[], spawn: Vector3): Vector3 {
   let fallback: Vector3 | null = null
   for (let attempt = 0; attempt < PLANET_PROP_PLACEMENT_ATTEMPTS; attempt++) {
     const random = randomSurfaceDirection()
     const candidate = Vector3.create(random.x, random.y, random.z)
-    if (isWithinCos(spawn, candidate, cosSpawnClear)) continue
+    if (clear.some((area) => isWithinCos(area.direction, candidate, area.cosRadius))) continue
     if (fallback === null) fallback = candidate
     if (!placed.some((prop) => isWithinCos(prop.direction, candidate, cosSeparation))) return candidate
   }
-  // Every pick landed in the spawn area: the opposite side of the planet is always outside it.
+  // Every pick landed in a clear area: the opposite side of the planet from spawn is outside the spawn area.
   return fallback ?? Vector3.scale(spawn, -1)
 }
 
 function scatterProps(): PlanetProp[] {
   const cosSeparation = cosOfDegrees(PLANET_PROP_MIN_SEPARATION_DEGREES)
-  const cosSpawnClear = cosOfDegrees(PLANET_PROP_SHIP_SPAWN_CLEAR_DEGREES)
   const spawn = shipSpawnDirection()
+  const clear: ClearArea[] = [{ direction: spawn, cosRadius: cosOfDegrees(PLANET_PROP_SHIP_SPAWN_CLEAR_DEGREES) }]
   const props: PlanetProp[] = []
   let nextId = 1
+  // Fixed props first, so the scattered ones keep clear of them.
+  for (const { kind, direction } of landmarks()) {
+    props.push({ id: nextId++, kind, direction })
+    const clearDegrees = PLANET_PROPS[kind].clearDegrees
+    if (clearDegrees) clear.push({ direction, cosRadius: cosOfDegrees(clearDegrees) })
+  }
   for (const kind of KINDS) {
-    for (let i = 0; i < PLANET_PROPS[kind].count; i++) {
-      props.push({ id: nextId++, kind, direction: pickDirection(props, cosSeparation, spawn, cosSpawnClear) })
+    const config = PLANET_PROPS[kind]
+    if (config.fixed) continue
+    for (let i = 0; i < config.count; i++) {
+      props.push({ id: nextId++, kind, direction: pickDirection(props, cosSeparation, clear, spawn) })
     }
   }
   return props
@@ -140,6 +139,13 @@ function setupServer(): void {
     if (!takeProp(zone.id, 'newsstand')) return
     console.log(`[SERVER] Ship flew over newsstand ${zone.id}`)
     notifyTabloids(zone.id)
+  })
+  // Landmarks do nothing yet. They are never taken, so there is no cooldown.
+  onSurfaceZoneEnter('roswellSign', (zone) => {
+    console.log(`[SERVER] Ship flew over the Roswell sign (prop ${zone.id})`)
+  })
+  onSurfaceZoneEnter('area51Sign', (zone) => {
+    console.log(`[SERVER] Ship flew over the Area 51 sign (prop ${zone.id})`)
   })
   engine.addSystem(PlanetPropCooldownSystem)
   console.log(`[SERVER] Scattered ${serverProps.length} planet props`)
