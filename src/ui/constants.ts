@@ -26,7 +26,7 @@ export const POPUP_PANEL_HEIGHT = '75vh'
 // MARK: HUD buttons
 
 /** Side of each square top-right button (Tutorial, Redeem Samples), as a share of screen height. */
-export const HUD_BUTTON_SIZE = '26vh'
+export const HUD_BUTTON_SIZE = '20.8vh'
 
 /** Theme-base px for the top-right button labels (theme default is 14). */
 export const HUD_BUTTON_FONT_SIZE = 24
