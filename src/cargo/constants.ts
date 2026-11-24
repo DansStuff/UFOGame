@@ -37,7 +37,7 @@ export const CARGO_MODELS: Record<CargoKind, CargoModel> = {
     removeHoverText: 'Eat corn',
     // The cob's top sits about 1.7 m above the deck.
     arrowY: 2.5,
-    arrowScale: 3.5
+    arrowScale: 1.75
   }
 }
 
