@@ -11,7 +11,7 @@ import {
   ZoneType,
   getTheme
 } from '@stom66/dcl-ui-component-kit'
-import { REDEEM_HEADER_HEIGHT, REDEEM_PADDING } from '../constants'
+import { REDEEM_BUTTON_SIZE, REDEEM_HEADER_HEIGHT, REDEEM_PADDING } from '../constants'
 
 // MARK: RedeemLayer
 /**
@@ -80,7 +80,7 @@ class RedeemLayer extends Layer {
 }
 
 // MARK: RedeemButtonLayer
-/** Top-right "Redeem Samples" button. Slides away while the window is open. */
+/** Top-right square "Redeem Samples" button. Slides away while the window is open. */
 class RedeemButtonLayer extends Layer {
   constructor() {
     super({ id: 'redeem-button', zone: ZoneType.TopRight, canBeHidden: true, zIndex: 3 })
@@ -93,6 +93,10 @@ class RedeemButtonLayer extends Layer {
         key="btn_redeem_open"
         id="btn_redeem_open"
         textLabel="Redeem Samples"
+        height={REDEEM_BUTTON_SIZE}
+        aspectRatio={1}
+        textWrap="wrap"
+        textAlign="middle-center"
         borderColor={theme.colors.secondary}
         fontColor={theme.colors.light}
         callback={() => redeemLayer.open()}

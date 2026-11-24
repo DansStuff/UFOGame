@@ -22,6 +22,9 @@ export const DEBUG_BUTTON_HEIGHT = 56
 /** Padding inside the redeem samples window, in virtual pixels. */
 export const REDEEM_PADDING = 24
 
+/** Side of the square Redeem Samples button, as a share of screen height. */
+export const REDEEM_BUTTON_SIZE = '15vh'
+
 /** Title row height inside the redeem samples window. */
 export const REDEEM_HEADER_HEIGHT = 64
 
