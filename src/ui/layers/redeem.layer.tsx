@@ -2,7 +2,6 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 import {
   Background,
   ButtonImageClose,
-  ButtonText,
   Column,
   H2,
   Layer,
@@ -11,7 +10,7 @@ import {
   ZoneType,
   getTheme
 } from '@stom66/dcl-ui-component-kit'
-import { REDEEM_BUTTON_SIZE, REDEEM_HEADER_HEIGHT, REDEEM_PADDING } from '../constants'
+import { REDEEM_HEADER_HEIGHT, REDEEM_PADDING } from '../constants'
 
 // MARK: RedeemLayer
 /**
@@ -39,13 +38,11 @@ class RedeemLayer extends Layer {
   open(): void {
     if (this.isOpen) return
     this.show()
-    redeemButtonLayer.hide()
   }
 
   close(): void {
     if (!this.isOpen) return
     this.hide()
-    redeemButtonLayer.show()
   }
 
   protected body() {
@@ -79,31 +76,4 @@ class RedeemLayer extends Layer {
   }
 }
 
-// MARK: RedeemButtonLayer
-/** Top-right square "Redeem Samples" button. Slides away while the window is open. */
-class RedeemButtonLayer extends Layer {
-  constructor() {
-    super({ id: 'redeem-button', zone: ZoneType.TopRight, canBeHidden: true, zIndex: 3 })
-  }
-
-  protected body() {
-    const theme = getTheme()
-    return (
-      <ButtonText
-        key="btn_redeem_open"
-        id="btn_redeem_open"
-        textLabel="Redeem Samples"
-        height={REDEEM_BUTTON_SIZE}
-        aspectRatio={1}
-        textWrap="wrap"
-        textAlign="middle-center"
-        borderColor={theme.colors.secondary}
-        fontColor={theme.colors.light}
-        callback={() => redeemLayer.open()}
-      />
-    )
-  }
-}
-
 export const redeemLayer = new RedeemLayer()
-export const redeemButtonLayer = new RedeemButtonLayer()

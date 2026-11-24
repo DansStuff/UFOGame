@@ -1,13 +1,14 @@
 /**
  * Writes the crew sample total onto the samples HUD, opens the tutorial when the
- * camera fly-in lands, advances its flipbook, and hides the mobile controls while
- * a popup covers them.
+ * camera fly-in lands, advances its flipbook, and hides the top-right buttons and
+ * the mobile controls while a popup covers them.
  * Layout lives in src/ui/layers. This file is the only thing that changes those values.
  */
 import { engine, InputAction, TouchScreenControls } from '@dcl/sdk/ecs'
 import { isServer } from '@dcl/sdk/network'
 import { onIntroFinished } from '../camera/intro'
 import { getGameState } from '../gamestate'
+import { hudButtonsLayer } from './layers/hudButtons.layer'
 import { redeemLayer } from './layers/redeem.layer'
 import { samplesHudState as samplesHud } from './layers/samples.layer'
 import { tutorialLayer } from './layers/tutorial.layer'
@@ -23,16 +24,18 @@ const STOCK_HIDDEN_TOUCH_BUTTONS = [
 
 let popupWasOpen = false
 
-/** Hides the joystick and touch buttons while the tutorial or redeem popup is open. */
-function syncPopupTouchControls(): void {
+/** Hides the top-right buttons, joystick and touch buttons while the tutorial or redeem popup is open. */
+function syncPopupCovers(): void {
   const open = tutorialLayer.isOpen || redeemLayer.isOpen
   if (open === popupWasOpen) return
   popupWasOpen = open
   if (open) {
+    hudButtonsLayer.hide()
     TouchScreenControls.hideAll()
     TouchScreenControls.hideJoystick()
     return
   }
+  hudButtonsLayer.show()
   TouchScreenControls.showAll()
   TouchScreenControls.hide(STOCK_HIDDEN_TOUCH_BUTTONS)
   TouchScreenControls.showJoystick()
@@ -44,6 +47,6 @@ export function registerUiBehaviors(): void {
   engine.addSystem(function UiBehaviorSystem(dt: number) {
     tutorialLayer.tick(dt)
     samplesHud.samplesCollected = getGameState().samplesCollected
-    syncPopupTouchControls()
+    syncPopupCovers()
   })
 }

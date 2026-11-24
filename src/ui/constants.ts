@@ -17,13 +17,18 @@ export const DEBUG_SPAWN_Z = 80.51
 export const DEBUG_BUTTON_WIDTH = 240
 export const DEBUG_BUTTON_HEIGHT = 56
 
+// MARK: HUD buttons
+
+/** Side of each square top-right button (Tutorial, Redeem Samples), as a share of screen height. */
+export const HUD_BUTTON_SIZE = '15vh'
+
+/** Gap between the top-right buttons, in virtual pixels. */
+export const HUD_BUTTON_GAP = 12
+
 // MARK: Redeem
 
 /** Padding inside the redeem samples window, in virtual pixels. */
 export const REDEEM_PADDING = 24
-
-/** Side of the square Redeem Samples button, as a share of screen height. */
-export const REDEEM_BUTTON_SIZE = '15vh'
 
 /** Title row height inside the redeem samples window. */
 export const REDEEM_HEADER_HEIGHT = 64
