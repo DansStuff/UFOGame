@@ -2,6 +2,7 @@ import ReactEcs from '@dcl/sdk/react-ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { movePlayerTo } from '~system/RestrictedActions'
 import { ButtonText, Layer, ZoneType, getTheme } from '@stom66/dcl-ui-component-kit'
+import { withClick } from '../../sfx'
 import { DEBUG_BUTTON_HEIGHT, DEBUG_BUTTON_WIDTH, DEBUG_SPAWN_X, DEBUG_SPAWN_Y, DEBUG_SPAWN_Z } from '../constants'
 import { markActivity } from '../../player/activity'
 
@@ -30,7 +31,7 @@ class DebugLayer extends Layer {
         height={DEBUG_BUTTON_HEIGHT}
         backgroundColor={theme.colors.dark}
         fontColor={theme.colors.light}
-        callback={returnToShip}
+        callback={withClick(returnToShip)}
       />
     )
   }

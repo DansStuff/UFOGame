@@ -1,5 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 import { ButtonText, Layer, Row, ZoneType, getTheme } from '@stom66/dcl-ui-component-kit'
+import { withClick } from '../../sfx'
 import { HUD_BUTTON_FONT_SIZE, HUD_BUTTON_GAP, HUD_BUTTON_SIZE } from '../constants'
 import { redeemLayer } from './redeem.layer'
 import { tutorialLayer } from './tutorial.layer'
@@ -18,7 +19,7 @@ function HudButton(props: { key?: string; id: string; label: string; onClick: ()
       textAlign="middle-center"
       borderColor={theme.colors.secondary}
       fontColor={theme.colors.light}
-      callback={props.onClick}
+      callback={withClick(props.onClick)}
     />
   )
 }

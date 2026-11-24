@@ -15,8 +15,10 @@ import {
   CARGO_BEAM_SPIN_DEGREES_PER_SECOND,
   CARGO_BEAM_TOP_Y,
   CARGO_SPIT_ARC_METERS,
-  CARGO_SPIT_SECONDS
+  CARGO_SPIT_SECONDS,
+  type CargoKind
 } from './constants'
+import { playSfx } from '../sfx'
 import type { CargoItem } from './state'
 
 type Arrival = {
@@ -29,6 +31,7 @@ type Arrival = {
   spinAxis: Vector3
   /** The model's middle relative to its origin, in ship-local meters, before rotation. */
   centerOffset: Vector3
+  kind: CargoKind
 }
 
 const arrivals = new Map<Entity, Arrival>()
@@ -84,9 +87,11 @@ export function startArrival(entity: Entity, ship: Entity, item: CargoItem): voi
     deckSpot: Vector3.create(item.x, model.restY, item.z),
     landed: Quaternion.fromEulerDegrees(0, item.yaw, 0),
     spinAxis: randomAxis(),
-    centerOffset: Vector3.create(0, model.centerY * model.scale, 0)
+    centerOffset: Vector3.create(0, model.centerY * model.scale, 0),
+    kind: item.kind
   }
   arrivals.set(entity, arrival)
+  playSfx(model.abductSfx)
   applyPose(entity, arrival, beamPose(arrival, 0))
 }
 
@@ -132,5 +137,6 @@ export function CargoArrivalSystem(dt: number): void {
     transform.position = Vector3.clone(arrival.deckSpot)
     transform.rotation = arrival.landed
     arrivals.delete(entity)
+    playSfx(CARGO_MODELS[arrival.kind].landSfx)
   }
 }

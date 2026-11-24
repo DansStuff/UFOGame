@@ -18,7 +18,7 @@ import { AbductableAngleSystem, replaceAbductable, resetLift } from './lift'
 import { resetClientCarry } from './placement'
 import { SamplesRemainingSystem } from './samplesLabel'
 import { resetSceneLookup } from './sceneLookup'
-import { preloadProbeClips, playProbeSound, resetMooSpeaker } from './sound'
+import { MooOnPickupSystem, preloadProbeClips, playProbeSound, resetMooSpeaker } from './sound'
 import { AbductableSpawnSystem } from './spawn'
 import { SpinnerSystem } from './spinner'
 
@@ -40,6 +40,7 @@ export function setupAbduction(): void {
   preloadProbeClips()
   engine.addSystem(AbductableSpawnSystem)
   engine.addSystem(SpinnerSystem)
+  engine.addSystem(MooOnPickupSystem)
   engine.addSystem(RedArrowSystem)
   engine.addSystem(CompassArrowSystem)
   engine.addSystem(AbductableArrowSystem)

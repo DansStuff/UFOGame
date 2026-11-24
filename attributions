@@ -1,2 +1,10 @@
 cow model: https://poly.pizza/m/5XSc2Fka3F
 https://pixabay.com/sound-effects/nature-cows-mooing-mono-4824-100996/
+Sound effects (all CC0, Freesound; trimmed and level-matched, candidates in references/sounds/):
+corn_pop.ogg: "The Best Bubble Pop Sound For Game and UI" by el_boss, https://freesound.org/s/669918/
+cargo_thud.ogg: "Heavy Metal Thud on Ground" by 7of9Designs, https://freesound.org/s/640204/
+corn_crunch.ogg: "Bite (Apple)" by wadaltmon, https://freesound.org/s/275015/
+tabloid_rustle.ogg: "Paper Rustle" by BenjaminNelan, https://freesound.org/s/353125/
+ui_click.ogg: first sweep of "Blip Wave" by Breviceps, CC0, https://freesound.org/s/452998/ (trimmed, pitched down 15%)
+ui_whoosh_in.ogg / ui_whoosh_out.ogg: "Swosh swoosh whoosh air sound" by qubodup, CC0, https://freesound.org/s/60026/ (in = reversed)
+ship_speedup.ogg / ship_slowdown.ogg: synthesized for this project (tools/synth_ufo_speed.py), no third-party source

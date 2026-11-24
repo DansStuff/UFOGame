@@ -2,6 +2,7 @@
  * Tunable numbers for cargo: items abducted onto the ship deck.
  * Deck positions are ship-local meters. The deck is flat at local Y 0.
  */
+import type { SfxName } from '../sfx/constants'
 import { SHIP_TILT_EDGE_RADIUS, SHIP_TILT_SAFE_RADIUS } from '../ship/constants'
 
 export type CargoKind = 'cornCob'
@@ -23,6 +24,12 @@ export type CargoModel = {
   arrowY: number
   /** Tutorial arrow scale, a bit smaller than the cow's (TUTORIAL_ARROW_COW_SCALE). */
   arrowScale: number
+  /** Played when the item starts up the beam. */
+  abductSfx: SfxName
+  /** Played when the item hits the deck at the end of its arrival. */
+  landSfx: SfxName
+  /** Played when a player removes the item from the deck. */
+  removeSfx: SfxName
 }
 
 export const CARGO_MODELS: Record<CargoKind, CargoModel> = {
@@ -37,7 +44,10 @@ export const CARGO_MODELS: Record<CargoKind, CargoModel> = {
     removeHoverText: 'Eat corn',
     // The cob's top sits about 1.7 m above the deck.
     arrowY: 2,
-    arrowScale: 1.75
+    arrowScale: 1.75,
+    abductSfx: 'cornPop',
+    landSfx: 'cargoThud',
+    removeSfx: 'cornCrunch'
   }
 }
 

@@ -11,6 +11,7 @@
 import { engine } from '@dcl/sdk/ecs'
 import ReactEcs, { ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { setOnTabloids } from '../networking/client'
+import { playSfx } from '../sfx'
 import {
   TABLOID_APPROACH_SECONDS,
   TABLOID_BOX_MAX_PIXELS,
@@ -193,6 +194,7 @@ export function setupTabloids(): void {
   setOnTabloids((newsstandId) => {
     console.log(`[CLIENT] Tabloids from newsstand ${newsstandId}`)
     throwTabloids()
+    playSfx('tabloidRustle')
   })
   engine.addSystem(TabloidClockSystem)
   ReactEcsRenderer.addUiRenderer(engine.addEntity(), TabloidOverlay, {

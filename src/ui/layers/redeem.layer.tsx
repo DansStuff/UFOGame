@@ -10,6 +10,7 @@ import {
   ZoneType,
   getTheme
 } from '@stom66/dcl-ui-component-kit'
+import { withClick } from '../../sfx'
 import { POPUP_PANEL_HEIGHT, POPUP_PANEL_WIDTH, REDEEM_HEADER_HEIGHT, REDEEM_PADDING } from '../constants'
 
 // MARK: RedeemLayer
@@ -66,7 +67,7 @@ class RedeemLayer extends Layer {
           alignItems="center"
         >
           <H2 key="redeem_title" value="Redeem Samples" fontColor={theme.colors.light} alignSelf="center" />
-          <ButtonImageClose key="btn_redeem_close" id="btn_redeem_close" callback={() => this.close()} />
+          <ButtonImageClose key="btn_redeem_close" id="btn_redeem_close" callback={withClick(() => this.close())} />
         </Row>
         <Column key="redeem_body" flexGrow={1} spacing={0} justifyContent="center" alignItems="center">
           <Text key="redeem_placeholder" value="Coming soon" fontColor={theme.colors.light} textAlign="middle-center" />

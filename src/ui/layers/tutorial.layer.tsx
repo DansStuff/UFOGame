@@ -10,6 +10,7 @@ import {
   getTheme,
   sizeValueToPixels
 } from '@stom66/dcl-ui-component-kit'
+import { playSfx, withClick } from '../../sfx'
 import {
   POPUP_PANEL_HEIGHT,
   POPUP_PANEL_WIDTH,
@@ -107,13 +108,16 @@ class TutorialLayer extends Layer {
   /** Shows the tutorial from its first page. */
   open(): void {
     if (TUTORIAL_PAGES.length === 0) return
+    if (!this.isOpen) playSfx('uiWhooshIn')
     this.page = 0
     this.elapsed = 0
     this.show()
   }
 
   close(): void {
-    if (this.isOpen) this.hide()
+    if (!this.isOpen) return
+    playSfx('uiWhooshOut')
+    this.hide()
   }
 
   private next(): void {
@@ -217,7 +221,7 @@ class TutorialLayer extends Layer {
             fontSize={TUTORIAL_BUTTON_FONT_SIZE}
             borderColor={theme.colors.secondary}
             fontColor={theme.colors.light}
-            callback={() => this.next()}
+            callback={withClick(() => this.next())}
           />
         </Row>
       </Column>

@@ -13,9 +13,11 @@ import { setupClientRoom } from './networking/client'
 import { setupPlanetProps } from './planetProps'
 import { setupActivity } from './player/activity'
 import { setupSceneEntities } from './scene/entities'
+import { setupSfx } from './sfx'
 import { setupShipMotion } from './ship/motion'
 import { setupProbes } from './ship/probes'
 import { setupSaucerFX } from './ship/saucerFx'
+import { setupShipSpeedSfx } from './ship/speedSfx'
 import { setupShipWind } from './ship/wind'
 import { setupSurfaceZones } from './surfaceZones'
 import { setupTabloids } from './tabloids'
@@ -38,10 +40,12 @@ export function main() {
   }
 
   setupSceneEntities()
+  setupSfx()
   setupCamera()
   setupClientRoom()
   setupShipWind()
   setupSaucerFX()
+  setupShipSpeedSfx()
   setupProbes()
   setupCosmetics()
   setupTabloids()

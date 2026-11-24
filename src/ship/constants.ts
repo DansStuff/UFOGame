@@ -189,3 +189,13 @@ export const BEAM_RING_EMISSIVE_INTENSITY = 3
 /** Beam ring surface, copied from BeamRing.gltf. */
 export const BEAM_RING_METALLIC = 0
 export const BEAM_RING_ROUGHNESS = 0.5
+
+// MARK: Speed sounds
+// Client-only one-shots on the synced speed fraction (shipSpeedFraction, 0 stopped to 1 full tilt).
+
+/** Speeding up past this fraction of top speed plays the speed-up sound. */
+export const SHIP_SPEEDUP_SFX_FRACTION = 0.2
+/** Slowing down past this fraction of top speed plays the slow-down sound. */
+export const SHIP_SLOWDOWN_SFX_FRACTION = 0.8
+/** After a speed sound plays, the same sound waits this long before it can play again. */
+export const SHIP_SPEED_SFX_COOLDOWN_SECONDS = 2.5

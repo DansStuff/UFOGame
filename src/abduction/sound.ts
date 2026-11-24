@@ -3,6 +3,7 @@ import { AssetLoad, AudioSource, engine, Entity, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { ABDUCTABLE_MODELS, ABDUCTABLE_PROBE_VOLUME } from './constants'
 import { findAbductable, findAbductableModel } from './components'
+import { getGameState } from '../gamestate'
 
 /** Follows the cow while a moo plays. Kept off the cow so replacing the cow does not stop the clip. */
 let mooSpeaker: Entity | null = null
@@ -61,6 +62,19 @@ export function preloadProbeClips(): void {
   AssetLoad.create(engine.addEntity(), { assets })
 }
 
+/** Last seen pickup state, by cow id. Null until the first look, so a late joiner does not moo for a cow already aboard. */
+let lastPickup: { id: number; onShip: boolean } | null = null
+
+/** Moos once when the beam picks the cow up off the surface (synced `abductableOnShip` turning on). */
+export function MooOnPickupSystem(): void {
+  const state = getGameState()
+  const seen = lastPickup
+  lastPickup = { id: state.abductableId, onShip: state.abductableOnShip }
+  if (seen === null || seen.id !== state.abductableId) return
+  if (state.abductableOnShip && !seen.onShip) playProbeSound()
+}
+
 export function resetMooSpeaker(): void {
   mooSpeaker = null
+  lastPickup = null
 }

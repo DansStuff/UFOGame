@@ -25,6 +25,7 @@ import { isServer } from '@dcl/sdk/network'
 import { EntityNames } from '../../assets/scene/entity-names'
 import { findNamed } from '../abduction/sceneLookup'
 import { requestRemoveCargo } from '../networking/client'
+import { playSfx } from '../sfx'
 import { SHIP_CENTER_X, SHIP_CENTER_Z } from '../ship/constants'
 import { createTutorialArrow, removeTutorialArrow } from '../tutorialArrow'
 import { CargoArrivalSystem, cancelArrival, isArriving, resetArrivals, startArrival } from './arrival'
@@ -106,6 +107,8 @@ export function removeCargo(playerAddress: string, cargoId: number): boolean {
 // MARK: Client
 
 const shown = new Map<number, Entity>()
+/** Kind of each shown item, so its removal sound can play after it leaves the synced list. */
+const shownKinds = new Map<number, CargoKind>()
 /** Tutorial arrows over items resting on the deck, by item id. */
 const arrows = new Map<number, Entity>()
 /** False until the first synced list has been mirrored, so items already aboard do not replay their arrival. */
@@ -166,6 +169,7 @@ function hideItem(id: number, entity: Entity): void {
   cancelArrival(entity)
   engine.removeEntity(entity)
   shown.delete(id)
+  shownKinds.delete(id)
 }
 
 /** Mirrors the synced list onto the ship. */
@@ -176,13 +180,18 @@ function CargoMirrorSystem(): void {
 
   const present = new Set(items.map((item) => item.id))
   for (const [id, entity] of Array.from(shown)) {
-    if (!present.has(id)) hideItem(id, entity)
+    if (present.has(id)) continue
+    const kind = shownKinds.get(id)
+    hideItem(id, entity)
+    // Removal from the synced list means someone ate it.
+    if (kind !== undefined) playSfx(CARGO_MODELS[kind].removeSfx)
   }
   for (const item of items) {
     let entity = shown.get(item.id)
     if (entity === undefined) {
       entity = showItem(ship, item, seededFromSnapshot)
       shown.set(item.id, entity)
+      shownKinds.set(item.id, item.kind)
     }
     if (!arrows.has(item.id) && !isArriving(entity)) arrows.set(item.id, showArrow(ship, item))
   }
@@ -192,6 +201,7 @@ function CargoMirrorSystem(): void {
 export function setupCargo(): void {
   nextCargoId = 1
   shown.clear()
+  shownKinds.clear()
   arrows.clear()
   seededFromSnapshot = false
   lastRemoveRequestAt = 0
