@@ -95,6 +95,13 @@ export const TUTORIAL_PAGES: TutorialPage[] = [
     aspect: 4 / 3
   },
   {
+    title: 'Camera follows the ship!',
+    frames: ['assets/images/tutorial/cameraman1.png', 'assets/images/tutorial/cameraman2.png'],
+    sequence: [0, 1],
+    fps: 1.25,
+    aspect: 16 / 9
+  },
+  {
     title: 'Abduct cows for samples!',
     // Probe frames alternate back and forth.
     frames: [
