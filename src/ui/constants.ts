@@ -26,7 +26,10 @@ export const POPUP_PANEL_HEIGHT = '75vh'
 // MARK: HUD buttons
 
 /** Side of each square top-right button (Tutorial, Redeem Samples), as a share of screen height. */
-export const HUD_BUTTON_SIZE = '15vh'
+export const HUD_BUTTON_SIZE = '26vh'
+
+/** Theme-base px for the top-right button labels (theme default is 14). */
+export const HUD_BUTTON_FONT_SIZE = 24
 
 /** Gap between the top-right buttons, in virtual pixels. */
 export const HUD_BUTTON_GAP = 12
@@ -125,17 +128,17 @@ export const TUTORIAL_PAGES: TutorialPage[] = [
 export const TUTORIAL_PADDING = 16
 
 /** Height of the title row above a tutorial image, when the page has a title. */
-export const TUTORIAL_TITLE_HEIGHT = 64
+export const TUTORIAL_TITLE_HEIGHT = 112
 
 /** Theme-base px for the tutorial title and text-only pages (theme h2 is 24). */
-export const TUTORIAL_TITLE_FONT_SIZE = 30
+export const TUTORIAL_TITLE_FONT_SIZE = 52
 
 /** Theme-base px for the Next / Done label (theme default is 14). */
-export const TUTORIAL_BUTTON_FONT_SIZE = 18
+export const TUTORIAL_BUTTON_FONT_SIZE = 32
 
 /** Gap between the tutorial title, image and button row. */
 export const TUTORIAL_BUTTON_GAP = 12
 
 /** Next / Done button size, in virtual pixels. */
-export const TUTORIAL_BUTTON_WIDTH = 200
-export const TUTORIAL_BUTTON_HEIGHT = 56
+export const TUTORIAL_BUTTON_WIDTH = 350
+export const TUTORIAL_BUTTON_HEIGHT = 98
