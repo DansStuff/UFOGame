@@ -115,6 +115,10 @@ export const TUTORIAL_PAGES: TutorialPage[] = [
   { title: 'Redeem (coming soon)', frames: [] }
 ]
 
+/** Tutorial panel size, centered on the screen, as a share of screen width and height. */
+export const TUTORIAL_PANEL_WIDTH = '75vw'
+export const TUTORIAL_PANEL_HEIGHT = '75vh'
+
 /** Padding inside the tutorial popup, in virtual pixels. The image fits inside it. */
 export const TUTORIAL_PADDING = 16
 

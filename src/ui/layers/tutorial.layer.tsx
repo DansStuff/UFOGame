@@ -18,21 +18,19 @@ import {
   TUTORIAL_DEFAULT_FPS,
   TUTORIAL_PAGES,
   TUTORIAL_PADDING,
+  TUTORIAL_PANEL_HEIGHT,
+  TUTORIAL_PANEL_WIDTH,
   TUTORIAL_TITLE_HEIGHT
 } from '../constants'
 import type { TutorialFrame, TutorialPage } from '../constants'
-
-/** Size of DUCK's Default zone, which this layer fills: half the virtual canvas each way. */
-const TUTORIAL_ZONE_WIDTH = '50vw'
-const TUTORIAL_ZONE_HEIGHT = '50vh'
 
 /**
  * Largest box with the page's aspect that fits the space left in the popup
  * after padding, the title row (when there is one) and the button row. Virtual pixels.
  */
 function fitTutorialImage(aspect: number, hasTitle: boolean): { width: number; height: number } {
-  const zoneWidth = sizeValueToPixels(TUTORIAL_ZONE_WIDTH) ?? 0
-  const zoneHeight = sizeValueToPixels(TUTORIAL_ZONE_HEIGHT) ?? 0
+  const zoneWidth = sizeValueToPixels(TUTORIAL_PANEL_WIDTH) ?? 0
+  const zoneHeight = sizeValueToPixels(TUTORIAL_PANEL_HEIGHT) ?? 0
   const maxWidth = Math.max(1, zoneWidth - TUTORIAL_PADDING * 2)
   const titleSpace = hasTitle ? TUTORIAL_TITLE_HEIGHT + TUTORIAL_BUTTON_GAP : 0
   const maxHeight = Math.max(
@@ -78,7 +76,7 @@ const FRAME_HIDDEN = { r: 1, g: 1, b: 1, a: 0 }
 
 // MARK: TutorialLayer
 /**
- * Centered tutorial popup. Fills DUCK's Default zone (the middle half of the screen)
+ * Centered tutorial popup, TUTORIAL_PANEL_WIDTH x TUTORIAL_PANEL_HEIGHT on the FullScreen zone,
  * with one page image and a Next button; the last page's button reads Done and closes.
  * Hidden until src/ui/behaviors.ts opens it when the camera fly-in lands.
  * The image keeps its aspect and is centered in the space above the button. Each page is a
@@ -93,7 +91,7 @@ class TutorialLayer extends Layer {
   constructor() {
     super({
       id: 'tutorial',
-      zone: ZoneType.Default,
+      zone: ZoneType.FullScreen,
       canBeHidden: true,
       startHidden: true,
       zIndex: 20
@@ -144,8 +142,8 @@ class TutorialLayer extends Layer {
     return (
       <Column
         key="tutorial_popup"
-        width="100%"
-        height="100%"
+        width={TUTORIAL_PANEL_WIDTH}
+        height={TUTORIAL_PANEL_HEIGHT}
         spacing={0}
         padding={TUTORIAL_PADDING}
         alignItems="center"
