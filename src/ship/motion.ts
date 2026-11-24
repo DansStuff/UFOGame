@@ -27,6 +27,7 @@ import {
   type PlanetAngularVelocitySnapshot,
   type PlanetRotationSnapshot
 } from '../gamestate'
+import { CARGO_MODELS } from '../cargo/constants'
 import { getLandedCargoItems } from '../cargo/state'
 
 /** Snap the tilt once it is this close, so easing reaches the target instead of crawling. */
@@ -64,19 +65,22 @@ function tiltContribution(distance: number): number {
 
 /**
  * Everything weighing on the deck, as offsets from the ship center: each player in the
- * scene, and each landed cargo item, which weighs the same as one player standing at its spot.
+ * scene (weight 1), and each landed cargo item, which weighs its kind's `weight` in players
+ * standing at its spot.
  */
-function deckWeights(): Array<{ x: number; z: number }> {
-  const weights: Array<{ x: number; z: number }> = []
+function deckWeights(): Array<{ x: number; z: number; weight: number }> {
+  const weights: Array<{ x: number; z: number; weight: number }> = []
   for (const [, , transform] of engine.getEntitiesWith(PlayerIdentityData, Transform)) {
-    weights.push({ x: transform.position.x - SHIP_CENTER_X, z: transform.position.z - SHIP_CENTER_Z })
+    weights.push({ x: transform.position.x - SHIP_CENTER_X, z: transform.position.z - SHIP_CENTER_Z, weight: 1 })
   }
-  for (const item of getLandedCargoItems(Date.now())) weights.push({ x: item.x, z: item.z })
+  for (const item of getLandedCargoItems(Date.now())) {
+    weights.push({ x: item.x, z: item.z, weight: CARGO_MODELS[item.kind].weight })
+  }
   return weights
 }
 
 /**
- * Players and cargo on the deck, averaged, mapped to a ship speed.
+ * Players and cargo on the deck, averaged by weight, mapped to a ship speed.
  * Weights inside the safe radius are left out. If nothing is outside it, the speed is 0.
  * Each other weight adds a push toward the side it is on. That push is 0 just
  * outside the safe radius and 1 at the saucer edge, rising in a straight line.
@@ -90,13 +94,13 @@ export function normalizedShipSpeed(): number {
   let sumX = 0
   let sumZ = 0
   let count = 0
-  for (const { x, z } of deckWeights()) {
+  for (const { x, z, weight } of deckWeights()) {
     const distance = Math.hypot(x, z)
     if (distance <= SHIP_TILT_SAFE_RADIUS) continue
-    const push = tiltContribution(distance) / distance
+    const push = (tiltContribution(distance) / distance) * weight
     sumX += x * push
     sumZ += z * push
-    count++
+    count += weight
   }
   if (count === 0) return 0
 

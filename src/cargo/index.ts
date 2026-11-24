@@ -1,6 +1,6 @@
 /**
- * Cargo: items abducted onto the ship deck. Each item weighs on steering like one
- * player standing at its spot (see `normalizedShipSpeed` in `ship/motion.ts`).
+ * Cargo: items abducted onto the ship deck. Each item weighs on steering like its kind's
+ * `weight` in players standing at its spot (see `normalizedShipSpeed` in `ship/motion.ts`).
  *
  * Server: `addCargo` places an item at a random deck spot near the rim,
  * `removeCargo` takes it off when a nearby player asks. The list is synced in `CargoState`.

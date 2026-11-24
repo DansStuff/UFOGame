@@ -18,6 +18,8 @@ export type CargoModel = {
   centerY: number
   /** Ship-local height of the origin when resting on the deck, meters. Negative sinks it into the deck. */
   restY: number
+  /** Weight on steering, in players standing at the item's spot (see deckWeights in ship/motion.ts). */
+  weight: number
   /** Text shown next to the proximity prompt. */
   removeHoverText: string
   /** Ship-local height of the tutorial arrow's tip while the item rests on the deck. */
@@ -41,6 +43,8 @@ export const CARGO_MODELS: Record<CargoKind, CargoModel> = {
     // The file is 0.737 m tall.
     centerY: 0.37,
     restY: -0.5,
+    // A giant cob: as heavy as two players.
+    weight: 2,
     removeHoverText: 'Eat corn',
     // The cob's top sits about 1.7 m above the deck.
     arrowY: 2,
