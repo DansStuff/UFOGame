@@ -19,14 +19,17 @@ import { isServer } from '@dcl/sdk/network'
 import { PLANET_SURFACE_RADIUS_METERS } from '../abduction/constants'
 import { addCargo } from '../cargo'
 import { randomSurfaceDirection, rotationWithUp } from '../abduction/geometry'
-import { findPlanet, setVisible } from '../abduction/sceneLookup'
+import { EntityNames } from '../../assets/scene/entity-names'
+import { findNamed, findPlanet, setVisible } from '../abduction/sceneLookup'
+import { getGameState } from '../gamestate'
 import { notifyPlanetProps, notifyTabloids } from '../gamestate/serverRoom'
 import { setOnPlanetProps, type PlanetPropMessage } from '../networking/client'
 import { addSurfaceZone, onSurfaceZoneEnter } from '../surfaceZones'
-import { cosOfDegrees, isWithinCos } from '../surfaceZones/geometry'
+import { cosOfDegrees, isWithinCos, shipPlanetDirection } from '../surfaceZones/geometry'
 import {
   PLANET_PROP_MIN_SEPARATION_DEGREES,
   PLANET_PROP_PLACEMENT_ATTEMPTS,
+  PLANET_PROP_SHIP_SPAWN_CLEAR_DEGREES,
   PLANET_PROPS,
   type PlanetPropKind
 } from './constants'
@@ -60,24 +63,44 @@ function takeProp(id: number, kind: PlanetPropKind): boolean {
   return takePlanetProp(id, PLANET_PROPS[kind].cooldownSeconds)
 }
 
-/** A random direction at least the minimum separation from every placed prop, if one turns up. */
-function pickDirection(placed: PlanetProp[], cosSeparation: number): Vector3 {
-  let candidate = Vector3.create(0, 1, 0)
+/**
+ * Planet-local direction under the ship when the server loads. Straight up when the
+ * ship or planet is missing, which is where the composite puts the ship.
+ */
+function shipSpawnDirection(): Vector3 {
+  const planet = findPlanet()
+  const ship = findNamed(EntityNames.Ship)
+  const direction = planet !== null && ship !== null ? shipPlanetDirection(planet, ship, getGameState().planetRotation) : null
+  return direction ?? Vector3.create(0, 1, 0)
+}
+
+/**
+ * A random direction outside the ship spawn area and at least the minimum separation
+ * from every placed prop. If no pick keeps the separation, the first pick outside the
+ * spawn area is used; the spawn area is never broken.
+ */
+function pickDirection(placed: PlanetProp[], cosSeparation: number, spawn: Vector3, cosSpawnClear: number): Vector3 {
+  let fallback: Vector3 | null = null
   for (let attempt = 0; attempt < PLANET_PROP_PLACEMENT_ATTEMPTS; attempt++) {
     const random = randomSurfaceDirection()
-    candidate = Vector3.create(random.x, random.y, random.z)
+    const candidate = Vector3.create(random.x, random.y, random.z)
+    if (isWithinCos(spawn, candidate, cosSpawnClear)) continue
+    if (fallback === null) fallback = candidate
     if (!placed.some((prop) => isWithinCos(prop.direction, candidate, cosSeparation))) return candidate
   }
-  return candidate
+  // Every pick landed in the spawn area: the opposite side of the planet is always outside it.
+  return fallback ?? Vector3.scale(spawn, -1)
 }
 
 function scatterProps(): PlanetProp[] {
   const cosSeparation = cosOfDegrees(PLANET_PROP_MIN_SEPARATION_DEGREES)
+  const cosSpawnClear = cosOfDegrees(PLANET_PROP_SHIP_SPAWN_CLEAR_DEGREES)
+  const spawn = shipSpawnDirection()
   const props: PlanetProp[] = []
   let nextId = 1
   for (const kind of KINDS) {
     for (let i = 0; i < PLANET_PROPS[kind].count; i++) {
-      props.push({ id: nextId++, kind, direction: pickDirection(props, cosSeparation) })
+      props.push({ id: nextId++, kind, direction: pickDirection(props, cosSeparation, spawn, cosSpawnClear) })
     }
   }
   return props

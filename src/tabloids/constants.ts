@@ -34,8 +34,8 @@ export const TABLOID_LIFE_SECONDS = TABLOID_APPROACH_SECONDS + TABLOID_HOLD_SECO
 export const TABLOID_BATCH_SECONDS = (TABLOID_COUNT_MAX - 1) * TABLOID_STAGGER_SECONDS + TABLOID_LIFE_SECONDS
 
 /** Side of the square box holding the page. The page fills about 60-70% of its width. */
-export const TABLOID_BOX_MIN_PIXELS = 1000
-export const TABLOID_BOX_MAX_PIXELS = 1150
+export const TABLOID_BOX_MIN_PIXELS = 1300
+export const TABLOID_BOX_MAX_PIXELS = 1495
 /** Starting size as a fraction of the final size. */
 export const TABLOID_START_SCALE = 0.05
 /** Whole turns spun during the approach. */

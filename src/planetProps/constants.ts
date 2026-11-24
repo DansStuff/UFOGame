@@ -62,6 +62,12 @@ export const PLANET_PROPS: Record<PlanetPropKind, PlanetPropConfig> = {
   }
 }
 
+/**
+ * No prop is scattered within this many degrees of the point under the ship when the server loads,
+ * so the area players first see stays clear. 1 degree is about 1.7 m on the surface; the saucer is about 40 m across.
+ */
+export const PLANET_PROP_SHIP_SPAWN_CLEAR_DEGREES = 20
+
 /** Props are kept at least this many degrees apart when scattered. */
 export const PLANET_PROP_MIN_SEPARATION_DEGREES = 10
 
