@@ -44,6 +44,7 @@ export type TutorialFrame = string | { src: string; xmirror?: boolean }
 
 /**
  * One tutorial page, played as a looping flipbook.
+ * - `title`: optional text shown above the image.
  * - `frames`: the page's frames (see TutorialFrame). A single frame is a still page.
  * - `sequence`: indices into `frames`, in play order; repeats are fine
  *   (`[0, 1, 2, 1]` ping-pongs). Defaults to every frame in order. Bad indices are skipped.
@@ -52,6 +53,7 @@ export type TutorialFrame = string | { src: string; xmirror?: boolean }
  *   a texture's size, so leave it out only when they match TUTORIAL_DEFAULT_ASPECT.
  */
 export type TutorialPage = {
+  title?: string
   frames: TutorialFrame[]
   sequence?: number[]
   fps?: number
@@ -71,6 +73,7 @@ export const TUTORIAL_DEFAULT_FPS = 6
  */
 export const TUTORIAL_PAGES: TutorialPage[] = [
   {
+    title: 'Balance the UFO to fly!',
     // Ship rocking: center, right, mirrored center, mirrored right.
     frames: [
       'assets/images/tutorial/TutCenter.png',
@@ -89,7 +92,10 @@ export const TUTORIAL_PAGES: TutorialPage[] = [
 /** Padding inside the tutorial popup, in virtual pixels. The image fits inside it. */
 export const TUTORIAL_PADDING = 16
 
-/** Gap between the tutorial image and the button row. */
+/** Height of the title row above a tutorial image, when the page has a title. */
+export const TUTORIAL_TITLE_HEIGHT = 56
+
+/** Gap between the tutorial title, image and button row. */
 export const TUTORIAL_BUTTON_GAP = 12
 
 /** Next / Done button size, in virtual pixels. */

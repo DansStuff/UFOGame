@@ -3,6 +3,7 @@ import {
   Background,
   ButtonText,
   Column,
+  H2,
   Layer,
   Row,
   ZoneType,
@@ -16,7 +17,8 @@ import {
   TUTORIAL_DEFAULT_ASPECT,
   TUTORIAL_DEFAULT_FPS,
   TUTORIAL_PAGES,
-  TUTORIAL_PADDING
+  TUTORIAL_PADDING,
+  TUTORIAL_TITLE_HEIGHT
 } from '../constants'
 import type { TutorialFrame, TutorialPage } from '../constants'
 
@@ -26,13 +28,17 @@ const TUTORIAL_ZONE_HEIGHT = '50vh'
 
 /**
  * Largest box with the page's aspect that fits the space left in the popup
- * after padding and the button row. Virtual pixels.
+ * after padding, the title row (when there is one) and the button row. Virtual pixels.
  */
-function fitTutorialImage(aspect: number): { width: number; height: number } {
+function fitTutorialImage(aspect: number, hasTitle: boolean): { width: number; height: number } {
   const zoneWidth = sizeValueToPixels(TUTORIAL_ZONE_WIDTH) ?? 0
   const zoneHeight = sizeValueToPixels(TUTORIAL_ZONE_HEIGHT) ?? 0
   const maxWidth = Math.max(1, zoneWidth - TUTORIAL_PADDING * 2)
-  const maxHeight = Math.max(1, zoneHeight - TUTORIAL_PADDING * 2 - TUTORIAL_BUTTON_GAP - TUTORIAL_BUTTON_HEIGHT)
+  const titleSpace = hasTitle ? TUTORIAL_TITLE_HEIGHT + TUTORIAL_BUTTON_GAP : 0
+  const maxHeight = Math.max(
+    1,
+    zoneHeight - TUTORIAL_PADDING * 2 - titleSpace - TUTORIAL_BUTTON_GAP - TUTORIAL_BUTTON_HEIGHT
+  )
   const ratio = aspect > 0 ? aspect : TUTORIAL_DEFAULT_ASPECT
   if (maxWidth / maxHeight > ratio) {
     return { width: Math.floor(maxHeight * ratio), height: Math.floor(maxHeight) }
@@ -126,18 +132,30 @@ class TutorialLayer extends Layer {
     const frame = page ? pageFrame(page, this.elapsed) : undefined
     const src = frame ? frameSrc(frame) : ''
     const uvs = frame && frameXMirror(frame) ? UVS_XMIRROR : UVS_NORMAL
-    const size = fitTutorialImage(page?.aspect ?? TUTORIAL_DEFAULT_ASPECT)
+    const title = page?.title ?? ''
+    const size = fitTutorialImage(page?.aspect ?? TUTORIAL_DEFAULT_ASPECT, title !== '')
     return (
       <Column
         key="tutorial_popup"
         width="100%"
         height="100%"
-        spacing={TUTORIAL_BUTTON_GAP}
+        spacing={0}
         padding={TUTORIAL_PADDING}
         alignItems="center"
         pointerFilter="block"
       >
         <Background key="tutorial_chrome" borderColor={theme.colors.secondary} borderRadius={theme.border.radiusSmall} />
+        {title !== '' ? (
+          <H2
+            key="tutorial_title"
+            value={title}
+            width="100%"
+            height={TUTORIAL_TITLE_HEIGHT}
+            margin={{ bottom: TUTORIAL_BUTTON_GAP }}
+            fontColor={theme.colors.light}
+            textAlign="middle-center"
+          />
+        ) : null}
         <UiEntity
           key="tutorial_image_area"
           uiTransform={{ width: '100%', flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
@@ -156,7 +174,13 @@ class TutorialLayer extends Layer {
             />
           ))}
         </UiEntity>
-        <Row key="tutorial_actions" height={TUTORIAL_BUTTON_HEIGHT} spacing={0} justifyContent="flex-end">
+        <Row
+          key="tutorial_actions"
+          height={TUTORIAL_BUTTON_HEIGHT}
+          margin={{ top: TUTORIAL_BUTTON_GAP }}
+          spacing={0}
+          justifyContent="flex-end"
+        >
           <ButtonText
             key="btn_tutorial_next"
             id="btn_tutorial_next"
