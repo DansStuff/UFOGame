@@ -88,8 +88,17 @@ export const TUTORIAL_PAGES: TutorialPage[] = [
     fps: 1.25,
     aspect: 4 / 3
   },
-  { frames: ['assets/images/tutorial/02.png'] },
-  { frames: ['assets/images/tutorial/03.png'] }
+  {
+    title: 'Abduct cows for samples!',
+    // Probe frames alternate back and forth.
+    frames: [
+      'assets/images/tutorial/alien_cow_probe_flipbook_frame_1.png',
+      'assets/images/tutorial/alien_cow_probe_flipbook_frame_2.png'
+    ],
+    sequence: [0, 1],
+    fps: 2,
+    aspect: 3 / 2
+  }
 ]
 
 /** Padding inside the tutorial popup, in virtual pixels. The image fits inside it. */
