@@ -13,6 +13,7 @@ import {
 import {
   POPUP_PANEL_HEIGHT,
   POPUP_PANEL_WIDTH,
+  TUTORIAL_BUTTON_FONT_SIZE,
   TUTORIAL_BUTTON_GAP,
   TUTORIAL_BUTTON_HEIGHT,
   TUTORIAL_BUTTON_WIDTH,
@@ -20,6 +21,7 @@ import {
   TUTORIAL_DEFAULT_FPS,
   TUTORIAL_PAGES,
   TUTORIAL_PADDING,
+  TUTORIAL_TITLE_FONT_SIZE,
   TUTORIAL_TITLE_HEIGHT
 } from '../constants'
 import type { TutorialFrame, TutorialPage } from '../constants'
@@ -156,6 +158,7 @@ class TutorialLayer extends Layer {
             value={title}
             width="100%"
             height={TUTORIAL_TITLE_HEIGHT}
+            fontSize={TUTORIAL_TITLE_FONT_SIZE}
             margin={{ bottom: TUTORIAL_BUTTON_GAP }}
             fontColor={theme.colors.light}
             textAlign="middle-center"
@@ -188,7 +191,14 @@ class TutorialLayer extends Layer {
               ))}
             </UiEntity>
           ) : (
-            <H2 key="tutorial_text" value={title} width="100%" fontColor={theme.colors.light} textAlign="middle-center" />
+            <H2
+              key="tutorial_text"
+              value={title}
+              width="100%"
+              fontSize={TUTORIAL_TITLE_FONT_SIZE}
+              fontColor={theme.colors.light}
+              textAlign="middle-center"
+            />
           )}
         </UiEntity>
         <Row
@@ -204,6 +214,7 @@ class TutorialLayer extends Layer {
             textLabel={isLast ? 'Done' : 'Next'}
             width={TUTORIAL_BUTTON_WIDTH}
             height={TUTORIAL_BUTTON_HEIGHT}
+            fontSize={TUTORIAL_BUTTON_FONT_SIZE}
             borderColor={theme.colors.secondary}
             fontColor={theme.colors.light}
             callback={() => this.next()}

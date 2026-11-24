@@ -125,7 +125,13 @@ export const TUTORIAL_PAGES: TutorialPage[] = [
 export const TUTORIAL_PADDING = 16
 
 /** Height of the title row above a tutorial image, when the page has a title. */
-export const TUTORIAL_TITLE_HEIGHT = 56
+export const TUTORIAL_TITLE_HEIGHT = 64
+
+/** Theme-base px for the tutorial title and text-only pages (theme h2 is 24). */
+export const TUTORIAL_TITLE_FONT_SIZE = 30
+
+/** Theme-base px for the Next / Done label (theme default is 14). */
+export const TUTORIAL_BUTTON_FONT_SIZE = 18
 
 /** Gap between the tutorial title, image and button row. */
 export const TUTORIAL_BUTTON_GAP = 12
