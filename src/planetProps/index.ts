@@ -14,7 +14,7 @@
  * the depleted model when the kind has one, a cube recolor for placeholders.
  */
 import { engine, Entity, GltfContainer, Material, MeshRenderer, Transform } from '@dcl/sdk/ecs'
-import { Vector3 } from '@dcl/sdk/math'
+import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
 import { PLANET_SURFACE_RADIUS_METERS } from '../abduction/constants'
 import { addCargo } from '../cargo'
@@ -27,6 +27,7 @@ import {
   isWithinCos,
   pickClearDirection,
   rotationWithUp,
+  rotationWithUpFacing,
   type ClearArea
 } from '../sphere/geometry'
 import { addSurfaceZone, onSurfaceZoneEnter } from '../surfaceZones'
@@ -51,6 +52,8 @@ export type PlanetProp = {
   kind: PlanetPropKind
   /** Unit direction from the planet center, in planet-local space. */
   direction: Vector3
+  /** Planet-local direction along the surface the model's front (+Z) points. Null for no set facing. */
+  facing: Vector3 | null
 }
 
 const KINDS = Object.keys(PLANET_PROPS) as PlanetPropKind[]
@@ -78,8 +81,8 @@ function scatterProps(): PlanetProp[] {
   const clear: ClearArea[] = [clearArea(spawn, PLANET_PROP_SHIP_SPAWN_CLEAR_DEGREES)]
   const props: PlanetProp[] = []
   let nextId = 1
-  for (const { kind, direction } of landmarks()) {
-    props.push({ id: nextId++, kind, direction })
+  for (const { kind, direction, facing } of landmarks()) {
+    props.push({ id: nextId++, kind, direction, facing })
     const clearDegrees = PLANET_PROPS[kind].clearDegrees
     if (clearDegrees) clear.push(clearArea(direction, clearDegrees))
   }
@@ -96,7 +99,7 @@ function scatterProps(): PlanetProp[] {
         // Opposite the spawn point: outside the spawn area, and the signs sit 90 degrees from spawn.
         fallback: Vector3.scale(spawn, -1)
       })
-      props.push({ id: nextId++, kind, direction })
+      props.push({ id: nextId++, kind, direction, facing: null })
     }
   }
   return props
@@ -110,7 +113,10 @@ export function publishPlanetProps(to: string): void {
       kind: prop.kind,
       x: prop.direction.x,
       y: prop.direction.y,
-      z: prop.direction.z
+      z: prop.direction.z,
+      fx: prop.facing?.x ?? 0,
+      fy: prop.facing?.y ?? 0,
+      fz: prop.facing?.z ?? 0
     })),
     to
   )
@@ -200,6 +206,12 @@ function addModel(parent: Entity, src: string): Entity {
   return entity
 }
 
+/** Stands the prop up on the surface, turned to its facing when it has one. */
+function propRotation(prop: PlanetProp): Quaternion {
+  if (prop.facing === null) return rotationWithUp(prop.direction)
+  return rotationWithUpFacing(prop.direction, Vector3.add(prop.direction, prop.facing))
+}
+
 function spawnProp(planet: Entity, prop: PlanetProp): ShownProp {
   const config = PLANET_PROPS[prop.kind]
   const entity = engine.addEntity()
@@ -208,7 +220,7 @@ function spawnProp(planet: Entity, prop: PlanetProp): ShownProp {
       parent: planet,
       // The model's origin is at its base.
       position: Vector3.scale(prop.direction, PLANET_SURFACE_RADIUS_METERS),
-      rotation: rotationWithUp(prop.direction),
+      rotation: propRotation(prop),
       scale: Vector3.create(config.modelScale ?? 1, config.modelScale ?? 1, config.modelScale ?? 1)
     })
     if (config.depletedModel) {
@@ -224,7 +236,7 @@ function spawnProp(planet: Entity, prop: PlanetProp): ShownProp {
     parent: planet,
     // Half the height past the surface, so the cube sits on it.
     position: Vector3.scale(prop.direction, PLANET_SURFACE_RADIUS_METERS + config.size.y / 2),
-    rotation: rotationWithUp(prop.direction),
+    rotation: propRotation(prop),
     scale: Vector3.create(config.size.x, config.size.y, config.size.z)
   })
   MeshRenderer.setBox(entity)
@@ -257,7 +269,13 @@ function receiveProps(messages: PlanetPropMessage[]): void {
     if (!isKind(message.kind)) continue
     const direction = Vector3.create(message.x, message.y, message.z)
     if (Vector3.lengthSquared(direction) < 1e-8) continue
-    props.push({ id: message.id, kind: message.kind, direction: Vector3.normalize(direction) })
+    const facing = Vector3.create(message.fx, message.fy, message.fz)
+    props.push({
+      id: message.id,
+      kind: message.kind,
+      direction: Vector3.normalize(direction),
+      facing: Vector3.lengthSquared(facing) < 1e-8 ? null : Vector3.normalize(facing)
+    })
   }
   pendingProps = props
 }

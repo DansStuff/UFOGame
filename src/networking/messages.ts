@@ -57,7 +57,11 @@ export const Messages = {
         kind: Schemas.String,
         x: Schemas.Float,
         y: Schemas.Float,
-        z: Schemas.Float
+        z: Schemas.Float,
+        /** Planet-local direction the model's front (+Z) points along the surface. Zero for no set facing. */
+        fx: Schemas.Float,
+        fy: Schemas.Float,
+        fz: Schemas.Float
       })
     )
   }),

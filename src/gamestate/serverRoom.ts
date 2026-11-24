@@ -48,7 +48,17 @@ export function notifyProbed(probedAt: number): void {
   room.send('notifyProbed', { probedAt })
 }
 
-export type PlanetPropPayload = { id: number; kind: string; x: number; y: number; z: number }
+export type PlanetPropPayload = {
+  id: number
+  kind: string
+  x: number
+  y: number
+  z: number
+  /** Facing direction; zero for no set facing. */
+  fx: number
+  fy: number
+  fz: number
+}
 
 export function notifyPlanetProps(props: PlanetPropPayload[], to: string): void {
   room.send('notifyPlanetProps', { sentAt: Date.now(), props }, { to: [to] })

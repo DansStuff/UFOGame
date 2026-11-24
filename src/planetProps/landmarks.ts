@@ -8,7 +8,7 @@ import { Vector3 } from '@dcl/sdk/math'
 import { EntityNames } from '../../assets/scene/entity-names'
 import { findNamed, findPlanet } from '../abduction/sceneLookup'
 import { getGameState } from '../gamestate'
-import { clearArea, directionAtAngleAndBearing, type ClearArea } from '../sphere/geometry'
+import { clearArea, directionAtAngleAndBearing, tangentToward, type ClearArea } from '../sphere/geometry'
 import { shipPlanetDirection } from '../surfaceZones/geometry'
 import { PLANET_PROPS, type PlanetPropKind } from './constants'
 
@@ -30,17 +30,23 @@ export function shipSpawnDirection(): Vector3 {
   return spawnDirection
 }
 
-export type Landmark = { kind: PlanetPropKind; direction: Vector3 }
+export type Landmark = {
+  kind: PlanetPropKind
+  direction: Vector3
+  /** Planet-local direction along the surface the model's front points. Null for no set facing. */
+  facing: Vector3 | null
+}
 
-/** Every `fixed` prop with its planet-local direction, in `PLANET_PROPS` order. */
+/** Every `fixed` prop with its planet-local direction and facing, in `PLANET_PROPS` order. */
 export function landmarks(): Landmark[] {
   const spawn = shipSpawnDirection()
   const out: Landmark[] = []
   for (const kind of FIXED_KINDS) {
     const placement = PLANET_PROPS[kind].fixed
-    if (placement) {
-      out.push({ kind, direction: directionAtAngleAndBearing(spawn, placement.fromSpawnDegrees, placement.bearingDegrees) })
-    }
+    if (!placement) continue
+    const direction = directionAtAngleAndBearing(spawn, placement.fromSpawnDegrees, placement.bearingDegrees)
+    const facing = placement.faceSpawn ? tangentToward(direction, spawn) : null
+    out.push({ kind, direction, facing })
   }
   return out
 }

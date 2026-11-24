@@ -16,6 +16,8 @@ export type PlanetPropKind = 'cornField' | 'newsstand' | 'roswellSign' | 'area51
 export type PlanetPropFixedPlacement = {
   fromSpawnDegrees: number
   bearingDegrees: number
+  /** Turn the model's front (+Z in the GLB, −Y in Blender) toward the spawn point along the surface. */
+  faceSpawn?: boolean
 }
 
 export type PlanetPropConfig = {
@@ -78,7 +80,7 @@ export const PLANET_PROPS: Record<PlanetPropKind, PlanetPropConfig> = {
   // Landmarks: no gameplay yet, the server only logs when the ship flies over them.
   roswellSign: {
     count: 1,
-    fixed: { fromSpawnDegrees: 90, bearingDegrees: 0 },
+    fixed: { fromSpawnDegrees: 90, bearingDegrees: 0, faceSpawn: true },
     clearDegrees: 12,
     zoneRadiusDegrees: 15,
     cooldownSeconds: 0,
@@ -91,7 +93,7 @@ export const PLANET_PROPS: Record<PlanetPropKind, PlanetPropConfig> = {
   area51Sign: {
     count: 1,
     // Opposite side of the planet from the Roswell sign.
-    fixed: { fromSpawnDegrees: 90, bearingDegrees: 180 },
+    fixed: { fromSpawnDegrees: 90, bearingDegrees: 180, faceSpawn: true },
     clearDegrees: 12,
     zoneRadiusDegrees: 15,
     cooldownSeconds: 0,

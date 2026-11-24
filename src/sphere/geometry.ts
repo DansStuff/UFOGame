@@ -66,6 +66,26 @@ export function rotationWithUp(outward: Vector3): Quaternion {
   return Quaternion.lookRotation(forward, outward)
 }
 
+/**
+ * Local +Y along `outward` and local +Z (a model's front) pointing along the surface toward
+ * `toward`. Falls back to `rotationWithUp` when `toward` is straight up or down from there.
+ */
+export function rotationWithUpFacing(outward: Vector3, toward: Vector3): Quaternion {
+  const forward = tangentToward(outward, toward)
+  if (forward === null) return rotationWithUp(outward)
+  return Quaternion.lookRotation(forward, outward)
+}
+
+/**
+ * Unit direction along the surface at `from` that heads toward `to`: `to` with its
+ * component along `from` removed. Null when `to` is straight up or down from `from`.
+ */
+export function tangentToward(from: Vector3, to: Vector3): Vector3 | null {
+  const along = Vector3.subtract(to, Vector3.scale(from, Vector3.dot(to, from)))
+  if (Vector3.lengthSquared(along) < 1e-8) return null
+  return Vector3.normalize(along)
+}
+
 /** Unit quaternions invert by conjugation. */
 export function invertQuaternion(rotation: Quaternion): Quaternion {
   const normalized = Quaternion.normalize(rotation)

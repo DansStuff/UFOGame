@@ -15,7 +15,17 @@ export function setOnProbeAccepted(handler: () => void): void {
   onProbeAccepted = handler
 }
 
-export type PlanetPropMessage = { id: number; kind: string; x: number; y: number; z: number }
+export type PlanetPropMessage = {
+  id: number
+  kind: string
+  x: number
+  y: number
+  z: number
+  /** Facing direction; zero for no set facing. */
+  fx: number
+  fy: number
+  fz: number
+}
 
 /** Client-only reaction to the prop layout. */
 let onPlanetProps: ((props: PlanetPropMessage[]) => void) | null = null
