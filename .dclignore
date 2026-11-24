@@ -22,3 +22,6 @@ src
 blender
 references
 tools
+# Editor and agent files, never part of the deployed scene
+cursor.config
+cursorignore
