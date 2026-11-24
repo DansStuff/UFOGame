@@ -50,6 +50,9 @@ export const NEWSSTAND_MODEL_SCALE = 2
 /** Corn field size multiplier. At 2.5 it is about 7 m wide and 7.4 m tall. */
 export const CORN_FIELD_MODEL_SCALE = 2.5
 
+/** Landmark sign size multiplier. At 1.5 Roswell is about 20 x 21 m and 9.9 m tall, Area 51 about 23 x 24 m and 8.3 m tall. */
+export const LANDMARK_MODEL_SCALE = 1.5
+
 export const PLANET_PROPS: Record<PlanetPropKind, PlanetPropConfig> = {
   cornField: {
     count: 15,
@@ -84,8 +87,9 @@ export const PLANET_PROPS: Record<PlanetPropKind, PlanetPropConfig> = {
     clearDegrees: 12,
     zoneRadiusDegrees: 15,
     cooldownSeconds: 0,
-    // About 13.3 m wide, 14 m deep and 6.6 m tall. Source: blender/mcp_models.blend, RoswellSign collection.
+    // About 13.3 m wide, 14 m deep and 6.6 m tall in the file. Source: blender/mcp_models.blend, RoswellSign collection.
     model: 'assets/scene/Models/PlanetProps/roswellSign.glb',
+    modelScale: LANDMARK_MODEL_SCALE,
     size: { x: 13, y: 6.6, z: 14 },
     color: Color4.create(0.55, 0.38, 0.26, 1),
     depletedColor: Color4.create(0.55, 0.38, 0.26, 1)
@@ -97,9 +101,10 @@ export const PLANET_PROPS: Record<PlanetPropKind, PlanetPropConfig> = {
     clearDegrees: 12,
     zoneRadiusDegrees: 15,
     cooldownSeconds: 0,
-    // About 15.2 m wide, 16 m deep and 5.5 m tall. Source: blender/mcp_models.blend, Area51Sign collection
+    // About 15.2 m wide, 16 m deep and 5.5 m tall in the file. Source: blender/mcp_models.blend, Area51Sign collection
     // (the A51_Hangar child collection is not part of it).
     model: 'assets/scene/Models/PlanetProps/area51Sign.glb',
+    modelScale: LANDMARK_MODEL_SCALE,
     size: { x: 15, y: 5.5, z: 16 },
     color: Color4.create(0.62, 0.6, 0.56, 1),
     depletedColor: Color4.create(0.62, 0.6, 0.56, 1)
