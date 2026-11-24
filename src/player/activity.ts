@@ -35,6 +35,7 @@ import {
 import { notifyActivityRecall } from '../gamestate/serverRoom'
 import { reportActivity } from '../networking/client'
 import { room } from '../networking/messages'
+import { describeServerPlayers, setupServerRoster } from './serverRoster'
 
 const ACTIVITY_INPUTS = [
   InputAction.IA_POINTER,
@@ -183,7 +184,7 @@ function ActivityServerSystem(): void {
     if (!position) continue
     recalledPlayers.add(playerAddress)
     notifyActivityRecall(now, playerAddress, position)
-    console.log(`[SERVER] Recalled inactive player ${playerAddress}`)
+    console.log(`[SERVER] Recalled inactive player ${playerAddress}; roster: ${describeServerPlayers()}`)
   }
 }
 
@@ -194,16 +195,19 @@ export function setupActivity(): void {
   lastActivityAtByPlayer.clear()
   joinedAtByPlayer.clear()
   recalledPlayers.clear()
+  setupServerRoster()
 
   if (isServer()) {
     onEnterScene((player) => {
       if (!player?.userId) return
       if (joinedAtByPlayer.has(player.userId)) return
       joinedAtByPlayer.set(player.userId, Date.now())
+      console.log(`[SERVER] Player entered: ${player.userId}; roster: ${describeServerPlayers()}`)
     })
     onLeaveScene((userId) => {
       if (!userId) return
       forgetPlayer(userId)
+      console.log(`[SERVER] Player left: ${userId}; roster: ${describeServerPlayers()}`)
     })
     engine.addSystem(ActivityServerSystem)
     return

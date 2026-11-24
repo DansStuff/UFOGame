@@ -3,7 +3,7 @@
  * `weight` in players standing at its spot (see `normalizedShipSpeed` in `ship/motion.ts`).
  *
  * Server: `addCargo` places an item at a random deck spot near the rim,
- * `removeCargo` takes it off when a nearby player asks. The list is synced in `CargoState`.
+ * `removeCargo` takes it off when a player asks. The list is synced in `CargoState`.
  * An item weighs on steering once its arrival has had time to play.
  * Client: mirrors the synced list as models parented to the ship. Items that arrive
  * after this client's first look ride the beam up and are spat onto the deck
@@ -16,7 +16,6 @@ import {
   Entity,
   GltfContainer,
   InputAction,
-  PlayerIdentityData,
   pointerEventsSystem,
   Transform
 } from '@dcl/sdk/ecs'
@@ -26,7 +25,6 @@ import { EntityNames } from '../../assets/scene/entity-names'
 import { findNamed } from '../abduction/sceneLookup'
 import { requestRemoveCargo } from '../networking/client'
 import { playSfx } from '../sfx'
-import { SHIP_CENTER_X, SHIP_CENTER_Z } from '../ship/constants'
 import { createTutorialArrow, removeTutorialArrow } from '../tutorialArrow'
 import { CargoArrivalSystem, cancelArrival, isArriving, resetArrivals, startArrival } from './arrival'
 import {
@@ -37,7 +35,6 @@ import {
   CARGO_PLACEMENT_ATTEMPTS,
   CARGO_REMOVE_PROXIMITY_METERS,
   CARGO_REMOVE_REQUEST_COOLDOWN_SECONDS,
-  CARGO_REMOVE_SERVER_MAX_DISTANCE_METERS,
   type CargoKind
 } from './constants'
 import { createCargoState, getCargoItems, hasCargoState, resetCargoState, writeCargoItems, type CargoItem } from './state'
@@ -79,27 +76,14 @@ export function addCargo(kind: CargoKind): CargoItem {
   return item
 }
 
-/** Flat distance on the deck from a player to an item, or null when the player is not in the scene. */
-function playerDistanceToItem(playerAddress: string, item: CargoItem): number | null {
-  for (const [, identity, transform] of engine.getEntitiesWith(PlayerIdentityData, Transform)) {
-    if (identity.address.toLowerCase() !== playerAddress.toLowerCase()) continue
-    const dx = transform.position.x - (SHIP_CENTER_X + item.x)
-    const dz = transform.position.z - (SHIP_CENTER_Z + item.z)
-    return Math.hypot(dx, dz)
-  }
-  return null
-}
-
 /**
- * Server-only. Removes the item when it is still on the deck and the player is near it.
+ * Server-only. Removes the item when it is still on the deck. Any player may remove any item:
+ * the proximity prompt already limits who can press it.
  * Returns true when it was removed.
  */
-export function removeCargo(playerAddress: string, cargoId: number): boolean {
+export function removeCargo(cargoId: number): boolean {
   const items = getCargoItems()
-  const item = items.find((candidate) => candidate.id === cargoId)
-  if (!item) return false
-  const distance = playerDistanceToItem(playerAddress, item)
-  if (distance === null || distance > CARGO_REMOVE_SERVER_MAX_DISTANCE_METERS) return false
+  if (!items.some((candidate) => candidate.id === cargoId)) return false
   writeCargoItems(items.filter((candidate) => candidate.id !== cargoId))
   return true
 }

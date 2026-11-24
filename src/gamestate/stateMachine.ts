@@ -7,6 +7,7 @@ import { isServer } from '@dcl/sdk/network'
 import { noteActivity } from '../player/activity'
 import { replaceAbductable } from '../abduction'
 import { removeCargo } from '../cargo'
+import { describeServerPlayer } from '../player/serverRoster'
 import { publishPlanetProps } from '../planetProps'
 import {
   applyAbductableSampleTaken,
@@ -143,10 +144,12 @@ export function setupStateMachine(): void {
       console.log(`[SERVER] Activity reported by ${from}`)
     },
     onRemoveCargo: (from, cargoId) => {
-      if (removeCargo(from, cargoId)) {
-        console.log(`[SERVER] Cargo ${cargoId} removed by ${from}`)
+      // Diagnostic: where the server sees the player, to catch a frozen or duplicate player entity.
+      const seen = describeServerPlayer(from)
+      if (removeCargo(cargoId)) {
+        console.log(`[SERVER] Cargo ${cargoId} removed by ${from}; server sees ${seen}`)
       } else {
-        console.log(`[SERVER] Ignored cargo ${cargoId} removal from ${from}`)
+        console.log(`[SERVER] Ignored cargo ${cargoId} removal from ${from}: not on the deck; server sees ${seen}`)
       }
     }
   })

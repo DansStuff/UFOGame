@@ -68,8 +68,6 @@ export const CARGO_PLACEMENT_ATTEMPTS = 30
 
 /** Proximity range for removing cargo. The Explorer clamps proximity at about 3 m. */
 export const CARGO_REMOVE_PROXIMITY_METERS = 3
-/** The server accepts a removal from a player within this many meters, measured flat on the deck. */
-export const CARGO_REMOVE_SERVER_MAX_DISTANCE_METERS = 8
 /** Minimum time between removal requests from one client. */
 export const CARGO_REMOVE_REQUEST_COOLDOWN_SECONDS = 0.5
 
