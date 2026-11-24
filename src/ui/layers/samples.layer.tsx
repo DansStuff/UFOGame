@@ -2,15 +2,9 @@ import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 import { Label, Layer, ZoneType, getTheme } from '@stom66/dcl-ui-component-kit'
 import { SAMPLES_HUD_HEIGHT, SAMPLES_HUD_TOP, SAMPLES_HUD_WIDTH } from '../constants'
 
-/**
- * Live values written by src/ui/behaviors.ts. The bar spans the whole screen in
- * inset coordinates so the pill sits on the true screen center, not the inset center.
- * Rest size is a 1920-wide desktop canvas with no inset.
- */
+/** Live values written by src/ui/behaviors.ts. */
 export const samplesHudState = {
-  samplesCollected: 0,
-  barLeft: 0,
-  barWidth: 1920
+  samplesCollected: 0
 }
 
 // MARK: SamplesHudLayer
@@ -26,10 +20,10 @@ class SamplesHudLayer extends Layer {
       <UiEntity
         key="samples_bar"
         uiTransform={{
-          width: samplesHudState.barWidth,
+          width: '100%',
           height: SAMPLES_HUD_HEIGHT,
           positionType: 'absolute',
-          position: { top: SAMPLES_HUD_TOP, left: samplesHudState.barLeft },
+          position: { top: SAMPLES_HUD_TOP, left: 0 },
           justifyContent: 'center',
           alignItems: 'center',
           pointerFilter: 'none'

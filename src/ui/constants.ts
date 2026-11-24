@@ -79,7 +79,7 @@ export const TUTORIAL_PAGES: TutorialPage[] = [
       { src: 'assets/images/tutorial/TutRight.png', xmirror: true }
     ],
     sequence: [0, 1, 2, 3],
-    fps: 2,
+    fps: 1.25,
     aspect: 4 / 3
   },
   { frames: ['assets/images/tutorial/02.png'] },
